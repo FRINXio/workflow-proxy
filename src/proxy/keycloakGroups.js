@@ -1,6 +1,6 @@
 // @flow
 
-import kClient from "keycloak-client";
+import kClient from "@fbc-hub/keycloak-client";
 
 const RETRY_TIME = 5 * 1000; // 5 seconds
 

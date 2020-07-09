@@ -7,10 +7,6 @@ WORKDIR /app
 
 COPY workflow-proxy/ /app/workflow-proxy
 
-# "keycloak-client" is a local module dependency of workflow-proxy
-COPY keycloak-client /app/keycloak-client
-
-
 # Start app
 WORKDIR /app/workflow-proxy
 RUN yarn install
