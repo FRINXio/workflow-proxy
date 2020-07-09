@@ -52,7 +52,7 @@ function sanitizeScheduleBefore(
 
 /*
 curl http://localhost/proxy/schedule \
-  -H "X-Auth-Organization: fb-test" \
+  -H "x-tenant-id: fb-test" \
   -H 'Content-Type: application/json'
 */
 const getAllBefore: BeforeFun = (tenantId, groups, req, res, proxyCallback) => {
@@ -96,7 +96,7 @@ const getAllAfter: AfterFun = (tenantId, groups, req, respObj) => {
 
 /*
 curl http://localhost/proxy/schedule/workflow1 \
-  -H "X-Auth-Organization: fb-test" \
+  -H "x-tenant-id: fb-test" \
   -H 'Content-Type: application/json'
 */
 const getBefore: BeforeFun = (tenantId, groups, req, res, proxyCallback) => {
@@ -111,7 +111,7 @@ const getAfter: AfterFun = (tenantId, req, respObj) => {
 
 /*
 curl -X POST http://localhost/proxy/schedule \
-  -H "X-Auth-Organization: fb-test" \
+  -H "x-tenant-id: fb-test" \
   -H 'Content-Type: application/json' \
   -d '
   {
@@ -140,7 +140,7 @@ const postBefore: BeforeFun = (tenantId, groups, req, res, proxyCallback) => {
 
 /*
 curl -X PUT http://localhost/proxy/schedule/workflow1 \
-  -H "X-Auth-Organization: fb-test" \
+  -H "x-tenant-id: fb-test" \
   -H 'Content-Type: application/json' \
   -d '
   {
@@ -180,7 +180,7 @@ const putBefore: BeforeFun = (tenantId, groups, req, res, proxyCallback) => {
 
 /*
 curl -X DELETE \
-  -H "X-Auth-Organization: fb-test" \
+  -H "x-tenant-id: fb-test" \
   -H 'Content-Type: application/json' \
   http://localhost/proxy/schedule/workflow1
 */

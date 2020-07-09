@@ -12,8 +12,8 @@
 import ExpressApplication from 'express';
 import proxy from './proxy/proxy';
 import workflowRouter from './routes';
-import {getUserGroups, getUserRole} from './proxy/utils.js';
-import {groupsForUser} from './proxy/graphqlGroups';
+import {getUserRole, getUserGroups} from './proxy/utils.js';
+import {groupsForUser, rolesForUser} from './proxy/keycloakGroups';
 
 import bulk from './proxy/transformers/bulk';
 import event from './proxy/transformers/event';
@@ -30,10 +30,12 @@ import type {$Application, ExpressRequest, ExpressResponse} from 'express';
 
 const app = ExpressApplication();
 
+// TODO make configurable
 const OWNER_ROLE = 'OWNER';
 const NETWORK_ADMIN_GROUP = 'network-admin';
-const adminAccess = (role, groups) => {
-  return role === OWNER_ROLE || groups.includes(NETWORK_ADMIN_GROUP);
+
+const adminAccess = (roles, groups) => {
+  return roles.includes(OWNER_ROLE) || groups.includes(NETWORK_ADMIN_GROUP);
 };
 
 const generalAccess = (_role, _groups) => {
@@ -60,6 +62,7 @@ async function init() {
     ],
     adminAccess,
     groupsForUser,
+    rolesForUser,
   );
 
   app.use('/', await workflowRouter('http://localhost/proxy/', true));
@@ -73,12 +76,13 @@ async function init() {
   rbacConductorRouter.get(
     '/editableworkflows',
     async (req: ExpressRequest, res, _) => {
+      const role = await getUserRole(req, rolesForUser)
       res
         .status(200)
         .send(
           adminAccess(
-            getUserRole(req),
-            await getUserGroups(req, groupsForUser),
+            role,
+            await getUserGroups(req, role, groupsForUser),
           ),
         );
     },
@@ -100,7 +104,7 @@ async function init() {
 
   app.use('/rbac', rbacConductorRouter);
   app.use('/rbac_proxy', rbacRouter);
-  app.listen(80);
+  app.listen(8099);
 }
 
 init();

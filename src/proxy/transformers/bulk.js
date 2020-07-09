@@ -22,12 +22,12 @@ import type {BeforeFun, TransformerRegistrationFun} from '../../types';
 // used to get all metadata in a single request. If there are no
 // validation issues, request is passed to the proxy target.
 /*
-curl  -H "x-auth-organization: fb-test" \
+curl  -H "x-tenant-id: fb-test" \
     "localhost/proxy/api/workflow/bulk/restart" -v -X POST \
     -H "Content-Type: application/json" \
     -d '["381f879d-3225-4605-b1c4-91e1c00f8ab9"]'
 
-curl  -H "x-auth-organization: fb-test" \
+curl  -H "x-tenant-id: fb-test" \
     "localhost/proxy/api/workflow/bulk/terminate" -v -X DELETE \
     -H "Content-Type: application/json" \
     -d '["7d40eb5f-6a0d-438d-a35c-3b2111e2744b"]'

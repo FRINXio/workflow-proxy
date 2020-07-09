@@ -10,9 +10,7 @@
 module.exports = {
   collectCoverageFrom: [
     '**/*.js',
-    '!**/__mocks__/**',
     '!**/__tests__/**',
-    '!**/thrift/gen-nodejs/**',
     '!**/node_modules/**',
   ],
 
@@ -23,28 +21,12 @@ module.exports = {
       name: 'server',
       testEnvironment: 'node',
       testMatch: [
-        '<rootDir>/__tests__/*.js',
-      ],
-      transform: {
-        '^.+\\.js$': 'babel-jest',
-      },
-    },
-    {
-      moduleNameMapper: {
-        '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
-          '<rootDir>/__mocks__/fileMock.js',
-        '\\.(css|less)$': 'identity-obj-proxy',
-      },
-      name: 'app',
-      testEnvironment: 'jsdom',
-      testMatch: [
-        '<rootDir>/**/__tests__/*.js',
+        '<rootDir>/src/**/__tests__/*.js',
       ],
       transform: {
         '^.+\\.js$': 'babel-jest',
       },
     },
   ],
-  testEnvironment: 'jsdom',
   testPathIgnorePatterns: ['/node_modules/'],
 };

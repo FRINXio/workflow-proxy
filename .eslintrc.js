@@ -10,71 +10,22 @@
 // enforces copyright header to be present in every file
 // eslint-disable-next-line max-len
 
-module.exports.extends = ['eslint-config-fbcnms'];
-module.exports.overrides = [
-  {
-    env: {
-      node: true,
-    },
-    files: ['*'],
-    rules: {
-      'prettier/prettier': [
-        2,
-        {
-          singleQuote: true,
-          trailingComma: 'all',
-          bracketSpacing: false,
-          jsxBracketSameLine: true,
-          parser: 'flow',
-        },
-      ],
-    },
+module.exports = {
+  extends: ["eslint:recommended", "prettier"],
+  env: {
+    es6: true,
+    node: true,
   },
-  {
-    files: ['.eslintrc.js'],
-    rules: {
-      quotes: ['warn', 'single'],
-    },
+  parser: "babel-eslint",
+  parserOptions: {
+    sourceType: "module",
   },
-  {
-    env: {
-      jest: true,
-      node: true,
-    },
-    files: [
-      '**/__mocks__/**/*.js',
-      '**/__tests__/**/*.js',
-      '**/tests/*.js',
-      'testHelpers.js',
-      'testData.js',
-    ],
-  },
-  {
-    env: {
-      node: true,
-    },
-    files: [
-      '.eslintrc.js',
-      'babel.config.js',
-      'jest.config.js',
-      'jest.*.config.js',
-      'src/**/*.js'
-    ],
-    rules: {
-      'no-console': 'off',
-    },
-  },
-  {
-    files: ['**/tgnms/**/*.js'],
-    rules: {
-      // tgnms doesn't want this because there's too many errors
-      'flowtype/no-weak-types': 'off',
-      'flowtype/require-valid-file-annotation': 'off',
-    },
-  },
-];
-module.exports.settings = {
-  react: {
-    version: 'detect',
+  rules: {
+    // we want to force semicolons
+    semi: ["error", "always"],
+    // we use 2 spaces to indent our code
+    indent: ["error", 2],
+    // we want to avoid useless spaces
+    "no-multi-spaces": ["error"],
   },
 };

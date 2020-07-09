@@ -17,6 +17,7 @@ import type {
   AuthorizationCheck,
   ExpressRouter,
   GroupLoadingStrategy,
+  RoleLoadingStrategy,
   ProxyCallback,
   ProxyNext,
   ProxyRequest,
@@ -30,6 +31,7 @@ export default async function(
   transformFx: Array<TransformerRegistrationFun>,
   authorizationCheck: AuthorizationCheck,
   groupLoadingStrategy: GroupLoadingStrategy,
+  roleLoadingStrategy: RoleLoadingStrategy,
 ) {
   const router = Router<ProxyRequest, ProxyResponse>();
   router.use(bodyParser.urlencoded({extended: false}));
@@ -55,8 +57,8 @@ export default async function(
 
     proxy.on('proxyRes', async function(proxyRes, req, res) {
       const tenantId = getTenantId(req);
-      const role = getUserRole(req);
-      const groups = await getUserGroups(req, groupLoadingStrategy);
+      const role = await getUserRole(req, roleLoadingStrategy);
+      const groups = await getUserGroups(req, role, groupLoadingStrategy);
 
       if (!authorizationCheck(role, groups)) {
         res.status(401);
@@ -106,10 +108,12 @@ export default async function(
       entry.url,
       async (req: ProxyRequest, res: ProxyResponse, next: ProxyNext) => {
         let tenantId: string;
+        let role: string;
         let groups: string[];
         try {
           tenantId = getTenantId(req);
-          groups = await getUserGroups(req, groupLoadingStrategy);
+          role = await getUserRole(req, roleLoadingStrategy);
+          groups = await getUserGroups(req, role, groupLoadingStrategy);
         } catch (err) {
           res.status(400);
           res.send('Cannot get tenantId:' + err);

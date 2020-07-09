@@ -21,7 +21,7 @@ import type {AfterFun} from '../../types';
 import type {BeforeFun, Event, TransformerRegistrationFun} from '../../types';
 
 /*
-curl -H "x-auth-organization: fb-test" \
+curl -H "x-tenant-id: fb-test" \
  "localhost/proxy/api/event" -X PUT -H 'Content-Type: application/json' -d '
 {
     "actions": [

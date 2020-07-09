@@ -13,8 +13,8 @@
           "contentType": "application/json",
           "accept": "application/json",
           "headers": {
-            "x-auth-user-email": "fbuser@fb.com",
-            "x-auth-organization": "fb-test"
+            "From": "fbuser@fb.com",
+            "x-tenant-id": "fb-test"
           },
           "connectionTimeOut": "3600",
           "readTimeOut": "3600",

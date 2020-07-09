@@ -13,6 +13,7 @@ import {JSONPath} from 'jsonpath-plus';
 
 import type {
   GroupLoadingStrategy,
+  RoleLoadingStrategy,
   ProxyRequest,
   Task,
   Workflow,
@@ -158,10 +159,10 @@ export function assertValueIsWithoutInfixSeparator(value: string): void {
 }
 
 export function getTenantId(req: ExpressRequest): string {
-  const tenantId: ?string = req.headers['x-auth-organization'];
+  const tenantId: ?string = req.headers['x-tenant-id'];
   if (tenantId == null) {
-    console.error('x-auth-organization header not found');
-    throw 'x-auth-organization header not found';
+    console.error('x-tenant-id header not found');
+    throw 'x-tenant-id header not found';
   }
   if (tenantId == GLOBAL_PREFIX) {
     console.error(`Illegal name for TenantId: '${tenantId}'`);
@@ -170,32 +171,34 @@ export function getTenantId(req: ExpressRequest): string {
   return tenantId;
 }
 
-export function getUserRole(req: ExpressRequest): string {
-  const role: ?string = req.headers['x-auth-user-role'];
-  if (role == null) {
-    console.error('x-auth-user-role header not found');
-    throw 'x-auth-user-role header not found';
-  }
-  return role;
-}
-
 export function getUserEmail(req: ExpressRequest): string {
-  const userEmail: ?string = req.headers['x-auth-user-email'];
+  const userEmail: ?string = req.headers['from'];
   if (userEmail == null) {
-    console.error('x-auth-user-email header not found');
-    throw 'x-auth-user-email header not found';
+    console.error('"from" header not found');
+    throw '"from" header not found';
   }
   return userEmail;
 }
 
+export function getUserRole(
+  req: ExpressRequest,
+  roleLoadingStrategy: RoleLoadingStrategy,
+): Promise<string> {
+  return roleLoadingStrategy(
+    getTenantId(req),
+    getUserEmail(req),
+  );
+}
+
 export async function getUserGroups(
   req: ExpressRequest,
+  role: string,
   groupLoadingStrategy: GroupLoadingStrategy,
 ): Promise<string[]> {
   return groupLoadingStrategy(
     getTenantId(req),
     getUserEmail(req),
-    getUserRole(req),
+    role,
   );
 }
 

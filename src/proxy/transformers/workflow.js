@@ -28,7 +28,7 @@ import type {
 
 // Search for workflows based on payload and other parameters
 /*
- curl -H "x-auth-organization: fb-test" \
+ curl -H "x-tenant-id: fb-test" \
   "localhost/proxy/api/workflow/search?query=status+IN+(FAILED)"
 */
 export const getSearchBefore: BeforeFun = (
@@ -74,7 +74,7 @@ export function updateQuery(
 // Start a new workflow with StartWorkflowRequest, which allows task to be
 // executed in a domain
 /*
-curl -X POST -H "x-auth-organization: fb-test" -H \
+curl -X POST -H "x-tenant-id: fb-test" -H \
 "Content-Type: application/json" "localhost/proxy/api/workflow" -d '
 {
   "name": "fx3",
@@ -124,7 +124,7 @@ export const postWorkflowBefore: BeforeFun = (
 
 // Gets the workflow by workflow id
 /*
-curl  -H "x-auth-organization: fb-test" \
+curl  -H "x-tenant-id: fb-test" \
     "localhost/proxy/api/workflow/c0a438d4-25b7-4c12-8a29-3473d98b1ad7"
 */
 export const getExecutionStatusAfter: AfterFun = (
@@ -155,7 +155,7 @@ export const getExecutionStatusAfter: AfterFun = (
 
 // Removes the workflow from the system
 /*
-curl  -H "x-auth-organization: fb-test" \
+curl  -H "x-tenant-id: fb-test" \
     "localhost/proxy/api/workflow/2dbb6e3e-c45d-464b-a9c9-2bbb16b7ca71/remove" \
     -X DELETE
 */

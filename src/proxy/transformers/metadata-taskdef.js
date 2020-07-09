@@ -29,7 +29,7 @@ import type {
 
 // Gets all task definition
 /*
-curl  -H "x-auth-organization: fb-test" "localhost/proxy/api/metadata/taskdefs"
+curl  -H "x-tenant-id: fb-test" "localhost/proxy/api/metadata/taskdefs"
 */
 const getAllTaskdefsAfter: AfterFun = (tenantId, groups, req, respObj) => {
   const tasks = anythingTo<Array<Task>>(respObj);
@@ -61,7 +61,7 @@ function sanitizeTaskdefBefore(tenantId: string, taskdef: Task): void {
 // Create new task definition(s)
 // Underscore in name is not allowed.
 /*
-curl -X POST -H "x-auth-organization: fb-test"  \
+curl -X POST -H "x-tenant-id: fb-test"  \
  "localhost/proxy/api/metadata/taskdefs" \
  -H 'Content-Type: application/json' -d '
 [
@@ -103,7 +103,7 @@ const postTaskdefsBefore: BeforeFun = (
 // Update an existing task
 // Underscore in name is not allowed.
 /*
-curl -X PUT -H "x-auth-organization: fb-test" \
+curl -X PUT -H "x-tenant-id: fb-test" \
  "localhost/proxy/api/metadata/taskdefs" \
  -H 'Content-Type: application/json' -d '
     {
@@ -138,7 +138,7 @@ const putTaskdefBefore: BeforeFun = (
 };
 
 /*
-curl -H "x-auth-organization: fb-test" \
+curl -H "x-tenant-id: fb-test" \
  "localhost/proxy/api/metadata/taskdefs/frinx"
 */
 // Gets the task definition
@@ -179,7 +179,7 @@ const getTaskdefByNameAfter: AfterFun = (
 // TODO: can this be disabled?
 // Remove a task definition
 /*
-curl -H "x-auth-organization: fb-test" \
+curl -H "x-tenant-id: fb-test" \
  "localhost/api/metadata/taskdefs/bar" -X DELETE -v
 */
 const deleteTaskdefByNameBefore: BeforeFun = (

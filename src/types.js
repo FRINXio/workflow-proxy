@@ -113,10 +113,15 @@ export type TaskType = {
     subWorkflowVersion: string,
   },
 };
-export type AuthorizationCheck = (role: string, groups: string[]) => boolean;
+export type AuthorizationCheck = (role: string[], groups: string[]) => boolean;
+export type RoleLoadingStrategy = (
+  tenant: string,
+  email: string,
+  sessionId: ?string,
+) => Promise<string[]>;
 export type GroupLoadingStrategy = (
   tenant: string,
   email: string,
-  role: string,
+  role: string[],
   sessionId: ?string,
 ) => Promise<string[]>;

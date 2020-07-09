@@ -196,7 +196,7 @@ function sanitizeWorkflowTaskdefAfter(
 
 // Retrieves all workflow definition along with blueprint
 /*
-curl -H "x-auth-organization: fb-test" "localhost/proxy/api/metadata/workflow"
+curl -H "x-tenant-id: fb-test" "localhost/proxy/api/metadata/workflow"
 */
 export const getAllWorkflowsAfter: AfterFun = (
   tenantId,
@@ -229,7 +229,7 @@ export const getAllWorkflowsAfter: AfterFun = (
 // with the definition.
 // Version is passed as url parameter.
 /*
-curl -H "x-auth-organization: fb-test" \
+curl -H "x-tenant-id: fb-test" \
   "localhost/proxy/api/metadata/workflow/2/2" -X DELETE
 */
 const deleteWorkflowBefore: BeforeFun = (
@@ -251,7 +251,7 @@ const deleteWorkflowBefore: BeforeFun = (
 // Retrieves workflow definition along with blueprint
 // Version is passed as query parameter.
 /*
-curl -H "x-auth-organization: fb-test" \
+curl -H "x-tenant-id: fb-test" \
   "localhost/proxy/api/metadata/workflow/fx3?version=1"
 */
 export const getWorkflowBefore: BeforeFun = (
@@ -291,7 +291,7 @@ export const getWorkflowAfter: AfterFun = (tenantId, groups, req, respObj) => {
 // Create or update workflow definition
 // Underscore in name is not allowed.
 /*
-curl -X PUT -H "x-auth-organization: fb-test" \
+curl -X PUT -H "x-tenant-id: fb-test" \
   "localhost/proxy/api/metadata/workflow" \
   -H 'Content-Type: application/json' -d '
 [
@@ -313,7 +313,7 @@ curl -X PUT -H "x-auth-organization: fb-test" \
 ]'
 
 
-curl -X PUT -H "x-auth-organization: fb-test" \
+curl -X PUT -H "x-tenant-id: fb-test" \
   "localhost/proxy/api/metadata/workflow" \
   -H 'Content-Type: application/json' -d '
 [
@@ -358,7 +358,7 @@ const putWorkflowBefore: BeforeFun = (
 // Create a new workflow definition
 // Underscore in name is not allowed.
 /*
-curl -X POST -H "x-auth-organization: fb-test" \
+curl -X POST -H "x-tenant-id: fb-test" \
   "localhost/proxy/api/metadata/workflow" \
   -H 'Content-Type: application/json' -d '
 
