@@ -5,14 +5,14 @@ EXPOSE 80
 # Create app directory
 WORKDIR /app
 
-# Copy package dependencies
-COPY package.json workflows-proxy/
+COPY workflow-proxy/ /app/workflow-proxy
 
-# Copy app source
-WORKDIR /app/workflows-proxy
-COPY . .
+# "keycloak-client" is a local module dependency of workflow-proxy
+COPY keycloak-client /app/keycloak-client
+
 
 # Start app
-CMD yarn
-CMD yarn run transpile
+WORKDIR /app/workflow-proxy
+RUN yarn install
+RUN yarn run transpile
 CMD yarn start

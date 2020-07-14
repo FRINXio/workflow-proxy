@@ -104,7 +104,7 @@ async function init() {
 
   app.use('/rbac', rbacConductorRouter);
   app.use('/rbac_proxy', rbacRouter);
-  app.listen(8099);
+  app.listen(8088);
 }
 
 init();

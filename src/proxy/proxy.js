@@ -115,6 +115,7 @@ export default async function(
           role = await getUserRole(req, roleLoadingStrategy);
           groups = await getUserGroups(req, role, groupLoadingStrategy);
         } catch (err) {
+          console.error('Cannot get tenantId', err);
           res.status(400);
           res.send('Cannot get tenantId:' + err);
           return;
