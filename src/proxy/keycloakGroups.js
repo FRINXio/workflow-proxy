@@ -54,5 +54,5 @@ export async function rolesForUser(
     // TODO cache per session
   }
 
-  return roles.map((x) => x.name)[0];
+  return roles.map((x) => x.name);
 }
