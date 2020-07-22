@@ -46,7 +46,7 @@ const SYSTEM_TASK_TYPES: Array<string> = [
   'DO_WHILE',
 ];
 
-const WHITELISTED_SIMPLE_TASKS = ['GLOBAL___js', 'GLOBAL___py'];
+const WHITELISTED_SIMPLE_TASKS = ['GLOBAL___js', 'GLOBAL___py', 'GLOBAL___HTTP_task'];
 
 export function isLabeledWithGroup(
   workflowdef: Workflow,
