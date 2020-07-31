@@ -1,0 +1,35 @@
+[
+  {
+    "name": "workflow1",
+    "description": "description - ADMIN,OWNER,TEST",
+    "tasks": [
+      {
+        "name": "task_1",
+        "taskReferenceName": "task_1",
+        "type": "SIMPLE"
+      }
+    ]
+  },
+  {
+    "name": "workflow2",
+    "description": "description - OWNER",
+    "tasks": [
+      {
+        "name": "task_1",
+        "taskReferenceName": "task_1",
+        "type": "SIMPLE"
+      }
+    ]
+  },
+  {
+    "name": "workflow3",
+    "description": "description - ADMIN",
+    "tasks": [
+      {
+        "name": "task_1",
+        "taskReferenceName": "task_1",
+        "type": "SIMPLE"
+      }
+    ]
+  }
+]

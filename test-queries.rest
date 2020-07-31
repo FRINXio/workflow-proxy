@@ -1,0 +1,102 @@
+# Can be executed with HTTP client built-in plugin in IDEA
+
+################ WORKFLOW METADATA ################
+
+### Add new workflow def - transformers/metadata-workflowdef.js
+### fb-user has to be role -> OWNER or part or group -> network-admin to access this API
+PUT http://localhost:8088/proxy/api/metadata/workflow
+Content-Type: application/json
+x-tenant-id: fb
+from: fb-user
+
+[
+  {
+    "name": "fx1",
+    "description": "accessible to admins only",
+    "ownerEmail": "foo@bar.baz",
+    "version": 1,
+    "schemaVersion": 2,
+    "tasks": [
+      {
+        "name": "bar",
+        "taskReferenceName": "barref",
+        "type": "TERMINATE",
+        "inputParameters": {
+          "terminationStatus": "FAILED"
+        }
+      }
+    ]
+  }
+]
+
+### Add new workflow def - transformers/metadata-workflowdef.js
+PUT http://localhost:8088/proxy/api/metadata/workflow
+Content-Type: application/json
+x-tenant-id: fb
+from: fb-user
+
+[
+  {
+    "name": "fx3",
+    "description": "accessible to operators and testers - OPERATOR,TEST",
+    "ownerEmail": "foo@bar.baz",
+    "version": 1,
+    "schemaVersion": 2,
+    "tasks": [
+      {
+        "name": "bar",
+        "taskReferenceName": "barref",
+        "type": "TERMINATE",
+        "inputParameters": {
+          "terminationStatus": "FAILED"
+        }
+      }
+    ]
+  }
+]
+
+### Get all workflow defs for a tenant - transformers/metadata-workflowdef.js
+GET http://localhost:8088/proxy/api/metadata/workflow
+x-tenant-id: fb
+from: fb-user
+
+### Get single workflow def for a tenant - transformers/metadata-workflowdef.js
+GET http://localhost:8088/proxy/api/metadata/workflow/fx3
+x-tenant-id: fb
+from: fb-user
+
+### Delete single workflow def for a tenant - transformers/metadata-workflowdef.js
+DELETE http://localhost:8088/proxy/api/metadata/workflow/fx3/1
+x-tenant-id: fb
+from: fb-user
+
+### RBAC: Get all workflow defs for a tenant and user- transformers/metadata-workflowdef-rbac.js
+### fb-operator has to be part or group -> OPERATOR to access this API
+GET http://localhost:8088/rbac_proxy/api/metadata/workflow
+x-tenant-id: fb
+from: fb-operator
+
+### RBAC: Get single workflow def for a tenant and user - transformers/metadata-workflowdef-rbac.js
+GET http://localhost:8088/rbac_proxy/api/metadata/workflow/fx3
+x-tenant-id: fb
+from: fb-operator
+
+### RBAC: Get single workflow def for a tenant and user (FORBIDDEN) - transformers/metadata-workflowdef-rbac.js
+GET http://localhost:8088/rbac_proxy/api/metadata/workflow/fx1
+x-tenant-id: fb
+from: fb-operator
+
+################ WORKFLOW METADATA END ################
+################ RBAC CHECK ################
+
+### Check if user has network-operator privileges
+GET http://localhost:8088/rbac/editableworkflows
+x-tenant-id: fb
+from: fb-user
+
+### Check if user has network-operator privileges
+GET http://localhost:8088/rbac/editableworkflows
+x-tenant-id: fb
+from: fb-operator
+
+################ RBAC CHECK END ################

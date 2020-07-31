@@ -76,7 +76,7 @@ async function init() {
   rbacConductorRouter.get(
     '/editableworkflows',
     async (req: ExpressRequest, res, _) => {
-      const role = await getUserRole(req, rolesForUser)
+      const role = await getUserRole(req, rolesForUser);
       res
         .status(200)
         .send(
@@ -100,6 +100,7 @@ async function init() {
     ],
     generalAccess,
     groupsForUser,
+    rolesForUser
   );
 
   app.use('/rbac', rbacConductorRouter);

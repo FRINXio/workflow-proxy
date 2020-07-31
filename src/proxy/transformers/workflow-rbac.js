@@ -71,7 +71,7 @@ export const getSearchBefore: BeforeFun = (
   // This limits the search to workflows started by current user
   const userEmail = getUserEmail(req);
   const originalQueryString = req._parsedUrl.query;
-  const limitToTenant = `correlationId = \'${userEmail}\'`;
+  const limitToTenant = `correlationId = '${userEmail}'`;
   const newQueryString = updateQuery(originalQueryString, limitToTenant);
   req._parsedUrl.query = newQueryString;
   getSearchBeforeDelegate(tenantId, groups, req, res, proxyCallback);
