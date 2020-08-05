@@ -58,13 +58,23 @@ export function isLabeledWithGroup(
 
 export function getWorkflowLabels(workflowdef: Workflow): string[] {
   const descr = workflowdef.description;
-  if (descr && descr.match(/-(,|) [A-Z].*/g)) {
-    return descr
-      .substring(descr.indexOf('-') + 1)
-      .replace(/\s/g, '')
-      .split(',');
+  try {
+    // Extract labels from description as JSON
+    let parsedDescription = JSON.parse(descr);
+    if (parsedDescription?.labels) {
+      return parsedDescription.labels;
+    }
+  } catch (e) {
+    // Fallback solution, deprecated format of storing labels
+    if (descr && descr.match(/-(,|) [A-Z].*/g)) {
+      return descr
+        .substring(descr.indexOf('-') + 1)
+        .replace(/\s/g, '')
+        .split(',');
+    }
   }
 
+  // No labels found either as json or text
   return [];
 }
 
