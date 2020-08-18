@@ -16,6 +16,9 @@ import {
   removeTenantPrefix,
   withInfixSeparator,
 } from '../utils.js';
+import {
+  getAllWorkflowsAfter as getAllWorkflowsAfterDelegate,
+} from './metadata-workflowdef.js';
 
 import type {
   AfterFun,
@@ -104,7 +107,7 @@ const getBefore: BeforeFun = (tenantId, groups, req, res, proxyCallback) => {
   req.url = '/schedule/' + withInfixSeparator(tenantId) + reqName;
   proxyCallback({target: schellarTarget});
 };
-const getAfter: AfterFun = (tenantId, req, respObj) => {
+const getAfter: AfterFun = (tenantId, groups, req, respObj) => {
   removeTenantPrefix(tenantId, respObj, '$.workflowName', false);
   removeTenantPrefix(tenantId, respObj, '$.name', false);
 };
@@ -219,6 +222,11 @@ const registration: TransformerRegistrationFun = function(ctx) {
       method: 'delete',
       url: '/schedule/:name',
       before: deleteBefore,
+    },
+    {
+      method: 'get',
+      url: '/schedule/metadata/workflow',
+      after: getAllWorkflowsAfterDelegate,
     },
   ];
 };
