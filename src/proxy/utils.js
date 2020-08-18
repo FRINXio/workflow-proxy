@@ -44,8 +44,6 @@ const SYSTEM_TASK_TYPES: Array<string> = [
   'DO_WHILE',
 ];
 
-const WHITELISTED_SIMPLE_TASKS = ['GLOBAL___js', 'GLOBAL___py', 'GLOBAL___HTTP_task'];
-
 export function isLabeledWithGroup(
   workflowdef: Workflow,
   groups: string[],
@@ -94,13 +92,14 @@ export function isForkTask(task: Task): boolean {
   return FORK === task.type;
 }
 
-function isWhitelistedSimpleTask(task: Task): boolean {
-  return task.type == 'SIMPLE' && WHITELISTED_SIMPLE_TASKS.includes(task.name);
-}
-
-// TODO: remove 'System' from name
 export function assertAllowedSystemTask(task: Task): void {
-  if (!isAllowedSystemTask(task) && !isWhitelistedSimpleTask(task)) {
+  if (task.type === 'SIMPLE') {
+    // Simple tasks (internal workers) are under our full control
+    // no need to assert
+    return;
+  }
+
+  if (!isAllowedSystemTask(task)) {
     console.error(
       `Task type is not allowed: ` + ` in '${JSON.stringify(task)}'`,
     );
