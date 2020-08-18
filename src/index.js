@@ -65,13 +65,13 @@ async function init() {
     rolesForUser,
   );
 
-  app.use('/', await workflowRouter('http://localhost:8088/proxy/', true));
+  app.use('/', await workflowRouter('http://localhost:8088/proxy/'));
   app.use('/proxy', proxyRouter);
 
   const rbacConductorRouter: $Application<
     ExpressRequest,
     ExpressResponse,
-  > = await workflowRouter('http://localhost:8088/rbac_proxy/', false);
+  > = await workflowRouter('http://localhost:8088/rbac_proxy/');
   // Expose a simple boolean endpoint to check if current user is privileged
   rbacConductorRouter.get(
     '/editableworkflows',

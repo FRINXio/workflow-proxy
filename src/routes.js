@@ -37,7 +37,6 @@ const findSchedule = (schedules, name) => {
 //TODO merge with proxy
 export default async function(
   baseURL: string,
-  addScheduleMetadata: boolean,
 ): Promise<$Application<ExpressRequest, ExpressResponse>> {
   const router = Router();
   const baseApiURL = baseURL + 'api/';
@@ -103,20 +102,6 @@ export default async function(
   router.get('/metadata/workflow', async (req: ExpressRequest, res, next) => {
     try {
       const result = await http.get(baseURLMeta + 'workflow', req);
-      // combine with schedules
-      // FIXME this should not be here, schedules must be isolated from
-      // the rest of workflow API !
-      if (addScheduleMetadata) {
-        const schedules = await http.get(baseURLSchedule, req);
-        for (const workflowDef of result) {
-          const expectedScheduleName =
-            workflowDef.name + ':' + workflowDef.version;
-          const found = findSchedule(schedules, expectedScheduleName);
-          workflowDef.hasSchedule = found != null;
-          workflowDef.expectedScheduleName = expectedScheduleName;
-        }
-      }
-
       res.status(200).send({result});
     } catch (err) {
       next(err);
@@ -576,6 +561,25 @@ export default async function(
         req,
       );
       res.status(result.statusCode).send(result.text);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.get('/schedule/metadata/workflow', async (req: ExpressRequest, res, next) => {
+    try {
+      const result = await http.get(baseURLMeta + 'workflow', req);
+      // combine with schedules
+      const schedules = await http.get(baseURLSchedule, req);
+      for (const workflowDef of result) {
+        const expectedScheduleName =
+            workflowDef.name + ':' + workflowDef.version;
+        const found = findSchedule(schedules, expectedScheduleName);
+        workflowDef.hasSchedule = found != null;
+        workflowDef.expectedScheduleName = expectedScheduleName;
+      }
+
+      res.status(200).send({result});
     } catch (err) {
       next(err);
     }
