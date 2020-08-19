@@ -13,7 +13,7 @@ import request from 'request';
 import {
   addTenantIdPrefix,
   anythingTo,
-  createProxyOptionsBuffer,
+  createProxyOptionsBuffer, getUserEmail,
   removeTenantPrefix,
   removeTenantPrefixes,
   withInfixSeparator,
@@ -116,6 +116,8 @@ export const postWorkflowBefore: BeforeFun = (
   addTenantIdPrefix(tenantId, reqObj);
   // add taskToDomain
   reqObj.taskToDomain = {};
+  // Put userEmail into correlationId
+  reqObj.correlationId = getUserEmail(req);
   //TODO: is this OK?
   reqObj.taskToDomain[tenantWithInfixSeparator + '*'] = tenantId;
   console.info(`Transformed request to ${JSON.stringify(reqObj)}`);
