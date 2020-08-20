@@ -61,6 +61,7 @@ export default async function(
       const groups = await getUserGroups(req, role, groupLoadingStrategy);
 
       if (!authorizationCheck(role, groups)) {
+        console.warn('User unauthorized to access this endpoint');
         res.status(401);
         res.send('User unauthorized to access this endpoint');
         return;
