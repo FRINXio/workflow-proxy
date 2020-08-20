@@ -105,6 +105,8 @@ async function init() {
 
   app.use('/rbac', rbacConductorRouter);
   app.use('/rbac_proxy', rbacRouter);
+  app.get("/probe/liveness", (req, res) => res.sendStatus(200));
+  app.get("/probe/readiness", (req, res) => res.sendStatus(200));
   app.listen(8088);
 }
 

@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "workflow-proxy.fullname" . }}
+  labels:
+    {{- include "workflow-proxy.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "workflow-proxy.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "workflow-proxy.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "workflow-proxy.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8088
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /probe/liveness
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /prove/readiness
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: "KEYCLOAK_HOST"
+              value: {{ .Values.env.KEYCLOAK_HOST }}
+            - name: "KEYCLOAK_ADMIN_CLIENT_ID"
+              value: {{ .Values.env.KEYCLOAK_ADMIN_CLIENT_ID }}
+            - name: "KEYCLOAK_ADMIN_CLIENT_USERNAME"
+              value: {{ .Values.env.KEYCLOAK_ADMIN_CLIENT_USERNAME }}
+            - name: "KEYCLOAK_ADMIN_CLIENT_PASSWORD"
+              value: {{ .Values.env.KEYCLOAK_ADMIN_CLIENT_PASSWORD }}
+            - name: "PROXY_TARGET"
+              value: {{ .Values.env.PROXY_TARGET }}
+            - name: "SCHELLAR_TARGET"
+              value: {{ .Values.env.SCHELLAR_TARGET }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
