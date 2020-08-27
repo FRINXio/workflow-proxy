@@ -65,7 +65,7 @@
     "test:ci": "NODE_ENV=test jest -w 1",
     "flow": "flow",
     "flow-typed-install": "flow-typed --flowVersion $(flow version --json | jq -r .semver) install --",
-    "start": "node lib/index.js",
-    "start:dev": "nodemon --inspect=0.0.0.0:9229 --exec babel-node src/index.js"
+    "start": "node --unhandled-rejections=strict lib/index.js",
+    "start:dev": "nodemon --unhandled-rejections=strict --inspect=0.0.0.0:9229 --exec babel-node src/index.js"
   }
 }
