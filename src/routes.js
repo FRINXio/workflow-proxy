@@ -531,7 +531,7 @@ export default async function(
       const result = await http.get(baseURLSchedule + req.params.name, req);
       res.status(200).send(result);
     } catch (err) {
-      console.warn('Failed to POST and PUT', {error: err});
+      console.warn('Failed to GET', {error: err});
       next(err);
     }
   });
@@ -542,13 +542,14 @@ export default async function(
       // create using POST
       const result = await http.post(baseURLSchedule, req.body, req);
       res.status(result.statusCode).send(result.text);
-    } catch (e) {
+    } catch (postError) {
       try {
         // update using PUT
         const result = await http.put(urlWithName, req.body, req);
         res.status(result.statusCode).send(result.text);
-      } catch (err) {
-        next(err);
+      } catch (putError) {
+        console.warn('Failed to POST,PUT', {postError, putError});
+        next(putError);
       }
     }
   });
