@@ -66,6 +66,6 @@
     "flow": "flow",
     "flow-typed-install": "flow-typed --flowVersion $(flow version --json | jq -r .semver) install --",
     "start": "node --unhandled-rejections=strict lib/index.js",
-    "start:dev": "nodemon --unhandled-rejections=strict --inspect=0.0.0.0:9229 --exec babel-node src/index.js"
+    "start:dev": "nodemon --exitcrash --unhandled-rejections=strict --inspect=0.0.0.0:9229 --exec babel-node src/index.js"
   }
 }
