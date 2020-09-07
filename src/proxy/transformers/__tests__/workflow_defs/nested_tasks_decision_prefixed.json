@@ -2,6 +2,7 @@
   "name": "FACEBOOK___EquipmentTypes",
   "description": "",
   "version": 1,
+  "ownerEmail": "testmail",
   "tasks": [
     {
       "name": "FACEBOOK___HTTP_REQUEST_TASK",

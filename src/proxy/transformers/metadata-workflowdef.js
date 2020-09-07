@@ -23,6 +23,7 @@ import {
   isSubworkflowTask,
   objectToValues,
   withInfixSeparator,
+  getUserEmail,
 } from '../utils.js';
 
 import type {
@@ -39,6 +40,7 @@ import type {
 export function sanitizeWorkflowdefBefore(
   tenantId: string,
   workflowdef: Workflow,
+  req: ExpressRequest,
 ) {
   // only whitelisted system tasks are allowed
   for (const task of workflowdef.tasks) {
@@ -50,6 +52,8 @@ export function sanitizeWorkflowdefBefore(
   }
   // add prefix to workflow
   addTenantIdPrefix(tenantId, workflowdef);
+  // add ownerEmail - used to fill correlationId when running periodically
+  workflowdef.ownerEmail = getUserEmail(req);
 }
 
 function sanitizeWorkflowTaskdefBefore(tenantId: string, task: Task) {
@@ -349,7 +353,7 @@ const putWorkflowBefore: BeforeFun = (
 ) => {
   const workflows: Array<Workflow> = anythingTo<Array<Workflow>>(req.body);
   for (const workflowdef of workflows) {
-    sanitizeWorkflowdefBefore(tenantId, workflowdef);
+    sanitizeWorkflowdefBefore(tenantId, workflowdef, req);
   }
   console.info(`Transformed request to ${JSON.stringify(workflows)}`);
   proxyCallback({buffer: createProxyOptionsBuffer(workflows, req)});
@@ -393,7 +397,7 @@ const postWorkflowBefore: BeforeFun = (
   proxyCallback,
 ) => {
   const workflow: Workflow = anythingTo<Workflow>(req.body);
-  sanitizeWorkflowdefBefore(tenantId, workflow);
+  sanitizeWorkflowdefBefore(tenantId, workflow, req);
   console.info(`Transformed request to ${JSON.stringify(workflow)}`);
   proxyCallback({buffer: createProxyOptionsBuffer(workflow, req)});
 };

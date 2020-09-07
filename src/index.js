@@ -25,8 +25,14 @@ import workflow from './proxy/transformers/workflow';
 
 import metadataWorkflowdefRbac from './proxy/transformers/metadata-workflowdef-rbac';
 import workflowRbac from './proxy/transformers/workflow-rbac';
+import taskProxy from './task-proxy';
+import schellarProxy from './schellar-proxy';
+
+import dotenv from "dotenv";
 
 import type {$Application, ExpressRequest, ExpressResponse} from 'express';
+
+dotenv.config();
 
 const app = ExpressApplication();
 
@@ -42,11 +48,14 @@ const generalAccess = (_role, _groups) => {
   return true;
 };
 
-async function init() {
-  const proxyTarget =
+const schellarProxyPort = process.env.SCHELLAR_PROXY_PORT ?? 8087;
+const userFacingPort = process.env.USER_FACING_PORT ?? 8088;
+const taskProxyPort = process.env.TASK_PROXY_PORT ?? 8089;
+const proxyTarget =
     process.env.PROXY_TARGET || 'http://conductor-server:8080';
-  const schellarTarget = process.env.SCHELLAR_TARGET || 'http://schellar:3000';
+const schellarTarget = process.env.SCHELLAR_TARGET || 'http://schellar:3000';
 
+async function init() {
   const proxyRouter = await proxy(
     proxyTarget,
     schellarTarget,
@@ -107,7 +116,9 @@ async function init() {
   app.use('/rbac_proxy', rbacRouter);
   app.get("/probe/liveness", (req, res) => res.sendStatus(200));
   app.get("/probe/readiness", (req, res) => res.sendStatus(200));
-  app.listen(8088);
+  app.listen(userFacingPort);
+  taskProxy.init(proxyTarget, taskProxyPort);
+  schellarProxy.init(proxyTarget, schellarProxyPort);
 }
 
 init();

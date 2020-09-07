@@ -29,10 +29,15 @@ describe('Workflow def transformers', () => {
   test.each(testCases)('%s', (_, workflowDef, workflowDefPrefixed) => {
     const workflowDefTest = JSON.parse(JSON.stringify(workflowDef));
 
-    sanitizeWorkflowdefBefore(tenant, workflowDefTest);
+    // add prefixes etc
+    const req = {headers: {from: 'testmail'}};
+    sanitizeWorkflowdefBefore(tenant, workflowDefTest, req);
     expect(workflowDefTest).toStrictEqual(workflowDefPrefixed);
 
+    // remove prefixes etc
     sanitizeWorkflowdefAfter(tenant, workflowDefTest);
+    // Only difference with original is that it should have the ownerEmail attribute
+    workflowDef.ownerEmail = "testmail";
     expect(workflowDefTest).toStrictEqual(workflowDef);
   });
 

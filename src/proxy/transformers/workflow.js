@@ -118,8 +118,7 @@ export const postWorkflowBefore: BeforeFun = (
   reqObj.taskToDomain = {};
   // Put userEmail into correlationId
   reqObj.correlationId = getUserEmail(req);
-  //TODO: is this OK?
-  reqObj.taskToDomain[tenantWithInfixSeparator + '*'] = tenantId;
+  reqObj.taskToDomain['*'] = tenantId;
   console.info(`Transformed request to ${JSON.stringify(reqObj)}`);
   proxyCallback({buffer: createProxyOptionsBuffer(reqObj, req)});
 };

@@ -178,6 +178,20 @@ export function getTenantId(req: ExpressRequest): string {
   return tenantId;
 }
 
+
+export function extractTenantId(workflowName) {
+  const idx = workflowName.indexOf(INFIX_SEPARATOR);
+  if (idx === -1) {
+    console.error(`Value '${workflowName}' must contain '${INFIX_SEPARATOR}'`);
+    throw new Error('Value must contain INFIX_SEPARATOR');
+  }
+  if (workflowName.substr(idx + 1).indexOf(INFIX_SEPARATOR) > -1) {
+    console.error(`Value '${workflowName}' must contain '${INFIX_SEPARATOR}' exactly once`);
+    throw new Error('Value must contain INFIX_SEPARATOR exactly once');
+  }
+  return workflowName.substr(0, idx);
+}
+
 export function getUserEmail(req: ExpressRequest): string {
   const userEmail: ?string = req.headers['from'];
   if (userEmail == null) {

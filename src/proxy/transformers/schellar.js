@@ -15,6 +15,7 @@ import {
   findValuesByJsonPath,
   removeTenantPrefix,
   withInfixSeparator,
+  getUserEmail,
 } from '../utils.js';
 import {
   getAllWorkflowsAfter as getAllWorkflowsAfterDelegate,
@@ -34,6 +35,7 @@ let schellarTarget: string;
 function sanitizeScheduleBefore(
   tenantId: string,
   schedule: ScheduleRequest,
+  req: ExpressRequest,
 ): void {
   const expectedName =
     schedule.workflowName + versionSeparator + schedule.workflowVersion;
@@ -47,10 +49,18 @@ function sanitizeScheduleBefore(
     throw 'Cannot create schedule with name containing "/" character';
   }
 
-  // add tenantId to name
+  // add tenantId to name - name is in form workflowName:version
   addTenantIdPrefix(tenantId, schedule);
   // add tenantId to workflowName
   schedule.workflowName = withInfixSeparator(tenantId) + schedule.workflowName;
+  // Whoever creates/updates the schedule will be persisted as the executor.
+  // First we save the email into workflowContext, then in schellar-proxy.js move
+  // it from there.
+  if (schedule.workflowContext == null) {
+    schedule.workflowContext = {};
+  }
+  schedule.workflowContext.correlationId = getUserEmail(req);
+  console.debug('sanitizeScheduleBefore', schedule);
 }
 
 /*
@@ -136,7 +146,7 @@ curl -X POST http://localhost/proxy/schedule \
 const postBefore: BeforeFun = (tenantId, groups, req, res, proxyCallback) => {
   req.url = '/schedule';
   const schedule = anythingTo<ScheduleRequest>(req.body);
-  sanitizeScheduleBefore(tenantId, schedule);
+  sanitizeScheduleBefore(tenantId, schedule, req);
   const buffer = createProxyOptionsBuffer(schedule, req);
   proxyCallback({target: schellarTarget, buffer});
 };
@@ -174,7 +184,7 @@ const putBefore: BeforeFun = (tenantId, groups, req, res, proxyCallback) => {
     // TODO create Exception class
     throw 'Schedule name must be equal to name supplied in url';
   }
-  sanitizeScheduleBefore(tenantId, schedule);
+  sanitizeScheduleBefore(tenantId, schedule, req);
   reqName = schedule.name;
   req.url = '/schedule/' + reqName;
   const buffer = createProxyOptionsBuffer(schedule, req);
