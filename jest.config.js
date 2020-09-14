@@ -14,7 +14,7 @@ module.exports = {
     '!**/node_modules/**',
   ],
 
-  coverageReporters: ['json', 'html'],
+  coverageReporters: ['json', 'html', 'text'],
   modulePathIgnorePatterns: [],
   projects: [
     {

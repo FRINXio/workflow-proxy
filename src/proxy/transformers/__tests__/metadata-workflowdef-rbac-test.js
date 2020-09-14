@@ -8,29 +8,18 @@
  * @format
  */
 import metadataWorkflowdefRbac from '../metadata-workflowdef-rbac';
+import {findTransformerFx, mockResponse} from './metadata-workflowdef-test';
 
 const transformers = metadataWorkflowdefRbac();
-const workflowMetaTransformer = transformers.find(obj => obj.url === "/api/metadata/workflow").after;
-const singleWorkflowMetaTransformer = transformers.find(obj => obj.url === "/api/metadata/workflow/:name").after;
+const workflowMetaTransformer = findTransformerFx(transformers, "/api/metadata/workflow", "get", "after");
+const singleWorkflowMetaTransformer = findTransformerFx(transformers, "/api/metadata/workflow/:name", "get", "after");
 
 let blueprintPrefixed = require('./workflow_defs/multpile_workflows_labeled_prefixed.json');
 const unfilteredWorkflowsPrefixed = () => JSON.parse(JSON.stringify(blueprintPrefixed));
 let blueprint = require('./workflow_defs/multpile_workflows_labeled.json');
 const unfilteredWorkflows = () => JSON.parse(JSON.stringify(blueprint));
 
-function mockResponse() {
-  const res = {"status": 0, "msg": ""};
-  res.status = (stat) => {
-    res["status"] = stat;
-    return res;
-  };
-  res.send = (msg) => {
-    res["msg"] = msg;
-  };
-  return res;
-}
-
-describe('Workflow def RBAC proxy', () => {
+describe('Workflow def RBAC transformers', () => {
 
   test("should return error when asking for a single workflow not matching group", () => {
     let input = unfilteredWorkflowsPrefixed()[0];

@@ -100,3 +100,23 @@ x-tenant-id: fb
 from: fb-operator
 
 ################ RBAC CHECK END ################
+
+################ WORKFLOW ################
+
+### Get all workflow executions
+GET http://localhost:8088/proxy/api/workflow/search
+x-tenant-id: fb
+from: fb-user
+
+### Get a single workflow execution
+GET http://localhost:8088/proxy/api/workflow/51ad95cc-9a91-4070-8b1f-582146c22714?includeTasks=true
+x-tenant-id: fb
+from: fb-user
+
+### Get filtered workflow executions
+GET http://localhost:8088/proxy/api/workflow/search?query=status+IN+(COMPLETED)
+x-tenant-id: fb
+from: fb-user
+
+################ WORKFLOW END ################
+

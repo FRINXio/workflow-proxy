@@ -23,7 +23,7 @@
           }
         }
       },
-      "type": "HTTP",
+      "type": "SIMPLE",
       "startDelay": 0,
       "optional": false
     },
@@ -40,7 +40,7 @@
           {
             "name": "LAMBDA_TASK",
             "taskReferenceName": "lambdaTaskRef_4C88",
-            "type": "LAMBDA",
+            "type": "SIMPLE",
             "inputParameters": {
               "lambdaValue": "1",
               "scriptExpression": "if ($.lambdaValue == 1) {\n  return {testvalue: true} \n} else { \n  return {testvalue: false}\n}"

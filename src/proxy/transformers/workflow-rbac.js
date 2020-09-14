@@ -32,9 +32,6 @@ const postWorkflowBefore: BeforeFun = (
   proxyCallback,
 ) => {
   // FIXME verify workflow def has proper groups attached to it
-  const reqObj = anythingTo<StartWorkflowRequest>(req.body);
-  // Put userEmail into correlationId
-  reqObj.correlationId = getUserEmail(req);
   postWorkflowBeforeDelegate(tenantId, groups, req, res, proxyCallback);
 };
 

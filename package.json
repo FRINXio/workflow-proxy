@@ -26,7 +26,8 @@
     "keycloak-admin": "^1.13.0",
     "moment": "^2.24.0",
     "qs": "^6.9.3",
-    "stream-array": "^1.1.2"
+    "stream-array": "^1.1.2",
+    "stream-to-string": "^1.2.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
