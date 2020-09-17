@@ -20,6 +20,7 @@ import type {
   ProxyNext,
   ProxyRequest,
   ProxyResponse,
+  TransformerEntry,
 } from '../types';
 
 // This simplified proxy allows skipping proxy target altogether with `instead` function.

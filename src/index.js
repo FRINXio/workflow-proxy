@@ -9,10 +9,11 @@
  */
 'use strict';
 
+import type {$Application, ExpressRequest, ExpressResponse} from 'express';
 import ExpressApplication from 'express';
 import proxy from './proxy/proxy';
 import workflowRouter from './routes';
-import {getUserRole, getUserGroups} from './proxy/utils.js';
+import {getUserGroups, getUserRoles} from './proxy/utils.js';
 import {groupsForUser, rolesForUser} from './proxy/keycloakGroups';
 
 import bulk from './proxy/transformers/bulk';
@@ -27,26 +28,13 @@ import metadataWorkflowdefRbac from './proxy/transformers/metadata-workflowdef-r
 import workflowRbac from './proxy/transformers/workflow-rbac';
 import taskProxy from './task-proxy';
 import schellarProxy from './schellar-proxy';
+import {adminAccess, generalAccess} from "./proxy/utils";
 
 import dotenv from "dotenv";
-
-import type {$Application, ExpressRequest, ExpressResponse} from 'express';
 
 dotenv.config();
 
 const app = ExpressApplication();
-
-// TODO make configurable
-const OWNER_ROLE = 'OWNER';
-const NETWORK_ADMIN_GROUP = 'network-admin';
-
-const adminAccess = (roles, groups) => {
-  return roles.includes(OWNER_ROLE) || groups.includes(NETWORK_ADMIN_GROUP);
-};
-
-const generalAccess = (_role, _groups) => {
-  return true;
-};
 
 const schellarProxyPort = process.env.SCHELLAR_PROXY_PORT ?? 8087;
 const userFacingPort = process.env.USER_FACING_PORT ?? 8088;
@@ -54,10 +42,52 @@ const taskProxyPort = process.env.TASK_PROXY_PORT ?? 8089;
 const proxyTarget =
     process.env.PROXY_TARGET || 'http://conductor-server:8080';
 const schellarTarget = process.env.SCHELLAR_TARGET || 'http://schellar:3000';
+const tenantProxyUrl = 'http://localhost:8088/proxy/';
+const rbacProxyUrl = 'http://localhost:8088/rbac_proxy/';
+
+/*
+ User facing proxy architecture (exposed in api_gateway):
+
++-----------------------------------------------------------+
+| Workflow-proxy                                            |
+|                                                           |
+|                                /rbac                      |
+| /                              /rbac/editableworkflows    |
+|  +----------------------+       +----------------------+  |
+|  | Conductor proxy      |       | Conductor proxy      |  |
+|  |  routes.js           |       |  routes.js           |  |
+|  |                      |       |                      |  |
+|  +----------+-----------+       +-----------+----------+  |
+|             | HTTP                          | HTTP        |
+| /proxy      |                  /rbac_proxy  |             |
+|  +----------v-----------+       +-----------v----------+  |                  +----------+
+|  | Tenant proxy         |       | RBAC proxy           |  |       HTTP       | Keycloak |
+|  |  proxy.js            <-------+  proxy.js            |  +----------------->+          |
+|  |  transformers/*.js   |  HTTP |  trans/*-rbac.js     |  |                  |          |
+|  +-----------+----------+       +----------------------+  |                  +----------+
+|              |                             |              |
++-----------------------------------------------------------+
+               |                             |
+               |                             |
+               | HTTP                        | HTTP
+               |                             |
+               |             /api            |
+           +---v-----------------------------v---+
+           | Conductor built in REST API         |
+           |                                     |
+           |                                     |
+           +-------------------------------------+
+
+TODO: merge conductor proxy with tenant / rbac proxy
+TODO: do not make a real HTTP call between rbac_proxy and proxy (extract the functionality from express server if possible)
+.. to remove redundant HTTP calls inside the same process/container
+*/
 
 async function init() {
   const proxyRouter = await proxy(
     proxyTarget,
+    tenantProxyUrl,
+    rbacProxyUrl,
     schellarTarget,
     // TODO populate from fs
     [
@@ -73,32 +103,31 @@ async function init() {
     groupsForUser,
     rolesForUser,
   );
-
-  app.use('/', await workflowRouter('http://localhost:8088/proxy/'));
+  app.use('/', await workflowRouter(tenantProxyUrl));
   app.use('/proxy', proxyRouter);
 
   const rbacConductorRouter: $Application<
     ExpressRequest,
     ExpressResponse,
-  > = await workflowRouter('http://localhost:8088/rbac_proxy/');
+  > = await workflowRouter(rbacProxyUrl);
   // Expose a simple boolean endpoint to check if current user is privileged
   rbacConductorRouter.get(
     '/editableworkflows',
-    async (req: ExpressRequest, res, _) => {
-      const role = await getUserRole(req, rolesForUser);
+    async (req: ExpressRequest, res) => {
+      const roles = await getUserRoles(req, rolesForUser);
+      const groups = await getUserGroups(req, roles, groupsForUser);
       res
         .status(200)
         .send(
-          adminAccess(
-            role,
-            await getUserGroups(req, role, groupsForUser),
-          ),
+          adminAccess({"tenantId": "", roles, groups}),
         );
     },
   );
 
   const rbacRouter = await proxy(
     proxyTarget,
+    tenantProxyUrl,
+    rbacProxyUrl,
     'UNSUPPORTED', // Scheduling not allowed
     [
       metadataWorkflowdefRbac,

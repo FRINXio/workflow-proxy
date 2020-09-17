@@ -54,9 +54,10 @@ describe('Workflow def transformers', () => {
       let callback = function (input) {
         streamToString(input.buffer).then((workflow) => resolve(workflow));
       };
-      workflowPost(tenant, [], mockRequest(workflowDef()), null, callback);
+      let mockReq = mockRequest(workflowDef(), {}, {"from": "testmail"});
+      workflowPost({"tenantId": tenant, "roles": [], "groups": []}, mockReq, null, callback);
     }).then((workflow) => {
-      expect(workflow).toStrictEqual(JSON.stringify(workflowDefPrefixed()));
+      expect(JSON.parse(workflow)).toStrictEqual(workflowDefPrefixed());
     });
   });
 
@@ -67,9 +68,10 @@ describe('Workflow def transformers', () => {
       let callback = function (input) {
         streamToString(input.buffer).then((workflow) => resolve(workflow));
       };
-      workflowPost(tenant, [], mockRequest([workflowDef()]), null, callback);
+      let mockReq = mockRequest([workflowDef()], {}, {"from": "testmail"});
+      workflowPost({"tenantId": tenant, "roles": [], "groups": []}, mockReq, null, callback);
     }).then((workflow) => {
-      expect(workflow).toStrictEqual(JSON.stringify([workflowDefPrefixed()]));
+      expect(JSON.parse(workflow)).toStrictEqual([workflowDefPrefixed()]);
     });
   });
 
@@ -81,7 +83,7 @@ describe('Workflow def transformers', () => {
       let callback = function () {
         resolve();
       };
-      workflowGetBefore(tenant, [], mockReq, null, callback);
+      workflowGetBefore({"tenantId": tenant, "roles": [], "groups": []}, mockReq, null, callback);
     }).then(() => {
       expect(mockReq.url).toStrictEqual("/api/metadata/workflow/FACEBOOK___wf31?version=1.1");
     });
@@ -95,7 +97,7 @@ describe('Workflow def transformers', () => {
       let callback = function () {
         resolve();
       };
-      workflowGetBefore(tenant, [], mockReq, null, callback);
+      workflowGetBefore({"tenantId": tenant, "roles": [], "groups": []}, mockReq, null, callback);
     }).then(() => {
       expect(mockReq.url).toStrictEqual("/api/metadata/workflow/FACEBOOK___wf31/1.1");
     });

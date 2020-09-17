@@ -15,8 +15,7 @@ import type {BeforeFun, TransformerRegistrationFun} from '../../types';
 let proxyTarget;
 
 export const getLogBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
@@ -36,12 +35,12 @@ export const getLogBefore: BeforeFun = (
     if (response.statusCode == 200) {
       const task = JSON.parse(body);
       // make sure name starts with prefix
-      const tenantWithInfixSeparator = withInfixSeparator(tenantId);
+      const tenantWithInfixSeparator = withInfixSeparator(identity.tenantId);
       if (task.workflowType?.indexOf(tenantWithInfixSeparator) == 0) {
         proxyCallback();
       } else {
         console.error(
-          `Error trying to get task of different tenant: ${tenantId},`,
+          `Error trying to get task of different tenant: ${identity.tenantId},`,
           {task},
         );
         res.status(401);

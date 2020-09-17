@@ -2,5 +2,6 @@
 **/*.min.js
 
 **/node_modules/**
+**/__tests__/**
 
 dist/**/*.js

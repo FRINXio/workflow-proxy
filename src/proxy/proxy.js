@@ -12,7 +12,7 @@ import bodyParser from 'body-parser';
 import httpProxy from 'http-proxy';
 
 import transformerRegistry from './transformer-registry';
-import {getTenantId, getUserGroups, getUserRole} from './utils.js';
+import {getTenantId, getUserGroups, getUserRoles} from './utils.js';
 import type {
   AuthorizationCheck,
   ExpressRouter,
@@ -22,11 +22,13 @@ import type {
   ProxyNext,
   ProxyRequest,
   ProxyResponse,
-  TransformerRegistrationFun,
+  TransformerRegistrationFun, IdentityHeaders,
 } from '../types';
 
 export default async function(
   proxyTarget: string,
+  tenantProxyUrl: string,
+  rbacProxyUrl: string,
   schellarTarget: string,
   transformFx: Array<TransformerRegistrationFun>,
   authorizationCheck: AuthorizationCheck,
@@ -40,6 +42,8 @@ export default async function(
   const transformers = await transformerRegistry(
     {
       proxyTarget,
+      tenantProxyUrl,
+      rbacProxyUrl,
       schellarTarget,
     },
     transformFx,
@@ -57,10 +61,11 @@ export default async function(
 
     proxy.on('proxyRes', async function(proxyRes, req, res) {
       const tenantId = getTenantId(req);
-      const role = await getUserRole(req, roleLoadingStrategy);
-      const groups = await getUserGroups(req, role, groupLoadingStrategy);
+      const roles = await getUserRoles(req, roleLoadingStrategy);
+      const groups = await getUserGroups(req, roles, groupLoadingStrategy);
+      const identity: IdentityHeaders = {tenantId, roles, groups};
 
-      if (!authorizationCheck(role, groups)) {
+      if (!authorizationCheck(identity)) {
         console.warn('User unauthorized to access this endpoint');
         res.status(401);
         res.send('User unauthorized to access this endpoint');
@@ -91,7 +96,7 @@ export default async function(
             console.warn('Response is not JSON');
           }
           try {
-            entry.after(tenantId, groups, req, respObj, res);
+            entry.after(identity, req, respObj, res);
             res.end(JSON.stringify(respObj));
           } catch (e) {
             console.error('Error while modifying response', {error: e});
@@ -109,14 +114,16 @@ export default async function(
       entry.url,
       async (req: ProxyRequest, res: ProxyResponse, next: ProxyNext) => {
         let tenantId: string;
-        let role: string;
+        let roles: string;
         let groups: string[];
+        let identity: IdentityHeaders;
         try {
           tenantId = getTenantId(req);
-          role = await getUserRole(req, roleLoadingStrategy);
-          groups = await getUserGroups(req, role, groupLoadingStrategy);
+          roles = await getUserRoles(req, roleLoadingStrategy);
+          groups = await getUserGroups(req, roles, groupLoadingStrategy);
+          identity = {tenantId, roles, groups};
         } catch (err) {
-          console.error('Cannot get tenantId', {tenantId, role, groups}, err);
+          console.error('Cannot get tenantId', {tenantId, roles, groups}, err);
           res.status(400);
           res.send('Cannot get tenantId:' + err);
           return;
@@ -131,7 +138,7 @@ export default async function(
         };
         if (entry.before) {
           try {
-            entry.before(tenantId, groups, req, res, proxyCallback);
+            entry.before(identity, req, res, proxyCallback);
           } catch (err) {
             console.error('Got error in beforeFun', err);
             res.status(500);
@@ -144,5 +151,6 @@ export default async function(
       },
     );
   }
+
   return router;
 }

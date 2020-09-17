@@ -30,17 +30,21 @@ export type ProxyNext = mixed => void;
 
 export type ProxyCallback = (proxyOptions?: mixed) => void;
 
-export type BeforeFun = (
+export type IdentityHeaders = {
   tenantId: string,
+  roles: string[],
   groups: string[],
+}
+
+export type BeforeFun = (
+  identity: IdentityHeaders,
   req: ProxyRequest,
   res: ProxyResponse,
   proxyCallback: ProxyCallback,
 ) => void;
 
 export type AfterFun = (
-  tenantId: string,
-  groups: string[],
+  identity: IdentityHeaders,
   req: ProxyRequest,
   respObj: ?mixed,
   res: ProxyResponse,
@@ -83,6 +87,11 @@ export type Workflow = {
   tasks: Array<Task>,
 };
 
+export type WorkflowExecution = {
+  name: string,
+  version: string,
+};
+
 export type StartWorkflowRequest = {
   name: string,
   workflowDef?: mixed,
@@ -113,7 +122,7 @@ export type TaskType = {
     subWorkflowVersion: string,
   },
 };
-export type AuthorizationCheck = (role: string[], groups: string[]) => boolean;
+export type AuthorizationCheck = (IdentityHeaders) => boolean;
 export type RoleLoadingStrategy = (
   tenant: string,
   email: string,

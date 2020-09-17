@@ -10,12 +10,12 @@
 
 import request from 'request';
 
-import type {FrontendResponse} from './types';
+import type {FrontendResponse, ExpressRequest} from './types';
 
 function makeOptions(
   method: string,
   url: string,
-  parentRequest: express$Request,
+  parentRequest: ExpressRequest,
   body,
 ) {
   const options = {
@@ -74,7 +74,7 @@ function doHttpRequestWithOptions(options): Promise<FrontendResponse> {
 function doHttpRequest(
   method: string,
   url: string,
-  parentRequest: express$Request,
+  parentRequest: ExpressRequest,
   body,
 ): Promise<FrontendResponse> {
   return doHttpRequestWithOptions(
@@ -84,7 +84,7 @@ function doHttpRequest(
 
 const HttpClient = {
   // TODO: refactor usage so that get method can be simplified
-  get: <T>(path: string, parentRequest: express$Request): Promise<T> =>
+  get: <T>(path: string, parentRequest: ExpressRequest): Promise<T> =>
     new Promise<T>((resolve, reject) => {
       const options = makeOptions('GET', path, parentRequest);
       request(options, function(err, res) {

@@ -32,22 +32,21 @@ import type {
   "localhost/proxy/api/workflow/search?query=status+IN+(FAILED)"
 */
 export const getSearchBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
 ) => {
   // prefix query with workflowType STARTS_WITH tenantId_
   const originalQueryString = req._parsedUrl.query;
-  const limitToTenant = `workflowType STARTS_WITH \'${tenantId}_'`;
+  const limitToTenant = `workflowType STARTS_WITH '${identity.tenantId}_'`;
   const newQueryString = updateQuery(originalQueryString, limitToTenant);
   req.url = req._parsedUrl.pathname + '?' + newQueryString;
   proxyCallback();
 };
 
-export const getSearchAfter: AfterFun = (tenantId, groups, req, respObj) => {
-  removeTenantPrefix(tenantId, respObj, 'results[*].workflowType', false);
+export const getSearchAfter: AfterFun = (identity, req, respObj) => {
+  removeTenantPrefix(identity.tenantId, respObj, 'results[*].workflowType', false);
 };
 
 export function updateQuery(
@@ -87,14 +86,11 @@ curl -X POST -H "x-tenant-id: fb-test" -H \
 '
 */
 export const postWorkflowBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
 ) => {
-  // name must start with prefix
-  const tenantWithInfixSeparator = withInfixSeparator(tenantId);
   const reqObj = anythingTo<StartWorkflowRequest>(req.body);
 
   // workflowDef section is not allowed (no dynamic workflows)
@@ -113,12 +109,12 @@ export const postWorkflowBefore: BeforeFun = (
   }
 
   // add prefix
-  addTenantIdPrefix(tenantId, reqObj);
+  addTenantIdPrefix(identity.tenantId, reqObj);
   // add taskToDomain
   reqObj.taskToDomain = {};
   // Put userEmail into correlationId
   reqObj.correlationId = getUserEmail(req);
-  reqObj.taskToDomain['*'] = tenantId;
+  reqObj.taskToDomain['*'] = identity.tenantId;
   console.info(`Transformed request to ${JSON.stringify(reqObj)}`);
   proxyCallback({buffer: createProxyOptionsBuffer(reqObj, req)});
 };
@@ -129,8 +125,7 @@ curl  -H "x-tenant-id: fb-test" \
     "localhost/proxy/api/workflow/c0a438d4-25b7-4c12-8a29-3473d98b1ad7"
 */
 export const getExecutionStatusAfter: AfterFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   respObj,
 ) => {
@@ -140,7 +135,6 @@ export const getExecutionStatusAfter: AfterFun = (
     'tasks[*].taskDefName': true,
     'tasks[*].workflowTask.name': true,
     'tasks[*].workflowTask.taskDefinition.name': true,
-    'tasks[*].workflowType': false,
     'tasks[*].inputData.subWorkflowName': false,
     'tasks[*].workflowType': false,
     'tasks[*].outputData.workflowType': false,
@@ -151,7 +145,7 @@ export const getExecutionStatusAfter: AfterFun = (
     'workflowDefinition.tasks[*].taskDefinition.name': true,
     'workflowDefinition.tasks[*].subWorkflowParam.name': false,
   };
-  removeTenantPrefixes(tenantId, respObj, jsonPathToAllowGlobal);
+  removeTenantPrefixes(identity.tenantId, respObj, jsonPathToAllowGlobal);
 };
 
 // Removes the workflow from the system
@@ -161,8 +155,7 @@ curl  -H "x-tenant-id: fb-test" \
     -X DELETE
 */
 export const removeWorkflowBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
@@ -179,15 +172,15 @@ export const removeWorkflowBefore: BeforeFun = (
   console.info(`Requesting ${JSON.stringify(requestOptions)}`);
   request(requestOptions, function(error, response, body) {
     console.info(`Got status code: ${response.statusCode}, body: '${body}'`);
-    if (response.statusCode == 200) {
+    if (response.statusCode === 200) {
       const workflow = JSON.parse(body);
       // make sure name starts with prefix
-      const tenantWithInfixSeparator = withInfixSeparator(tenantId);
-      if (workflow.workflowName.indexOf(tenantWithInfixSeparator) == 0) {
+      const tenantWithInfixSeparator = withInfixSeparator(identity.tenantId);
+      if (workflow.workflowName.indexOf(tenantWithInfixSeparator) === 0) {
         proxyCallback();
       } else {
         console.error(
-          `Error trying to delete workflow of different tenant: ${tenantId},` +
+          `Error trying to delete workflow of different tenant: ${identity.tenantId},` +
             ` workflow: ${JSON.stringify(workflow)}`,
         );
         res.status(401);

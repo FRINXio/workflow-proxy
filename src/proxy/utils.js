@@ -11,12 +11,13 @@
 import streamify from 'stream-array';
 import {JSONPath} from 'jsonpath-plus';
 
+import type {ExpressRequest} from 'express';
 import type {
   GroupLoadingStrategy,
   RoleLoadingStrategy,
   ProxyRequest,
   Task,
-  Workflow,
+  Workflow, AuthorizationCheck,
 } from '../types';
 
 // Global prefix for taskdefs which can be used by all tenants.
@@ -143,7 +144,7 @@ export function addTenantIdPrefix(
 ): void {
   if (
     allowGlobal &&
-    objectWithName.name.indexOf(withInfixSeparator(GLOBAL_PREFIX)) == 0
+    objectWithName.name.indexOf(withInfixSeparator(GLOBAL_PREFIX)) === 0
   ) {
     return;
   }
@@ -171,7 +172,7 @@ export function getTenantId(req: ExpressRequest): string {
     console.error('x-tenant-id header not found');
     throw 'x-tenant-id header not found';
   }
-  if (tenantId == GLOBAL_PREFIX) {
+  if (tenantId === GLOBAL_PREFIX) {
     console.error(`Illegal name for TenantId: '${tenantId}'`);
     throw 'Illegal TenantId';
   }
@@ -201,7 +202,7 @@ export function getUserEmail(req: ExpressRequest): string {
   return userEmail;
 }
 
-export function getUserRole(
+export function getUserRoles(
   req: ExpressRequest,
   roleLoadingStrategy: RoleLoadingStrategy,
 ): Promise<string> {
@@ -260,12 +261,12 @@ export function removeTenantPrefix(
   for (const idx in result) {
     const item = result[idx];
     const prop = item.parent[item.parentProperty];
-    if (allowGlobal && prop.indexOf(globalPrefix) == 0) {
+    if (allowGlobal && prop.indexOf(globalPrefix) === 0) {
       continue;
     }
     // expect tenantId prefix
-    if (prop.indexOf(tenantWithInfixSeparator) != 0) {
-      if (jsonPath.indexOf('taskDefName') != -1) {
+    if (prop.indexOf(tenantWithInfixSeparator) !== 0) {
+      if (jsonPath.indexOf('taskDefName') !== -1) {
         // Skipping tenant removal in taskDefName
         //  This is expected as some tasks do not require task def
         //  and might contain just some default
@@ -317,3 +318,14 @@ export function anythingTo<T>(anything: any): T {
     throw 'Unexpected: value does not exist';
   }
 }
+
+const OWNER_ROLE = process.env.ADMIN_ACCESS_ROLE || 'OWNER';
+const NETWORK_ADMIN_GROUP = process.env.ADMIN_ACCESS_ROLE || 'network-admin';
+
+export const adminAccess : AuthorizationCheck = (identity) => {
+  return identity.roles.includes(OWNER_ROLE) || identity.groups.includes(NETWORK_ADMIN_GROUP);
+};
+
+export const generalAccess : AuthorizationCheck = () => {
+  return true;
+};

@@ -9,7 +9,7 @@
 
 module.exports = {
   collectCoverageFrom: [
-    '**/*.js',
+    'src/**/*.js',
     '!**/__tests__/**',
     '!**/node_modules/**',
   ],

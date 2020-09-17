@@ -11,8 +11,7 @@
 import workflows from '../workflow';
 import {findTransformerFx, mockRequest, mockResponse} from './metadata-workflowdef-test';
 import streamToString from "stream-to-string/index";
-
-let tenant = "FACEBOOK";
+import {mockIdentity} from "./metadata-workflowdef-rbac-test";
 
 describe('Workflow transformers', () => {
 
@@ -25,19 +24,19 @@ describe('Workflow transformers', () => {
       let callback = function (input) {
         streamToString(input.buffer).then((workflow) => resolve(workflow));
       };
-      transformer(tenant, [], mockRequest(
+      transformer(mockIdentity(), mockRequest(
         {"name": "wf1", "version": "1.1"},
         {},
         {'from': "a@fb.com"}),
-        null,
-        callback);
+      null,
+      callback);
 
     }).then((wfExec) => {
 
       expect(wfExec).toStrictEqual(JSON.stringify({
         "name": "FACEBOOK___wf1",
         "version": "1.1",
-        "taskToDomain": {"FACEBOOK___*": "FACEBOOK"},
+        "taskToDomain": {"*": "FACEBOOK"},
         "correlationId": "a@fb.com"
       }));
     });
@@ -47,16 +46,16 @@ describe('Workflow transformers', () => {
     const transformer = findTransformerFx(transformers, "/api/workflow/search", "get", "before");
 
     let mockReq = mockRequest("", {"name": "wf31"}, {},
-        {"pathname": "/api/workflow/search", "query": "status+IN+(FAILED)"});
+      {"pathname": "/api/workflow/search", "query": "status+IN+(FAILED)"});
 
     return new Promise(resolve => {
       let callback = function () {
         resolve();
       };
-      transformer(tenant, [], mockReq, null, callback);
+      transformer(mockIdentity(), mockReq, null, callback);
     }).then(() => {
       expect(mockReq.url)
-          .toStrictEqual("/api/workflow/search?"
+        .toStrictEqual("/api/workflow/search?"
               + escape("status IN (FAILED)") + "=&query="
               + escape("(workflowType STARTS_WITH 'FACEBOOK_')"));
     });
@@ -71,7 +70,7 @@ describe('Workflow transformers', () => {
     const transformer = findTransformerFx(transformers, "/api/workflow/:workflowId", "get", "after");
 
     let exec = workflowExecutionPrefixed();
-    transformer(tenant, [], null, exec);
+    transformer(mockIdentity(), null, exec);
 
     expect(exec).toStrictEqual(workflowExecution());
   });
@@ -85,7 +84,7 @@ describe('Workflow transformers', () => {
     const transformer = findTransformerFx(transformers, "/api/workflow/:workflowId", "get", "after");
 
     let exec = workflowExecutionPrefixed();
-    transformer(tenant, [], null, exec);
+    transformer(mockIdentity(), null, exec);
 
     expect(exec).toStrictEqual(workflowExecution());
   });

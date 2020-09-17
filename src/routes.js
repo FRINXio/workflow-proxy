@@ -1,5 +1,3 @@
-/* eslint-disable flowtype/require-valid-file-annotation */
-/* Disabled flow and also disabled eslint flow annotation check TODO */
 /**
  * Copyright 2004-present Facebook. All Rights Reserved.
  *

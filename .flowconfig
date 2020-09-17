@@ -2,6 +2,7 @@
 
 ; Ignore components that we dont care if they match our flow
 .*/node_modules/.*
+.*__tests__.*
 
 [untyped]
 .*/node_modules/express-graphql/.*

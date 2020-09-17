@@ -1,9 +1,46 @@
 # Can be executed with HTTP client built-in plugin in IDEA
 
+################ TEST SETUP ###################
+# Keycloak preconditions:
+# - tenant: fb
+# - user: fb-user
+#  - role: OWNER
+# - user: fb-operator
+#  - group: OPERATOR
+#  - role: <empty>
+################ TEST SETUP END ###################
+
+################ RBAC CHECK ################
+
+### Check if user has network-operator privileges
+GET http://localhost:8088/rbac/editableworkflows
+x-tenant-id: fb
+from: fb-user
+
+> {%
+client.test("test", function() {
+  client.assert(response.body === true, response.body);
+});
+%}
+
+### Check if user has network-operator privileges
+GET http://localhost:8088/rbac/editableworkflows
+x-tenant-id: fb
+from: fb-operator
+
+> {%
+client.test("test", function() {
+  client.assert(response.body === false, response.body);
+});
+%}
+
+################ RBAC CHECK END ################
+
 ################ WORKFLOW METADATA ################
 
-### Add new workflow def - transformers/metadata-workflowdef.js
-### fb-user has to be role -> OWNER or part or group -> network-admin to access this API
+## Add new WF def
+
+### Add new workflow def as admin via proxy accessible only to admins
 PUT http://localhost:8088/proxy/api/metadata/workflow
 Content-Type: application/json
 x-tenant-id: fb
@@ -29,7 +66,13 @@ from: fb-user
   }
 ]
 
-### Add new workflow def - transformers/metadata-workflowdef.js
+> {%
+client.test("test", function() {
+  client.assert(response.status === 204);
+});
+%}
+
+### Add new workflow def as admin via proxy accessible to also operators and testers
 PUT http://localhost:8088/proxy/api/metadata/workflow
 Content-Type: application/json
 x-tenant-id: fb
@@ -55,68 +98,389 @@ from: fb-user
   }
 ]
 
-### Get all workflow defs for a tenant - transformers/metadata-workflowdef.js
+> {%
+client.test("test", function() {
+  client.assert(response.status === 204);
+});
+%}
+
+
+### Get all workflows
+
+### Get all workflow defs as admin via proxy
 GET http://localhost:8088/proxy/api/metadata/workflow
 x-tenant-id: fb
 from: fb-user
 
-### Get single workflow def for a tenant - transformers/metadata-workflowdef.js
-GET http://localhost:8088/proxy/api/metadata/workflow/fx3
-x-tenant-id: fb
-from: fb-user
+> {%
+client.test("test", function() {
+  client.assert(response.status === 200, response);
+  client.assert(JSON.parse(response.body).length === 2, response.body);
+});
+%}
 
-### Delete single workflow def for a tenant - transformers/metadata-workflowdef.js
-DELETE http://localhost:8088/proxy/api/metadata/workflow/fx3/1
-x-tenant-id: fb
-from: fb-user
-
-### RBAC: Get all workflow defs for a tenant and user- transformers/metadata-workflowdef-rbac.js
-### fb-operator has to be part or group -> OPERATOR to access this API
+### Get all workflow defs as operator via rbac_proxy
 GET http://localhost:8088/rbac_proxy/api/metadata/workflow
 x-tenant-id: fb
 from: fb-operator
 
-### RBAC: Get single workflow def for a tenant and user - transformers/metadata-workflowdef-rbac.js
+> {%
+client.test("test", function() {
+  client.assert(response.status === 200, response);
+  client.assert(JSON.parse(response.body).length === 1, response.body);
+});
+%}
+
+
+### Get a single workflow def
+
+### Get a single workflow def as admin via proxy
+GET http://localhost:8088/proxy/api/metadata/workflow/fx3
+x-tenant-id: fb
+from: fb-user
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 200, response);
+  client.assert(JSON.parse(response.body).name === "fx3", response.body);
+});
+%}
+
+### Get a single workflow def as operator via proxy
 GET http://localhost:8088/rbac_proxy/api/metadata/workflow/fx3
 x-tenant-id: fb
 from: fb-operator
 
-### RBAC: Get single workflow def for a tenant and user (FORBIDDEN) - transformers/metadata-workflowdef-rbac.js
+> {%
+client.test("test", function() {
+  client.assert(response.status === 200, response);
+  client.assert(JSON.parse(response.body).name === "fx3", response.body);
+});
+%}
+
+### Get a single workflow def as operator via proxy: FAIL 401
 GET http://localhost:8088/rbac_proxy/api/metadata/workflow/fx1
 x-tenant-id: fb
 from: fb-operator
 
-################ WORKFLOW METADATA END ################
-################ RBAC CHECK ################
+> {%
+client.test("test", function() {
+  client.assert(response.status === 401, response);
+});
+%}
 
-### Check if user has network-operator privileges
-GET http://localhost:8088/rbac/editableworkflows
+################ WORKFLOW METADATA END ################
+
+################ WORKFLOW EXEC ################
+
+## Execute WF
+
+### Execute workflow as an admin via proxy
+POST http://localhost:8088/proxy/api/workflow
+Content-Type: application/json
 x-tenant-id: fb
 from: fb-user
 
-### Check if user has network-operator privileges
-GET http://localhost:8088/rbac/editableworkflows
+{
+    "name": "fx1"
+}
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 200, response.body);
+});
+client.global.set("admin_exec_1", response.body);
+%}
+
+
+### Execute workflow as an admin via rbac proxy
+POST http://localhost:8088/rbac_proxy/api/workflow
+Content-Type: application/json
+x-tenant-id: fb
+from: fb-user
+
+{
+  "name": "fx3"
+}
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 200, response.body);
+});
+client.global.set("admin_exec_2", response.body);
+%}
+
+### Execute workflow as operator via rbac_proxy: FAIL 401 (workflow not accessible for operators)
+POST http://localhost:8088/rbac_proxy/api/workflow
+Content-Type: application/json
 x-tenant-id: fb
 from: fb-operator
 
-################ RBAC CHECK END ################
+{
+  "name": "fx1"
+}
 
-################ WORKFLOW ################
+> {%
+client.test("test", function() {
+  client.assert(response.status === 401, response.body);
+});
+%}
 
-### Get all workflow executions
+### Execute workflow as operator via rbac_proxy # SUCCESS
+POST http://localhost:8088/rbac_proxy/api/workflow
+Content-Type: application/json
+x-tenant-id: fb
+from: fb-operator
+
+{
+  "name": "fx3",
+  "version": 1
+}
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 200, response.body);
+});
+client.global.set("oper_exec_1", response.body);
+// Sleep a little to make sure this wf finishes before moving to next request
+// This is running in nashorn so we can use JVM sleep
+java.lang.Thread.sleep(2000)
+%}
+
+
+### Search WF executions
+
+### Get all workflow executions as admin via proxy
 GET http://localhost:8088/proxy/api/workflow/search
 x-tenant-id: fb
 from: fb-user
 
-### Get a single workflow execution
-GET http://localhost:8088/proxy/api/workflow/51ad95cc-9a91-4070-8b1f-582146c22714?includeTasks=true
+> {%
+client.test("test", function() {
+  client.assert(response.status === 200, response);
+  client.assert(JSON.parse(response.body).totalHits === 3, response.body);
+});
+%}
+
+### Get all workflow executions as operator via proxy
+GET http://localhost:8088/rbac_proxy/api/workflow/search
+x-tenant-id: fb
+from: fb-operator
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 200, response);
+  client.assert(JSON.parse(response.body).totalHits === 1, response.body);
+});
+%}
+
+
+## Get a single workflow execution
+
+### Get a single workflow execution as admin via proxy
+GET http://localhost:8088/proxy/api/workflow/{{admin_exec_1}}?includeTasks=true
 x-tenant-id: fb
 from: fb-user
 
-### Get filtered workflow executions
+> {%
+client.test("test", function() {
+  client.assert(response.status === 200, response);
+  client.assert(JSON.parse(response.body).workflowName === "fx1", response.body);
+});
+%}
+
+### Get a single workflow execution as admin via rbac_proxy
+GET http://localhost:8088/rbac_proxy/api/workflow/{{admin_exec_2}}?includeTasks=true
+x-tenant-id: fb
+from: fb-user
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 200, response);
+  client.assert(JSON.parse(response.body).workflowName === "fx3", response.body);
+});
+%}
+
+### Get a single workflow execution as operator via proxy: FAIL 401
+GET http://localhost:8088/proxy/api/workflow/{{oper_exec_1}}?includeTasks=true
+x-tenant-id: fb
+from: fb-operator
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 401, response);
+});
+%}
+
+### Get a single workflow execution as operator via rbac_proxy: OK correlation ID matches
+GET http://localhost:8088/rbac_proxy/api/workflow/{{oper_exec_1}}?includeTasks=true
+x-tenant-id: fb
+from: fb-operator
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 200, response.status);
+  client.assert(JSON.parse(response.body).workflowName === "fx3", response.body);
+});
+%}
+
+### Get a single workflow execution as operator via rbac_proxy: FAIL 401 correlation ID doesn't match
+GET http://localhost:8088/rbac_proxy/api/workflow/{{admin_exec_1}}?includeTasks=true
+x-tenant-id: fb
+from: fb-operator
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 401, response);
+});
+%}
+
+## Search for workflow executions
+
+### Get filtered workflow executions as admin via proxy (COMPLETED)
 GET http://localhost:8088/proxy/api/workflow/search?query=status+IN+(COMPLETED)
 x-tenant-id: fb
 from: fb-user
 
+> {%
+client.test("test", function() {
+  client.assert(response.status === 200, response);
+  client.assert(JSON.parse(response.body).totalHits === 0, response.body);
+});
+%}
+
+### Get filtered workflow executions as admin via proxy (executed by fb-operator)
+GET http://localhost:8088/proxy/api/workflow/search?query=correlationId+IN+(fb-operator)
+x-tenant-id: fb
+from: fb-user
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 200, response);
+  client.assert(JSON.parse(response.body).totalHits === 1, response.body);
+});
+%}
+
+### Get all workflow executions as admin via proxy
+GET http://localhost:8088/proxy/api/workflow/search
+x-tenant-id: fb
+from: fb-user
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 200, response);
+  client.assert(JSON.parse(response.body).totalHits === 3, response.body);
+});
+%}
+
+### Get all workflow executions as admin via rbac proxy
+GET http://localhost:8088/rbac_proxy/api/workflow/search
+x-tenant-id: fb
+from: fb-user
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 200, response);
+  client.assert(JSON.parse(response.body).totalHits === 2, response.body);
+});
+%}
+
+### Get all workflow executions as operator via rbac proxy
+GET http://localhost:8088/rbac_proxy/api/workflow/search
+x-tenant-id: fb
+from: fb-operator
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 200, response);
+  client.assert(JSON.parse(response.body).totalHits === 1, response.body);
+});
+%}
+
+
+## Delete workflow executions
+
+### Delete workflow execution as operator via rbac-proxy: FAIL 401 wrong correlation ID
+DELETE http://localhost:8088/rbac_proxy/api/workflow/{{admin_exec_1}}/remove
+x-tenant-id: fb
+from: fb-operator
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 401, response);
+});
+%}
+
+### Delete workflow execution as operator via rbac-proxy
+DELETE http://localhost:8088/rbac_proxy/api/workflow/{{oper_exec_1}}/remove
+x-tenant-id: fb
+from: fb-operator
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 204, response);
+});
+%}
+
+### Delete workflow execution as admin via proxy
+DELETE http://localhost:8088/proxy/api/workflow/{{admin_exec_1}}/remove
+x-tenant-id: fb
+from: fb-user
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 204, response);
+});
+%}
+
+### Delete workflow execution as admin via proxy
+DELETE http://localhost:8088/proxy/api/workflow/{{admin_exec_2}}/remove
+x-tenant-id: fb
+from: fb-user
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 204, response);
+});
+%}
+
 ################ WORKFLOW END ################
 
+################ WORKFLOW METADATA DELETION ################
+
+## Delete a single workflow def
+
+### Delete workflow def as operator via rbac_proxy: FAIL 401
+DELETE http://localhost:8088/rbac_proxy/api/metadata/workflow/fx1/1
+x-tenant-id: fb
+from: fb-operator
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 404, response);
+});
+%}
+
+### Delete workflow def as admin via proxy
+DELETE http://localhost:8088/proxy/api/metadata/workflow/fx1/1
+x-tenant-id: fb
+from: fb-user
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 204, response);
+});
+%}
+
+### Delete workflow def as admin via proxy
+DELETE http://localhost:8088/proxy/api/metadata/workflow/fx3/1
+x-tenant-id: fb
+from: fb-user
+
+> {%
+client.test("test", function() {
+  client.assert(response.status === 204, response);
+});
+%}
+
+################ WORKFLOW METADATA DELETION END ################

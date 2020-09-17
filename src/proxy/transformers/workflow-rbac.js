@@ -8,7 +8,7 @@
  * @format
  */
 
-import {anythingTo, getUserEmail} from '../utils.js';
+import {anythingTo, getTenantId, getUserEmail} from '../utils.js';
 import {
   getExecutionStatusAfter as getExecutionStatusAfterDelegate,
   getSearchAfter as getSearchAfterDelegate,
@@ -17,49 +17,126 @@ import {
   removeWorkflowBefore as removeWorkflowBeforeDelegate,
   updateQuery,
 } from './workflow.js';
-import type {
-  AfterFun,
-  BeforeFun,
-  StartWorkflowRequest,
-  TransformerRegistrationFun,
-} from '../../types';
+import type {AfterFun, BeforeFun, TransformerRegistrationFun, WorkflowExecution,} from '../../types';
+import request from 'request';
 
 const postWorkflowBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
 ) => {
-  // FIXME verify workflow def has proper groups attached to it
-  postWorkflowBeforeDelegate(tenantId, groups, req, res, proxyCallback);
+  postWorkflowBeforeInternal(req, identity, res, proxyCallback,
+    (requestOptions, onWorkflowDefCheck) => {
+      request(requestOptions, onWorkflowDefCheck);
+    });
 };
 
+function postWorkflowBeforeInternal(req, identity, res, proxyCallback, checkAndExecute) {
+  const workflow: WorkflowExecution = anythingTo<WorkflowExecution>(req.body);
+  let url = rbacProxyUrl + 'api/metadata/workflow/' + workflow.name;
+  if (workflow.version) {
+    url += '?version=' + workflow.version;
+  }
+  // first make an HTTP request to validate that this workflow belongs to the right group
+  // by calling GET on workflow definition (that has checks built-in)
+  const requestOptions = {
+    url,
+    method: 'GET',
+    headers: {
+      'from': getUserEmail(req),
+      'x-tenant-id': getTenantId(req)
+    },
+  };
+
+  let workflowDefCheckHandler = async (error, response, body) => {
+    if (error) {
+      console.error(error);
+      res.status(500);
+      res.send('Unable to authorize user access');
+      return;
+    }
+
+    // authorize workflow def access
+    console.info(`Got status code: ${response.statusCode}, body: '${body}'`);
+    if (response.statusCode === 200) {
+      // Workflow def can be accessed via RBAC proxy, meaning we are authorized
+      postWorkflowBeforeDelegate(identity, req, res, proxyCallback);
+    } else {
+      res.status(response.statusCode);
+      res.send(body);
+    }
+  };
+
+  console.info(`Requesting ${JSON.stringify(requestOptions)}`);
+  checkAndExecute(requestOptions, workflowDefCheckHandler);
+}
+
+export function correlationIdCheck(respObj, req, res) {
+  if (respObj.correlationId !== getUserEmail(req)) {
+    res.status(401);
+    res.send("Unauthorized");
+  }
+}
+
 const getExecutionStatusAfter: AfterFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   respObj,
   res,
 ) => {
-  // FIXME verify workflow def has proper groups attached to it
-  getExecutionStatusAfterDelegate(tenantId, groups, req, respObj, res);
+  getExecutionStatusAfterDelegate(identity, req, respObj, res);
+  correlationIdCheck(respObj, req, res);
 };
 
 export const removeWorkflowBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
 ) => {
-  // FIXME verify workflow def has proper groups attached to it
-  removeWorkflowBeforeDelegate(tenantId, groups, req, res, proxyCallback);
+  removeWorkflowBeforeInternal(req, identity, res, proxyCallback,
+    (requestOptions, onWorkflowDefCheck) => {
+      request(requestOptions, onWorkflowDefCheck);
+    });
 };
 
+function removeWorkflowBeforeInternal(req, identity, res, proxyCallback, checkAndExecute) {
+  let url = rbacProxyUrl + 'api/workflow/' + req.params.workflowId;
+  const requestOptions = {
+    url,
+    method: 'GET',
+    headers: {
+      'from': getUserEmail(req),
+      'x-tenant-id': getTenantId(req)
+    },
+  };
+
+  let workflowDefCheckHandler = async (error, response, body) => {
+    if (error) {
+      console.error(error);
+      res.status(500);
+      res.send('Unable to authorize user access');
+      return;
+    }
+
+    // authorize workflow def access
+    console.info(`Got status code: ${response.statusCode}, body: '${body}'`);
+    if (response.statusCode === 200) {
+      // Workflow execution can be accessed via RBAC proxy, meaning we are authorized
+      removeWorkflowBeforeDelegate(identity, req, res, proxyCallback);
+    } else {
+      res.status(response.statusCode);
+      res.send(body);
+    }
+  };
+
+  console.info(`Requesting ${JSON.stringify(requestOptions)}`);
+  checkAndExecute(requestOptions, workflowDefCheckHandler);
+}
+
 export const getSearchBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
@@ -69,12 +146,15 @@ export const getSearchBefore: BeforeFun = (
   const userEmail = getUserEmail(req);
   const originalQueryString = req._parsedUrl.query;
   const limitToTenant = `correlationId = '${userEmail}'`;
-  const newQueryString = updateQuery(originalQueryString, limitToTenant);
-  req._parsedUrl.query = newQueryString;
-  getSearchBeforeDelegate(tenantId, groups, req, res, proxyCallback);
+  req._parsedUrl.query = updateQuery(originalQueryString, limitToTenant);
+  getSearchBeforeDelegate(identity, req, res, proxyCallback);
 };
 
-const registration: TransformerRegistrationFun = function() {
+let rbacProxyUrl: string;
+
+const registration: TransformerRegistrationFun = function(ctx) {
+  rbacProxyUrl = ctx.rbacProxyUrl;
+
   return [
     {
       method: 'get',
@@ -100,4 +180,5 @@ const registration: TransformerRegistrationFun = function() {
   ];
 };
 
+export {postWorkflowBeforeInternal};
 export default registration;

@@ -8,7 +8,7 @@
  * @format
  */
 
-import {anythingTo, isLabeledWithGroup} from '../utils.js';
+import {adminAccess, anythingTo, isLabeledWithGroup} from '../utils.js';
 import {
   getAllWorkflowsAfter as getAllWorkflowsAfterDelegate,
   getWorkflowAfter as getWorkflowAfterDelegate,
@@ -17,8 +17,7 @@ import {
 import type {AfterFun, TransformerRegistrationFun, Workflow} from '../../types';
 
 const getAllWorkflowsAfter: AfterFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   respObj,
   res,
@@ -30,30 +29,29 @@ const getAllWorkflowsAfter: AfterFun = (
     workflowIdx--
   ) {
     const workflowdef = workflows[workflowIdx];
-    if (!isLabeledWithGroup(workflowdef, groups)) {
+    if (!adminAccess(identity) && !isLabeledWithGroup(workflowdef, identity.groups)) {
       workflows.splice(workflowIdx, 1);
     }
   }
-  getAllWorkflowsAfterDelegate(tenantId, groups, req, respObj, res);
+  getAllWorkflowsAfterDelegate(identity, req, respObj, res);
 };
 
 export const getWorkflowAfter: AfterFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   respObj,
   res,
 ) => {
   const workflowdef: Workflow = anythingTo<Workflow>(respObj);
-  if (!isLabeledWithGroup(workflowdef, groups)) {
+  if (!adminAccess(identity) && !isLabeledWithGroup(workflowdef, identity.groups)) {
     // fail if workflow is outside of user's groups
     console.error(
-      `User accessing unauthorized workflow: ${workflowdef.name} for tenant: ${tenantId}`,
+      `User accessing unauthorized workflow: ${workflowdef.name} for tenant: ${identity.tenantId}`,
     );
     res.status(401).send('User unauthorized to access this endpoint');
   }
 
-  getWorkflowAfterDelegate(tenantId, groups, req, respObj, res);
+  getWorkflowAfterDelegate(identity, req, respObj, res);
 };
 
 const registration: TransformerRegistrationFun = () => [

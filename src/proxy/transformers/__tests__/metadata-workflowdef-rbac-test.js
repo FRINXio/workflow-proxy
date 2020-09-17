@@ -19,19 +19,23 @@ const unfilteredWorkflowsPrefixed = () => JSON.parse(JSON.stringify(blueprintPre
 let blueprint = require('./workflow_defs/multpile_workflows_labeled.json');
 const unfilteredWorkflows = () => JSON.parse(JSON.stringify(blueprint));
 
+export function mockIdentity(tenantId = "FACEBOOK", groups = [], roles = []) {
+  return {"tenantId": tenantId, "roles": roles, "groups": groups};
+}
+
 describe('Workflow def RBAC transformers', () => {
 
   test("should return error when asking for a single workflow not matching group", () => {
     let input = unfilteredWorkflowsPrefixed()[0];
     const res = mockResponse();
-    singleWorkflowMetaTransformer("FACEBOOK", [], null, input, res);
+    singleWorkflowMetaTransformer(mockIdentity(), null, input, res);
     expect(res["status"]).toEqual(401);
     expect(res["msg"]).toEqual("User unauthorized to access this endpoint");
   });
 
   test("should return single workflow matching group", () => {
     let input = unfilteredWorkflowsPrefixed()[0];
-    singleWorkflowMetaTransformer("FACEBOOK", ["ADMIN"], null, input, null);
+    singleWorkflowMetaTransformer(mockIdentity("FACEBOOK", ["ADMIN"]), null, input, null);
     expect(input).toEqual(
       {
         "name": "workflow1",
@@ -49,11 +53,11 @@ describe('Workflow def RBAC transformers', () => {
 
   test("should filter workflows by label", () => {
     let input = unfilteredWorkflowsPrefixed();
-    workflowMetaTransformer("FACEBOOK", [], null, input, null);
+    workflowMetaTransformer(mockIdentity(), null, input, null);
     expect(input).toEqual([]);
 
     input = unfilteredWorkflowsPrefixed();
-    workflowMetaTransformer("FACEBOOK", ["ADMIN"], null, input, null);
+    workflowMetaTransformer(mockIdentity("FACEBOOK", ["ADMIN"]), null, input, null);
     expect(input).toEqual([
       {
         "name": "workflow1",
@@ -79,7 +83,7 @@ describe('Workflow def RBAC transformers', () => {
     ]);
 
     input = unfilteredWorkflowsPrefixed();
-    workflowMetaTransformer("FACEBOOK", ["ADMIN", "OWNER"], null, input, null);
+    workflowMetaTransformer(mockIdentity("FACEBOOK", ["ADMIN", "OWNER"]), null, input, null);
     expect(input).toEqual(unfilteredWorkflows());
   });
 });

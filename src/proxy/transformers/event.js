@@ -61,40 +61,38 @@ function sanitizeEvent(tenantId: string, event: Event) {
 }
 
 const postEventBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
 ) => {
   const reqObj = req.body;
   console.info('Transforming', {reqObj});
-  sanitizeEvent(tenantId, anythingTo<Event>(reqObj));
+  sanitizeEvent(identity.tenantId, anythingTo<Event>(reqObj));
   proxyCallback({buffer: createProxyOptionsBuffer(reqObj, req)});
 };
 
 const putEventBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
 ) => {
   const reqObj = req.body;
   console.info('Transforming', {reqObj});
-  sanitizeEvent(tenantId, anythingTo<Event>(reqObj));
+  sanitizeEvent(identity.tenantId, anythingTo<Event>(reqObj));
   proxyCallback({buffer: createProxyOptionsBuffer(reqObj, req)});
 };
 
-const getEventAfter: AfterFun = (tenantId, groups, req, respObj) => {
+const getEventAfter: AfterFun = (identity, req, respObj) => {
   const events = anythingTo<Array<Event>>(respObj);
-  removeTenantPrefix(tenantId, respObj, '$[*].name', false);
+  removeTenantPrefix(identity.tenantId, respObj, '$[*].name', false);
   let wfName = '';
   for (const evnt of events) {
     const split = evnt.event.split(':');
     if (split.length === 3 && split[0] === 'conductor') {
       wfName = {name: split[1]};
-      removeTenantPrefix(tenantId, wfName, '$.name', false);
+      removeTenantPrefix(identity.tenantId, wfName, '$.name', false);
       evnt.event = `${split[0]}:${wfName.name}:${split[2]}`;
     }
   }

@@ -31,24 +31,24 @@ import type {
 /*
 curl  -H "x-tenant-id: fb-test" "localhost/proxy/api/metadata/taskdefs"
 */
-const getAllTaskdefsAfter: AfterFun = (tenantId, groups, req, respObj) => {
+const getAllTaskdefsAfter: AfterFun = (identity, req, respObj) => {
   const tasks = anythingTo<Array<Task>>(respObj);
   // iterate over taskdefs, keep only those belonging to tenantId or global
-  const tenantWithInfixSeparator = withInfixSeparator(tenantId);
+  const tenantWithInfixSeparator = withInfixSeparator(identity.tenantId);
   const globalPrefix = withInfixSeparator(GLOBAL_PREFIX);
 
   for (let idx = tasks.length - 1; idx >= 0; idx--) {
     const taskdef = tasks[idx];
     if (
-      taskdef.name.indexOf(tenantWithInfixSeparator) != 0 &&
-      taskdef.name.indexOf(globalPrefix) != 0
+      taskdef.name.indexOf(tenantWithInfixSeparator) !== 0 &&
+      taskdef.name.indexOf(globalPrefix) !== 0
     ) {
       // remove element
       tasks.splice(idx, 1);
     }
   }
   // remove tenantId prefix, keep GLOBAL prefix
-  removeTenantPrefix(tenantId, tasks, '$[*].name', true);
+  removeTenantPrefix(identity.tenantId, tasks, '$[*].name', true);
 };
 
 // Used in POST and PUT
@@ -80,8 +80,7 @@ curl -X POST -H "x-tenant-id: fb-test"  \
 */
 // TODO: should this be disabled?
 const postTaskdefsBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
@@ -91,7 +90,7 @@ const postTaskdefsBefore: BeforeFun = (
   if (reqObj != null && Array.isArray(reqObj)) {
     for (let idx = 0; idx < reqObj.length; idx++) {
       const taskdef = anythingTo<Task>(reqObj[idx]);
-      sanitizeTaskdefBefore(tenantId, taskdef);
+      sanitizeTaskdefBefore(identity.tenantId, taskdef);
     }
     proxyCallback({buffer: createProxyOptionsBuffer(reqObj, req)});
   } else {
@@ -120,8 +119,7 @@ curl -X PUT -H "x-tenant-id: fb-test" \
 */
 // TODO: should this be disabled?
 const putTaskdefBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
@@ -129,7 +127,7 @@ const putTaskdefBefore: BeforeFun = (
   const reqObj = req.body;
   if (reqObj != null && typeof reqObj === 'object') {
     const taskdef = anythingTo<Task>(reqObj);
-    sanitizeTaskdefBefore(tenantId, taskdef);
+    sanitizeTaskdefBefore(identity.tenantId, taskdef);
     proxyCallback({buffer: createProxyOptionsBuffer(reqObj, req)});
   } else {
     console.error('Expected req.body to be object in putTaskdefBefore');
@@ -143,33 +141,31 @@ curl -H "x-tenant-id: fb-test" \
 */
 // Gets the task definition
 const getTaskdefByNameBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
 ) => {
-  req.params.name = withInfixSeparator(tenantId) + req.params.name;
+  req.params.name = withInfixSeparator(identity.tenantId) + req.params.name;
   // modify url
   req.url = '/api/metadata/taskdefs/' + req.params.name;
   proxyCallback();
 };
 
 const getTaskdefByNameAfter: AfterFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   respObj,
   res,
 ) => {
   const task = anythingTo<Task>(respObj);
-  const tenantWithInfixSeparator = withInfixSeparator(tenantId);
+  const tenantWithInfixSeparator = withInfixSeparator(identity.tenantId);
   // remove prefix
-  if (task.name.indexOf(tenantWithInfixSeparator) == 0) {
+  if (task.name.indexOf(tenantWithInfixSeparator) === 0) {
     task.name = task.name.substr(tenantWithInfixSeparator.length);
   } else {
     console.error(
-      `Tenant Id prefix '${tenantId}' not found, taskdef name: '${task.name}'`,
+      `Tenant Id prefix '${identity.tenantId}' not found, taskdef name: '${task.name}'`,
     );
     res.status(400);
     res.send('Prefix not found');
@@ -183,13 +179,12 @@ curl -H "x-tenant-id: fb-test" \
  "localhost/api/metadata/taskdefs/bar" -X DELETE -v
 */
 const deleteTaskdefByNameBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
 ) => {
-  req.params.name = withInfixSeparator(tenantId) + req.params.name;
+  req.params.name = withInfixSeparator(identity.tenantId) + req.params.name;
   // modify url
   req.url = '/api/metadata/taskdefs/' + req.params.name;
   proxyCallback();

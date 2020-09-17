@@ -34,14 +34,13 @@ curl  -H "x-tenant-id: fb-test" \
 
 */
 const bulkOperationBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
 ) => {
   const requestWorkflowIds = req.body; // expect JS array
-  if (!Array.isArray(requestWorkflowIds) || requestWorkflowIds.length == 0) {
+  if (!Array.isArray(requestWorkflowIds) || requestWorkflowIds.length === 0) {
     console.error('Expected non empty array', {requestWorkflowIds});
     res.status(400);
     res.send('Expected array of workflows');
@@ -58,7 +57,7 @@ const bulkOperationBefore: BeforeFun = (
   let query = 'workflowId+IN+(';
 
   for (const workflowId of requestWorkflowIds) {
-    if (typeof workflowId === 'string' && /^[a-z0-9\-]+$/i.test(workflowId)) {
+    if (typeof workflowId === 'string' && /^[a-z0-9-]+$/i.test(workflowId)) {
       query += workflowId + ',';
     } else {
       console.error('Unexpected workflowId format', {workflowId});
@@ -81,7 +80,7 @@ const bulkOperationBefore: BeforeFun = (
     // only keep found workflows
     // security - check WorkflowType prefix
     removeTenantPrefix(
-      tenantId,
+      identity.tenantId,
       searchResult,
       'results[*].workflowType',
       false,

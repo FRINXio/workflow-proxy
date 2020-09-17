@@ -26,6 +26,7 @@ import {
   getUserEmail,
 } from '../utils.js';
 
+import type {ExpressRequest} from 'express';
 import type {
   AfterFun,
   BeforeFun,
@@ -105,7 +106,7 @@ export function sanitizeWorkflowdefAfter(
   workflowdef: Workflow,
 ): boolean {
   const tenantWithInfixSeparator = withInfixSeparator(tenantId);
-  if (workflowdef.name.indexOf(tenantWithInfixSeparator) == 0) {
+  if (workflowdef.name.indexOf(tenantWithInfixSeparator) === 0) {
     // keep only workflows with correct taskdefs,
     // allowed are GLOBAL and those with tenantId prefix which will be removed
 
@@ -177,7 +178,7 @@ function sanitizeWorkflowTaskdefAfter(
   if (isSubworkflowTask(task)) {
     if (task.subWorkflowParam != null) {
       const namedObject: {name: string} = task.subWorkflowParam;
-      if (namedObject.name.indexOf(tenantWithInfixSeparator) == 0) {
+      if (namedObject.name.indexOf(tenantWithInfixSeparator) === 0) {
         namedObject.name = namedObject.name.substr(
           tenantWithInfixSeparator.length,
         );
@@ -187,10 +188,10 @@ function sanitizeWorkflowTaskdefAfter(
     }
   }
 
-  if (task.name.indexOf(withInfixSeparator(GLOBAL_PREFIX)) == 0) {
+  if (task.name.indexOf(withInfixSeparator(GLOBAL_PREFIX)) === 0) {
     return true;
   }
-  if (task.name.indexOf(tenantWithInfixSeparator) == 0) {
+  if (task.name.indexOf(tenantWithInfixSeparator) === 0) {
     // remove prefix
     task.name = task.name.substr(tenantWithInfixSeparator.length);
     return true;
@@ -203,8 +204,7 @@ function sanitizeWorkflowTaskdefAfter(
 curl -H "x-tenant-id: fb-test" "localhost/proxy/api/metadata/workflow"
 */
 export const getAllWorkflowsAfter: AfterFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   respObj,
 ) => {
@@ -216,7 +216,7 @@ export const getAllWorkflowsAfter: AfterFun = (
     workflowIdx--
   ) {
     const workflowdef = workflows[workflowIdx];
-    const ok = sanitizeWorkflowdefAfter(tenantId, workflowdef);
+    const ok = sanitizeWorkflowdefAfter(identity.tenantId, workflowdef);
     if (!ok) {
       console.warn(
         `Removing workflow with invalid task or name: ${JSON.stringify(
@@ -237,13 +237,12 @@ curl -H "x-tenant-id: fb-test" \
   "localhost/proxy/api/metadata/workflow/2/2" -X DELETE
 */
 const deleteWorkflowBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
 ) => {
-  const tenantWithInfixSeparator = withInfixSeparator(tenantId);
+  const tenantWithInfixSeparator = withInfixSeparator(identity.tenantId);
   // change URL: add prefix to name
   const name = tenantWithInfixSeparator + req.params.name;
   const newUrl = `/api/metadata/workflow/${name}/${req.params.version}`;
@@ -259,13 +258,12 @@ curl -H "x-tenant-id: fb-test" \
   "localhost/proxy/api/metadata/workflow/fx3?version=1"
 */
 export const getWorkflowBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
 ) => {
-  const tenantWithInfixSeparator = withInfixSeparator(tenantId);
+  const tenantWithInfixSeparator = withInfixSeparator(identity.tenantId);
   const name = tenantWithInfixSeparator + req.params.name;
   let newUrl = `/api/metadata/workflow/${name}`;
   const originalQueryString = req._parsedUrl.query;
@@ -279,13 +277,13 @@ export const getWorkflowBefore: BeforeFun = (
   proxyCallback();
 };
 
-export const getWorkflowAfter: AfterFun = (tenantId, groups, req, respObj) => {
+export const getWorkflowAfter: AfterFun = (identity, req, respObj) => {
   const workflow = anythingTo<Workflow>(respObj);
-  const ok = sanitizeWorkflowdefAfter(tenantId, workflow);
+  const ok = sanitizeWorkflowdefAfter(identity.tenantId, workflow);
   if (!ok) {
     console.error(
       `Possible error in code: response contains invalid task or` +
-        `workflowdef name, tenant Id: ${tenantId}`,
+        `workflowdef name, tenant Id: ${identity.tenantId}`,
     );
     throw 'Possible error in code: response contains' +
       ' invalid task or workflowdef name'; // TODO create Exception class
@@ -345,15 +343,14 @@ curl -X PUT -H "x-tenant-id: fb-test" \
 ]'
 */
 const putWorkflowBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
 ) => {
   const workflows: Array<Workflow> = anythingTo<Array<Workflow>>(req.body);
   for (const workflowdef of workflows) {
-    sanitizeWorkflowdefBefore(tenantId, workflowdef, req);
+    sanitizeWorkflowdefBefore(identity.tenantId, workflowdef, req);
   }
   console.info(`Transformed request to ${JSON.stringify(workflows)}`);
   proxyCallback({buffer: createProxyOptionsBuffer(workflows, req)});
@@ -390,14 +387,13 @@ curl -X POST -H "x-tenant-id: fb-test" \
 '
 */
 const postWorkflowBefore: BeforeFun = (
-  tenantId,
-  groups,
+  identity,
   req,
   res,
   proxyCallback,
 ) => {
   const workflow: Workflow = anythingTo<Workflow>(req.body);
-  sanitizeWorkflowdefBefore(tenantId, workflow, req);
+  sanitizeWorkflowdefBefore(identity.tenantId, workflow, req);
   console.info(`Transformed request to ${JSON.stringify(workflow)}`);
   proxyCallback({buffer: createProxyOptionsBuffer(workflow, req)});
 };

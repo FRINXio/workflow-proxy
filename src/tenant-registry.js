@@ -13,7 +13,7 @@ async function pollKeycloak() {
   const tenants = [];
   for (const r of realms) {
     // skip the "master" realm
-    if (r.realm == "master") continue;
+    if (r.realm === "master") continue;
     tenants.push(r.realm);
   }
   conf.tenants = tenants;
@@ -29,7 +29,7 @@ async function tryStart() {
     .catch((err) => {
       // important because when starting all the containers,
       // keycloak isn't immediately available
-      console.log("Couldn't initilize keycloak client, trying again in a few seconds.");
+      console.log("Couldn't initilize keycloak client, trying again in a few seconds.", err);
       setTimeout(tryStart, RETRY_TIME);
     });
 }
