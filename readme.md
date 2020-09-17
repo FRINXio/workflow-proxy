@@ -39,6 +39,9 @@ must be specified when executing each workflow.
 Workers may reqiure to use current user's email for auth purposes. When creating
 or updating a schedule, the email will be saved to Schellar's database.
 
+Note about deprecation: once upstream adds ability to specify
+`taskDomain` and `correlationId` fields, this proxy can be removed.
+
 ## Task proxy
 Default port: 8089
 
@@ -52,3 +55,5 @@ Main responsibility:
 Workers should use the polling API to specify how many tasks they want to work on.
 Task proxy augments this API: It loops over tenants and requests the tasks from each
 tenant's queue, then sends combined result back to the worker.
+Contrary to the User facing proxy, the response body is not cleaned from tenant prefixes,
+so workers are able to figure out tenant Id based on the prefix of the workflow name.

@@ -3217,7 +3217,7 @@ http-errors@~1.7.2:
     statuses ">= 1.5.0 < 2"
     toidentifier "1.0.0"
 
-http-proxy@^1.18.0:
+http-proxy@^1.18.1:
   version "1.18.1"
   resolved "https://registry.yarnpkg.com/http-proxy/-/http-proxy-1.18.1.tgz#401541f0534884bbf95260334e72f88ee3976549"
   integrity sha512-7mz/721AbnJwIVbnaSv1Cz3Am0ZLT/UBwkC92VlxhXv/k/BBQfM2fXElQNC27BVGr0uwUpplYPQM9LnaBMR5NQ==
@@ -5006,6 +5006,11 @@ progress@^2.0.0:
   resolved "https://registry.yarnpkg.com/progress/-/progress-2.0.3.tgz#7e8cf8d8f5b8f239c1bc68beb4eb78567d572ef8"
   integrity sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==
 
+promise-polyfill@^1.1.6:
+  version "1.1.6"
+  resolved "https://registry.yarnpkg.com/promise-polyfill/-/promise-polyfill-1.1.6.tgz#cd04eff46f5c95c3a7d045591d79b5e3e01f12d7"
+  integrity sha1-zQTv9G9clcOn0EVZHXm14+AfEtc=
+
 prompts@^2.0.1:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/prompts/-/prompts-2.3.2.tgz#480572d89ecf39566d2bd3fe2c9fccb7c4c0b068"
@@ -5734,6 +5739,13 @@ stream-array@^1.1.2:
   integrity sha1-nl9zRfITfDDuO0mLkRToC1K7frU=
   dependencies:
     readable-stream "~2.1.0"
+
+stream-to-string@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/stream-to-string/-/stream-to-string-1.2.0.tgz#3ca506a097ecbf78b0e0aee0b6fa5c4565412a15"
+  integrity sha512-8drZlFIKBHSMdX9GCWv8V9AAWnQcTqw0iAI6/GC7UJ0H0SwKeFKjOoZfGY1tOU00GGU7FYZQoJ/ZCUEoXhD7yQ==
+  dependencies:
+    promise-polyfill "^1.1.6"
 
 string-length@^2.0.0:
   version "2.0.0"
