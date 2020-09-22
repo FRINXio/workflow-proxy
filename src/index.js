@@ -14,7 +14,6 @@ import ExpressApplication from 'express';
 import proxy from './proxy/proxy';
 import workflowRouter from './routes';
 import {getUserGroups, getUserRoles} from './proxy/utils.js';
-import {groupsForUser, rolesForUser} from './proxy/keycloakGroups';
 
 import bulk from './proxy/transformers/bulk';
 import event from './proxy/transformers/event';
@@ -60,11 +59,11 @@ const rbacProxyUrl = 'http://localhost:8088/rbac_proxy/';
 |  +----------+-----------+       +-----------+----------+  |
 |             | HTTP                          | HTTP        |
 | /proxy      |                  /rbac_proxy  |             |
-|  +----------v-----------+       +-----------v----------+  |                  +----------+
-|  | Tenant proxy         |       | RBAC proxy           |  |       HTTP       | Keycloak |
-|  |  proxy.js            <-------+  proxy.js            |  +----------------->+          |
-|  |  transformers/*.js   |  HTTP |  trans/*-rbac.js     |  |                  |          |
-|  +-----------+----------+       +----------------------+  |                  +----------+
+|  +----------v-----------+       +-----------v----------+  |
+|  | Tenant proxy         |       | RBAC proxy           |  |
+|  |  proxy.js            <-------+  proxy.js            |  |
+|  |  transformers/*.js   |  HTTP |  trans/*-rbac.js     |  |
+|  +-----------+----------+       +----------------------+  |
 |              |                             |              |
 +-----------------------------------------------------------+
                |                             |
@@ -100,8 +99,6 @@ async function init() {
       schellar,
     ],
     adminAccess,
-    groupsForUser,
-    rolesForUser,
   );
   app.use('/', await workflowRouter(tenantProxyUrl));
   app.use('/proxy', proxyRouter);
@@ -114,12 +111,13 @@ async function init() {
   rbacConductorRouter.get(
     '/editableworkflows',
     async (req: ExpressRequest, res) => {
-      const roles = await getUserRoles(req, rolesForUser);
-      const groups = await getUserGroups(req, roles, groupsForUser);
       res
         .status(200)
         .send(
-          adminAccess({"tenantId": "", roles, groups}),
+          adminAccess({
+            "tenantId": "",
+            roles: getUserRoles(req),
+            groups: getUserGroups(req)}),
         );
     },
   );
@@ -137,8 +135,6 @@ async function init() {
       bulk,
     ],
     generalAccess,
-    groupsForUser,
-    rolesForUser
   );
 
   app.use('/rbac', rbacConductorRouter);

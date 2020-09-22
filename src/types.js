@@ -123,14 +123,3 @@ export type TaskType = {
   },
 };
 export type AuthorizationCheck = (IdentityHeaders) => boolean;
-export type RoleLoadingStrategy = (
-  tenant: string,
-  email: string,
-  sessionId: ?string,
-) => Promise<string[]>;
-export type GroupLoadingStrategy = (
-  tenant: string,
-  email: string,
-  role: string[],
-  sessionId: ?string,
-) => Promise<string[]>;

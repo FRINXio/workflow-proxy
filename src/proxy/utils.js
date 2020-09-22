@@ -203,24 +203,23 @@ export function getUserEmail(req: ExpressRequest): string {
 
 export function getUserRoles(
   req: ExpressRequest,
-  roleLoadingStrategy: RoleLoadingStrategy,
-): Promise<string> {
-  return roleLoadingStrategy(
-    getTenantId(req),
-    getUserEmail(req),
-  );
+): Promise<string[]> {
+  const userRole: ?string = req.headers['x-auth-user-role'];
+  if (userRole == null) {
+    return [];
+  }
+  return userRole.split(',');
 }
 
-export async function getUserGroups(
+export function getUserGroups(
   req: ExpressRequest,
-  role: string,
-  groupLoadingStrategy: GroupLoadingStrategy,
 ): Promise<string[]> {
-  return groupLoadingStrategy(
-    getTenantId(req),
-    getUserEmail(req),
-    role,
-  );
+  const userGroup: ?string = req.headers['x-auth-user-group'];
+  if (userGroup == null) {
+    return [];
+  }
+
+  return userGroup.split(',');
 }
 
 export function createProxyOptionsBuffer(

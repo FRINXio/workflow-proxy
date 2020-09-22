@@ -24,6 +24,8 @@ function makeOptions(
     headers: {
       'x-tenant-id': parentRequest.headers['x-tenant-id'],
       'from': parentRequest.headers['from'],
+      'x-auth-user-role': parentRequest.headers['x-auth-user-role'],
+      'x-auth-user-group': parentRequest.headers['x-auth-user-group'],
       cookie: parentRequest.headers['cookie'],
       'Content-Type': 'application/json',
     },

@@ -8,7 +8,7 @@
  * @format
  */
 
-import {anythingTo, getTenantId, getUserEmail} from '../utils.js';
+import {anythingTo, getTenantId, getUserEmail, getUserGroups, getUserRoles} from '../utils.js';
 import {
   getExecutionStatusAfter as getExecutionStatusAfterDelegate,
   getSearchAfter as getSearchAfterDelegate,
@@ -45,7 +45,9 @@ function postWorkflowBeforeInternal(req, identity, res, proxyCallback, checkAndE
     method: 'GET',
     headers: {
       'from': getUserEmail(req),
-      'x-tenant-id': getTenantId(req)
+      'x-tenant-id': getTenantId(req),
+      'x-auth-user-role': getUserRoles(req),
+      'x-auth-user-group': getUserGroups(req),
     },
   };
 

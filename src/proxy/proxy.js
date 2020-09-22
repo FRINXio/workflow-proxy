@@ -32,8 +32,6 @@ export default async function(
   schellarTarget: string,
   transformFx: Array<TransformerRegistrationFun>,
   authorizationCheck: AuthorizationCheck,
-  groupLoadingStrategy: GroupLoadingStrategy,
-  roleLoadingStrategy: RoleLoadingStrategy,
 ) {
   const router = Router<ProxyRequest, ProxyResponse>();
   router.use(bodyParser.urlencoded({extended: false}));
@@ -61,8 +59,8 @@ export default async function(
 
     proxy.on('proxyRes', async function(proxyRes, req, res) {
       const tenantId = getTenantId(req);
-      const roles = await getUserRoles(req, roleLoadingStrategy);
-      const groups = await getUserGroups(req, roles, groupLoadingStrategy);
+      const roles = getUserRoles(req);
+      const groups = getUserGroups(req);
       const identity: IdentityHeaders = {tenantId, roles, groups};
 
       if (!authorizationCheck(identity)) {
@@ -119,8 +117,8 @@ export default async function(
         let identity: IdentityHeaders;
         try {
           tenantId = getTenantId(req);
-          roles = await getUserRoles(req, roleLoadingStrategy);
-          groups = await getUserGroups(req, roles, groupLoadingStrategy);
+          roles = getUserRoles(req);
+          groups = getUserGroups(req);
           identity = {tenantId, roles, groups};
         } catch (err) {
           console.error('Cannot get tenantId', {tenantId, roles, groups}, err);
