@@ -204,7 +204,7 @@ export function getUserEmail(req: ExpressRequest): string {
 export function getUserRoles(
   req: ExpressRequest,
 ): Promise<string[]> {
-  const userRole: ?string = req.headers['x-auth-user-role'];
+  const userRole: ?string = req.headers['x-auth-user-roles'];
   if (userRole == null) {
     return [];
   }
@@ -214,7 +214,7 @@ export function getUserRoles(
 export function getUserGroups(
   req: ExpressRequest,
 ): Promise<string[]> {
-  const userGroup: ?string = req.headers['x-auth-user-group'];
+  const userGroup: ?string = req.headers['x-auth-user-groups'];
   if (userGroup == null) {
     return [];
   }

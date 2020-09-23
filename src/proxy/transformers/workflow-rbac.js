@@ -46,8 +46,8 @@ function postWorkflowBeforeInternal(req, identity, res, proxyCallback, checkAndE
     headers: {
       'from': getUserEmail(req),
       'x-tenant-id': getTenantId(req),
-      'x-auth-user-role': getUserRoles(req),
-      'x-auth-user-group': getUserGroups(req),
+      'x-auth-user-roles': getUserRoles(req),
+      'x-auth-user-groups': getUserGroups(req),
     },
   };
 

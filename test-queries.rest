@@ -1,21 +1,12 @@
 # Can be executed with HTTP client built-in plugin in IDEA
 
-################ TEST SETUP ###################
-# Keycloak preconditions:
-# - tenant: fb
-# - user: fb-user
-#  - role: OWNER
-# - user: fb-operator
-#  - group: OPERATOR
-#  - role: <empty>
-################ TEST SETUP END ###################
-
 ################ RBAC CHECK ################
 
 ### Check if user has network-operator privileges
 GET http://localhost:8088/rbac/editableworkflows
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 > {%
 client.test("test", function() {
@@ -27,6 +18,7 @@ client.test("test", function() {
 GET http://localhost:8088/rbac/editableworkflows
 x-tenant-id: fb
 from: fb-operator
+x-auth-user-groups: OPERATOR
 
 > {%
 client.test("test", function() {
@@ -45,6 +37,7 @@ PUT http://localhost:8088/proxy/api/metadata/workflow
 Content-Type: application/json
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 [
   {
@@ -77,6 +70,7 @@ PUT http://localhost:8088/proxy/api/metadata/workflow
 Content-Type: application/json
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 [
   {
@@ -111,6 +105,7 @@ client.test("test", function() {
 GET http://localhost:8088/proxy/api/metadata/workflow
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 > {%
 client.test("test", function() {
@@ -123,6 +118,7 @@ client.test("test", function() {
 GET http://localhost:8088/rbac_proxy/api/metadata/workflow
 x-tenant-id: fb
 from: fb-operator
+x-auth-user-groups: OPERATOR
 
 > {%
 client.test("test", function() {
@@ -138,6 +134,7 @@ client.test("test", function() {
 GET http://localhost:8088/proxy/api/metadata/workflow/fx3
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 > {%
 client.test("test", function() {
@@ -150,6 +147,7 @@ client.test("test", function() {
 GET http://localhost:8088/rbac_proxy/api/metadata/workflow/fx3
 x-tenant-id: fb
 from: fb-operator
+x-auth-user-groups: OPERATOR
 
 > {%
 client.test("test", function() {
@@ -162,6 +160,7 @@ client.test("test", function() {
 GET http://localhost:8088/rbac_proxy/api/metadata/workflow/fx1
 x-tenant-id: fb
 from: fb-operator
+x-auth-user-groups: OPERATOR
 
 > {%
 client.test("test", function() {
@@ -180,6 +179,7 @@ POST http://localhost:8088/proxy/api/workflow
 Content-Type: application/json
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 {
     "name": "fx1"
@@ -198,6 +198,7 @@ POST http://localhost:8088/rbac_proxy/api/workflow
 Content-Type: application/json
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 {
   "name": "fx3"
@@ -215,6 +216,7 @@ POST http://localhost:8088/rbac_proxy/api/workflow
 Content-Type: application/json
 x-tenant-id: fb
 from: fb-operator
+x-auth-user-groups: OPERATOR
 
 {
   "name": "fx1"
@@ -231,6 +233,7 @@ POST http://localhost:8088/rbac_proxy/api/workflow
 Content-Type: application/json
 x-tenant-id: fb
 from: fb-operator
+x-auth-user-groups: OPERATOR
 
 {
   "name": "fx3",
@@ -254,6 +257,7 @@ java.lang.Thread.sleep(2000)
 GET http://localhost:8088/proxy/api/workflow/search
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 > {%
 client.test("test", function() {
@@ -266,6 +270,7 @@ client.test("test", function() {
 GET http://localhost:8088/rbac_proxy/api/workflow/search
 x-tenant-id: fb
 from: fb-operator
+x-auth-user-groups: OPERATOR
 
 > {%
 client.test("test", function() {
@@ -281,6 +286,7 @@ client.test("test", function() {
 GET http://localhost:8088/proxy/api/workflow/{{admin_exec_1}}?includeTasks=true
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 > {%
 client.test("test", function() {
@@ -293,6 +299,7 @@ client.test("test", function() {
 GET http://localhost:8088/rbac_proxy/api/workflow/{{admin_exec_2}}?includeTasks=true
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 > {%
 client.test("test", function() {
@@ -305,6 +312,7 @@ client.test("test", function() {
 GET http://localhost:8088/proxy/api/workflow/{{oper_exec_1}}?includeTasks=true
 x-tenant-id: fb
 from: fb-operator
+x-auth-user-groups: OPERATOR
 
 > {%
 client.test("test", function() {
@@ -316,6 +324,7 @@ client.test("test", function() {
 GET http://localhost:8088/rbac_proxy/api/workflow/{{oper_exec_1}}?includeTasks=true
 x-tenant-id: fb
 from: fb-operator
+x-auth-user-groups: OPERATOR
 
 > {%
 client.test("test", function() {
@@ -328,6 +337,7 @@ client.test("test", function() {
 GET http://localhost:8088/rbac_proxy/api/workflow/{{admin_exec_1}}?includeTasks=true
 x-tenant-id: fb
 from: fb-operator
+x-auth-user-groups: OPERATOR
 
 > {%
 client.test("test", function() {
@@ -341,6 +351,7 @@ client.test("test", function() {
 GET http://localhost:8088/proxy/api/workflow/search?query=status+IN+(COMPLETED)
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 > {%
 client.test("test", function() {
@@ -353,6 +364,7 @@ client.test("test", function() {
 GET http://localhost:8088/proxy/api/workflow/search?query=correlationId+IN+(fb-operator)
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 > {%
 client.test("test", function() {
@@ -365,6 +377,7 @@ client.test("test", function() {
 GET http://localhost:8088/proxy/api/workflow/search
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 > {%
 client.test("test", function() {
@@ -377,6 +390,7 @@ client.test("test", function() {
 GET http://localhost:8088/rbac_proxy/api/workflow/search
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 > {%
 client.test("test", function() {
@@ -389,6 +403,7 @@ client.test("test", function() {
 GET http://localhost:8088/rbac_proxy/api/workflow/search
 x-tenant-id: fb
 from: fb-operator
+x-auth-user-groups: OPERATOR
 
 > {%
 client.test("test", function() {
@@ -404,6 +419,7 @@ client.test("test", function() {
 DELETE http://localhost:8088/rbac_proxy/api/workflow/{{admin_exec_1}}/remove
 x-tenant-id: fb
 from: fb-operator
+x-auth-user-groups: OPERATOR
 
 > {%
 client.test("test", function() {
@@ -415,6 +431,7 @@ client.test("test", function() {
 DELETE http://localhost:8088/rbac_proxy/api/workflow/{{oper_exec_1}}/remove
 x-tenant-id: fb
 from: fb-operator
+x-auth-user-groups: OPERATOR
 
 > {%
 client.test("test", function() {
@@ -426,6 +443,7 @@ client.test("test", function() {
 DELETE http://localhost:8088/proxy/api/workflow/{{admin_exec_1}}/remove
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 > {%
 client.test("test", function() {
@@ -437,6 +455,7 @@ client.test("test", function() {
 DELETE http://localhost:8088/proxy/api/workflow/{{admin_exec_2}}/remove
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 > {%
 client.test("test", function() {
@@ -454,6 +473,7 @@ client.test("test", function() {
 DELETE http://localhost:8088/rbac_proxy/api/metadata/workflow/fx1/1
 x-tenant-id: fb
 from: fb-operator
+x-auth-user-groups: OPERATOR
 
 > {%
 client.test("test", function() {
@@ -465,6 +485,7 @@ client.test("test", function() {
 DELETE http://localhost:8088/proxy/api/metadata/workflow/fx1/1
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 > {%
 client.test("test", function() {
@@ -476,6 +497,7 @@ client.test("test", function() {
 DELETE http://localhost:8088/proxy/api/metadata/workflow/fx3/1
 x-tenant-id: fb
 from: fb-user
+x-auth-user-roles: OWNER
 
 > {%
 client.test("test", function() {
