@@ -60,9 +60,13 @@ export function sanitizeWorkflowdefBefore(
 function sanitizeWorkflowTaskdefBefore(tenantId: string, task: Task) {
   addTenantIdPrefix(tenantId, task, true);
 
-  // add prefix to SUB_WORKFLOW tasks' referenced workflows
   if (isSubworkflowTask(task)) {
+    // add prefix to SUB_WORKFLOW tasks' referenced workflows
     addTenantIdPrefix(tenantId, anythingTo<Task>(task.subWorkflowParam));
+    // Do not allow overriding taskToDomain in sub workflows
+    if (task.subWorkflowParam.taskToDomain != null) {
+      throw 'Attribute taskToDomain in subWorkflowParam is not allowed';
+    }
   }
 
   // process decision tasks recursively

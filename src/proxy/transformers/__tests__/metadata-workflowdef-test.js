@@ -62,14 +62,14 @@ describe('Workflow def transformers', () => {
   });
 
   test("PUT workflow before", () => {
-    const workflowPost = findTransformerFx(transformers, "/api/metadata/workflow", "put", "before");
+    const workflowPut = findTransformerFx(transformers, "/api/metadata/workflow", "put", "before");
 
     return new Promise(resolve => {
       let callback = function (input) {
         streamToString(input.buffer).then((workflow) => resolve(workflow));
       };
       let mockReq = mockRequest([workflowDef()], {}, {"from": "testmail"});
-      workflowPost({"tenantId": tenant, "roles": [], "groups": []}, mockReq, null, callback);
+      workflowPut({"tenantId": tenant, "roles": [], "groups": []}, mockReq, null, callback);
     }).then((workflow) => {
       expect(JSON.parse(workflow)).toStrictEqual([workflowDefPrefixed()]);
     });
@@ -101,6 +101,23 @@ describe('Workflow def transformers', () => {
     }).then(() => {
       expect(mockReq.url).toStrictEqual("/api/metadata/workflow/FACEBOOK___wf31/1.1");
     });
+  });
+
+  test("Do not allow taskToDomain in subworkflows", async () => {
+    const workflowPost = findTransformerFx(transformers, "/api/metadata/workflow", "post", "before");
+    console.log('workflowPost', workflowPost);
+    // const workflowPut = findTransformerFx(transformers, "/api/metadata/workflow", "put", "before");
+    expect(() => {
+      let callback = function (input) {
+        throw new Error("Unreachable " + input);
+      };
+      let wd = JSON.parse(JSON.stringify(workflowDef()));
+      let subWorkflowTask = wd.tasks[2];
+      expect(subWorkflowTask.type).toStrictEqual('SUB_WORKFLOW');
+      subWorkflowTask.subWorkflowParam.taskToDomain = { "*" : "NO_DOMAIN"};
+      let mockReq = mockRequest(wd, {}, {"from": "testmail"});
+      workflowPost({"tenantId": tenant, "roles": [], "groups": []}, mockReq, null, callback);
+    }).toThrowError(new Error('Attribute taskToDomain in subWorkflowParam is not allowed'));
   });
 });
 

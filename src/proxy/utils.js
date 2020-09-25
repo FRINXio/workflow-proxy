@@ -39,7 +39,6 @@ const SYSTEM_TASK_TYPES: Array<string> = [
   'JOIN',
   'EXCLUSIVE_JOIN',
   'WAIT',
-  'DYNAMIC',
   'TERMINATE',
   'KAFKA_PUBLISH',
   'DO_WHILE',

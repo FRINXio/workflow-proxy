@@ -65,6 +65,18 @@
       ],
       "optional": false,
       "startDelay": 0
+    },
+    {
+      "name": "sub",
+      "taskReferenceName": "sub_ref_T452",
+      "type": "SUB_WORKFLOW",
+      "startDelay": 0,
+      "subWorkflowParam": {
+        "name": "sub",
+        "version": 1
+      },
+      "optional": false,
+      "asyncComplete": false
     }
   ],
   "outputParameters": {},
