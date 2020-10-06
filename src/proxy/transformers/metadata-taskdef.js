@@ -146,9 +146,12 @@ const getTaskdefByNameBefore: BeforeFun = (
   res,
   proxyCallback,
 ) => {
-  req.params.name = withInfixSeparator(identity.tenantId) + req.params.name;
-  // modify url
-  req.url = '/api/metadata/taskdefs/' + req.params.name;
+  const globalPrefix = withInfixSeparator(GLOBAL_PREFIX);
+  if (req.params.name.indexOf(globalPrefix) != 0) {
+    req.params.name = withInfixSeparator(identity.tenantId) + req.params.name;
+    // modify url
+    req.url = '/api/metadata/taskdefs/' + req.params.name;
+  }
   proxyCallback();
 };
 
@@ -159,11 +162,12 @@ const getTaskdefByNameAfter: AfterFun = (
   res,
 ) => {
   const task = anythingTo<Task>(respObj);
+  const globalPrefix = withInfixSeparator(GLOBAL_PREFIX);
   const tenantWithInfixSeparator = withInfixSeparator(identity.tenantId);
   // remove prefix
   if (task.name.indexOf(tenantWithInfixSeparator) === 0) {
     task.name = task.name.substr(tenantWithInfixSeparator.length);
-  } else {
+  } else if (task.name.indexOf(globalPrefix) != 0) {
     console.error(
       `Tenant Id prefix '${identity.tenantId}' not found, taskdef name: '${task.name}'`,
     );

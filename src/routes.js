@@ -605,5 +605,19 @@ export default async function(
     }
   });
 
+  router.get("/queue/data", async (req, res, next) => {
+    try {
+      const queueNamesToSizes = await http.get(baseURLTask + "queue/all", req);
+      const polldata = [];
+      for (const name in queueNamesToSizes) {
+        polldata.push({queueName: name, qsize: queueNamesToSizes[name], lastPollTime: null});
+      }
+      res.status(200).send({ polldata });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+
   return router;
 }

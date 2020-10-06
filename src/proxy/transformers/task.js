@@ -14,7 +14,7 @@ import type {BeforeFun, TransformerRegistrationFun} from '../../types';
 
 let proxyTarget;
 
-export const getLogBefore: BeforeFun = (
+const getLogBefore: BeforeFun = (
   identity,
   req,
   res,
@@ -53,6 +53,35 @@ export const getLogBefore: BeforeFun = (
   });
 };
 
+/*
+Result contains task queues of all tenants, keep only belonging to the
+tenant's queues.
+Sample input:
+ {
+   "GLOBAL___GRAPHQL_task_go": 0,
+   "GLOBAL___RM_claim_task": 0,
+   "GLOBAL___RM_free_task": 0,
+   "GLOBAL___RM_graphql_task": 0,
+   "HTTP": 0,
+   "KAFKA_PUBLISH": 0,
+   "_deciderQueue": 0,
+   "fb-test:GLOBAL___HTTP_task": 0,
+   "fb-test:GLOBAL___SAMPLE_task": 0,
+   "fb-test:GLOBAL___js": 1,
+   "fb-test:GLOBAL___py": 0,
+   "secondt:GLOBAL___HTTP_task": 0
+ }
+*/
+const getQueueAllAfter: AfterFun = (identity, req, respObj) => {
+  const allowedDomainPrefix = identity.tenantId + ':';
+  for (const key in respObj) {
+    if (key.indexOf(allowedDomainPrefix) == 0) {
+      respObj[key.substr(allowedDomainPrefix.length)] = respObj[key];
+    }
+    delete respObj[key];
+  }
+};
+
 const registration: TransformerRegistrationFun = function(ctx) {
   proxyTarget = ctx.proxyTarget;
   return [
@@ -60,6 +89,11 @@ const registration: TransformerRegistrationFun = function(ctx) {
       method: 'get',
       url: '/api/tasks/:taskId/log',
       before: getLogBefore,
+    },
+    {
+      method: 'get',
+      url: '/api/tasks/queue/all',
+      after: getQueueAllAfter,
     },
   ];
 };
