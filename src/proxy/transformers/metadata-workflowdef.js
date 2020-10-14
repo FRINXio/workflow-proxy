@@ -13,27 +13,22 @@
 
 import qs from 'qs';
 import {
-  GLOBAL_PREFIX,
   addTenantIdPrefix,
   anythingTo,
   assertAllowedSystemTask,
   createProxyOptionsBuffer,
+  getUserEmail,
+  GLOBAL_PREFIX,
   isDecisionTask,
+  isDoWhileTask,
   isForkTask,
   isSubworkflowTask,
   objectToValues,
   withInfixSeparator,
-  getUserEmail,
 } from '../utils.js';
 
 import type {ExpressRequest} from 'express';
-import type {
-  AfterFun,
-  BeforeFun,
-  Task,
-  TransformerRegistrationFun,
-  Workflow,
-} from '../../types';
+import type {AfterFun, BeforeFun, Task, TransformerRegistrationFun, Workflow,} from '../../types';
 
 // Utility used in PUT, POST before methods to check that submitted workflow
 // and its tasks
@@ -100,6 +95,15 @@ function sanitizeWorkflowTaskdefBefore(tenantId: string, task: Task) {
       }
     }
   }
+
+  // process dowhile tasks recursively
+  if (isDoWhileTask(task)) {
+    const loopOver: Array<Task> = task.loopOver ? task.loopOver : [];
+    for (const nestedTask of loopOver) {
+      // handle sub lists in forked tasks
+      sanitizeWorkflowTaskdefBefore(tenantId, nestedTask);
+    }
+  }
 }
 
 // Utility used after getting single or all workflowdefs to remove prefix from
@@ -152,6 +156,17 @@ function sanitizeWorkflowTaskdefAfter(
         ) {
           return false;
         }
+      }
+    }
+  }
+
+  if (isDoWhileTask(task)) {
+    const loopOver: Array<Task> = task.loopOver ? task.loopOver : [];
+    for (const nestedTask of loopOver) {
+      if (
+        !sanitizeWorkflowTaskdefAfter(tenantWithInfixSeparator, nestedTask)
+      ) {
+        return false;
       }
     }
   }

@@ -77,6 +77,88 @@
       },
       "optional": false,
       "asyncComplete": false
+    },
+    {
+      "name": "whileTask",
+      "taskReferenceName": "whileTaskRef_MVOG",
+      "inputParameters": {
+        "iterations": 10
+      },
+      "type": "DO_WHILE",
+      "startDelay": 0,
+      "optional": false,
+      "asyncComplete": false,
+      "loopCondition": "$.whileTaskRef_MVOG['iteration'] < $.iterations",
+      "loopOver": [
+        {
+          "name": "forkTask",
+          "taskReferenceName": "forkTaskRef_A6DL",
+          "inputParameters": {},
+          "type": "FORK_JOIN",
+          "decisionCases": {},
+          "defaultCase": [],
+          "forkTasks": [
+            [
+              {
+                "name": "sub",
+                "taskReferenceName": "sub_ref_T452",
+                "type": "SUB_WORKFLOW",
+                "startDelay": 0,
+                "subWorkflowParam": {
+                  "name": "sub",
+                  "version": 1
+                },
+                "optional": false,
+                "asyncComplete": false
+              }
+            ],
+            [
+              {
+                "name": "GLOBAL___py",
+                "taskReferenceName": "lambdaJsTaskRef_STRY",
+                "inputParameters": {
+                  "lambdaValue": "${workflow.input.lambdaValue}",
+                  "scriptExpression": "if ($.lambdaValue == 1) {\n  return {testvalue: true};\n} else {\n  return {testvalue: false};\n}"
+                },
+                "type": "SIMPLE",
+                "decisionCases": {},
+                "defaultCase": [],
+                "forkTasks": [],
+                "startDelay": 0,
+                "joinOn": [],
+                "optional": false,
+                "defaultExclusiveJoinTask": [],
+                "asyncComplete": false,
+                "loopOver": []
+              }
+            ]
+          ],
+          "startDelay": 0,
+          "joinOn": [],
+          "optional": false,
+          "defaultExclusiveJoinTask": [],
+          "asyncComplete": false,
+          "loopOver": []
+        },
+        {
+          "name": "joinTask",
+          "taskReferenceName": "joinTaskRef_DB9Q",
+          "inputParameters": {},
+          "type": "JOIN",
+          "decisionCases": {},
+          "defaultCase": [],
+          "forkTasks": [],
+          "startDelay": 0,
+          "joinOn": [
+            "sub_ref_T452",
+            "lambdaJsTaskRef_STRY"
+          ],
+          "optional": false,
+          "defaultExclusiveJoinTask": [],
+          "asyncComplete": false,
+          "loopOver": []
+        }
+      ]
     }
   ],
   "outputParameters": {},

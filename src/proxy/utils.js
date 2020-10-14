@@ -28,13 +28,16 @@ export const INFIX_SEPARATOR: string = '___';
 
 const SUB_WORKFLOW: string = 'SUB_WORKFLOW';
 const DECISION: string = 'DECISION';
+const DO_WHILE: string = 'DO_WHILE';
 const FORK: string = 'FORK';
+const FORK_JOIN: string = 'FORK_JOIN';
 const SYSTEM_TASK_TYPES: Array<string> = [
   SUB_WORKFLOW,
   DECISION,
+  DO_WHILE,
   'EVENT',
   FORK,
-  'FORK_JOIN',
+  FORK_JOIN,
   'FORK_JOIN_DYNAMIC',
   'JOIN',
   'EXCLUSIVE_JOIN',
@@ -88,8 +91,12 @@ export function isDecisionTask(task: Task): boolean {
   return DECISION === task.type;
 }
 
+export function isDoWhileTask(task: Task): boolean {
+  return DO_WHILE === task.type;
+}
+
 export function isForkTask(task: Task): boolean {
-  return FORK === task.type;
+  return FORK === task.type || FORK_JOIN === task.type;
 }
 
 export function assertAllowedSystemTask(task: Task): void {
@@ -122,6 +129,14 @@ export function assertAllowedSystemTask(task: Task): void {
       for (const task of tasks) {
         assertAllowedSystemTask(task);
       }
+    }
+  }
+
+  // assert dowhile recursively
+  if (isDecisionTask(task)) {
+    const loopedTasks = task.loopOver ? task.loopOver : [];
+    for (const task of loopedTasks) {
+      assertAllowedSystemTask(task);
     }
   }
 }
