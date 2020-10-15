@@ -26,7 +26,6 @@ import workflow from './proxy/transformers/workflow';
 import metadataWorkflowdefRbac from './proxy/transformers/metadata-workflowdef-rbac';
 import workflowRbac from './proxy/transformers/workflow-rbac';
 import taskProxy from './task-proxy';
-import schellarProxy from './schellar-proxy';
 import {adminAccess, generalAccess} from "./proxy/utils";
 
 import dotenv from "dotenv";
@@ -35,7 +34,6 @@ dotenv.config();
 
 const app = ExpressApplication();
 
-const schellarProxyPort = process.env.SCHELLAR_PROXY_PORT ?? 8087;
 const userFacingPort = process.env.USER_FACING_PORT ?? 8088;
 const taskProxyPort = process.env.TASK_PROXY_PORT ?? 8089;
 const proxyTarget =
@@ -143,7 +141,6 @@ async function init() {
   app.get("/probe/readiness", (req, res) => res.sendStatus(200));
   app.listen(userFacingPort);
   taskProxy.init(proxyTarget, taskProxyPort);
-  schellarProxy.init(proxyTarget, schellarProxyPort);
 }
 
 init();

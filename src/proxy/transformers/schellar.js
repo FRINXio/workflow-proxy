@@ -54,13 +54,11 @@ function sanitizeScheduleBefore(
   addTenantIdPrefix(tenantId, schedule);
   // add tenantId to workflowName
   schedule.workflowName = withInfixSeparator(tenantId) + schedule.workflowName;
-  // Whoever creates/updates the schedule will be persisted as the executor.
-  // First we save the email into workflowContext, then in schellar-proxy.js move
-  // it from there.
-  if (schedule.workflowContext == null) {
-    schedule.workflowContext = {};
-  }
-  schedule.workflowContext.correlationId = getUserEmail(req);
+  // Whoever creates/updates the schedule will be presented to workers as the owner of the execution.
+  schedule.correlationId = getUserEmail(req); // TODO: include roles and groups
+  // Add taskToDomain so that schellar executes the workflow tasks in the per-tenant queue.
+  // See readme for more details.
+  schedule.taskToDomain = { "*": tenantId};
   console.debug('sanitizeScheduleBefore', schedule);
 }
 

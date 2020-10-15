@@ -22,22 +22,7 @@ worker can use it for authentication purposes.
 * Separate task queues for each tenant using [Task Domains](https://netflix.github.io/conductor/configuration/taskdomains/)
 
 
-## Schellar proxy
-Default port: 8087
-
-Environment variable: `SCHELLAR_PROXY_PORT`
-
-This proxy is used by Schellar when interacting with Conductor.
-When Schellar executes a workflow, some metadata must be added.
-
-Main responsibility:
-* Add task domain (tenant Id) and email to the workflow execution request
-
-In order to have separate task queues for each tenant, *Task Domain*
-must be specified when executing each workflow.
-
-Workers may reqiure to use current user's email for auth purposes. When creating
-or updating a schedule, the email will be saved to Schellar's database.
+TODO: describe schellar.js, especially task domains and correlation Ids
 
 Note about deprecation: once upstream adds ability to specify
 `taskDomain` and `correlationId` fields, this proxy can be removed.
