@@ -6,9 +6,10 @@ up to (tenants.length * count) results.
 */
 import request from 'request-promise-native';
 import ExpressApplication from 'express';
-import { tenantRegistry } from './tenant-registry';
+import {tenantRegistry} from './tenant-registry';
 import genericProxy from './generic-proxy';
 import qs from 'querystring';
+
 const app = ExpressApplication();
 
 const taskProxy = {
@@ -26,7 +27,7 @@ const taskProxy = {
           const promises = [];
           for (const domain of tenants) {
             const queryUrl = conductorProxyTarget + '/api/tasks/poll/batch/' + taskType + '?' +
-              qs.stringify({ workerid, count, timeout, domain });
+              qs.stringify({workerid, count, timeout, domain});
             const requestOptions = {
               url: queryUrl,
               method: 'GET',
@@ -59,6 +60,21 @@ const taskProxy = {
     app.use('/', proxyRouter);
     app.listen(port);
   },
+
+  live: function () {
+    return true;
+  },
+
+  ready: function() {
+    try {
+      tenantRegistry();
+    } catch (e) {
+      console.warn("Keycloak client not ready yet");
+      return false;
+    }
+    return true;
+  },
+
 };
 
 export default taskProxy;

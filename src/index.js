@@ -137,8 +137,20 @@ async function init() {
 
   app.use('/rbac', rbacConductorRouter);
   app.use('/rbac_proxy', rbacRouter);
-  app.get("/probe/liveness", (req, res) => res.sendStatus(200));
-  app.get("/probe/readiness", (req, res) => res.sendStatus(200));
+  app.get("/probe/liveness", (req, res) => {
+    if (taskProxy.live()) {
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(500);
+    }
+  });
+  app.get("/probe/readiness", (req, res) => {
+    if (taskProxy.ready()) {
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(500);
+    }
+  });
   app.listen(userFacingPort);
   taskProxy.init(proxyTarget, taskProxyPort);
 }

@@ -5,6 +5,7 @@ const RETRY_TIME = process.env.RETRY_TIME ?? 5 * 1000; // 5 seconds
 
 const conf = {
   tenants: [],
+  keycloakReady: false,
 };
 
 async function pollKeycloak() {
@@ -23,6 +24,7 @@ async function tryStart() {
   kClient
     .init()
     .then(() => {
+      conf.keycloakReady = true;
       pollKeycloak();
       setInterval(pollKeycloak, TENANT_POLL_INTERVAL);
     })
@@ -36,5 +38,8 @@ async function tryStart() {
 tryStart();
 
 export function tenantRegistry() {
+  if (!conf.keycloakReady) {
+    throw new Error("Keycloak not ready yet");
+  }
   return conf.tenants;
 }
