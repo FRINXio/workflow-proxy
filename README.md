@@ -178,6 +178,8 @@ There is no schema such as OpenAPI to describe workflow proxy. But since it copi
 * https://github.com/FRINXio/schellar
 * https://netflix.github.io/conductor/apispec/
 
+> Example queries for the proxy can be found in [test-queries.rest](./test-queries.rest)
+
 To start workflow proxy consult the scripts in `package.json`.
 
 ### Configuration
