@@ -17,6 +17,7 @@ import type {
 
 const rbacRouter = Router<ProxyRequest, ProxyResponse>();
 
+//TODO - is this being used? utils.js contains a similar function adminAccess 
 export default async function(
   authorizationCheck: AuthorizationCheck,
 ) {
