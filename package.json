@@ -19,7 +19,7 @@
     "@fbc-hub/keycloak-client": "^1.0.0",
     "babel-plugin-lodash": "^3.3.4",
     "body-parser": "^1.18.3",
-    "eslint-plugin-graphql": "^3.1.1",
+    "eslint-plugin-graphql": "^4.0.0",
     "express": "^4.16.3",
     "http-proxy": "^1.18.1",
     "jsonpath-plus": "^4.0.0",
