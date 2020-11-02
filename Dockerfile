@@ -6,10 +6,10 @@ EXPOSE 8088
 # Create app directory
 WORKDIR /app
 
-COPY workflow-proxy/ /app/workflow-proxy
+COPY . /app/workflow-proxy
 
 # Start app
 WORKDIR /app/workflow-proxy
-RUN yarn install
+RUN yarn install --frozen-lockfile && yarn cache clean
 RUN yarn run transpile
 CMD yarn start
