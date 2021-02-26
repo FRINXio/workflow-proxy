@@ -8,7 +8,7 @@
  * @format
  */
 
-import workflows, {correlationIdCheck, postWorkflowBeforeInternal} from '../workflow-rbac';
+import workflows, {correlationIdCheck, postWorkflowBeforeRbac} from '../workflow';
 import {findTransformerFx, mockRequest, mockResponse} from './metadata-workflowdef-test';
 import streamToString from "stream-to-string/index";
 import {mockIdentity} from "./metadata-workflowdef-rbac-test";
@@ -17,7 +17,7 @@ let blueprint = require('./workflow_defs/multpile_workflows_labeled.json');
 const singleLabeledWorkflow = () => JSON.parse(JSON.stringify(blueprint))[0];
 
 const transformers = workflows({"proxyTarget": "PROXY_TARGET"});
-const postWorkflowBeforeHandler = postWorkflowBeforeInternal;
+const postWorkflowBeforeHandler = postWorkflowBeforeRbac;
 const mockExecReq = () => mockRequest(
   {"name": "wf1", "version": "1.1"},
   {},

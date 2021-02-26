@@ -11,7 +11,7 @@ import qs from 'querystring';
 
 const app = ExpressApplication();
 
-const taskProxy = {
+const balancingTaskProxy = {
   init: function (conductorProxyTarget, port) {
     const transformers = [
       {
@@ -77,4 +77,4 @@ const taskProxy = {
 
 };
 
-export default taskProxy;
+export default balancingTaskProxy;

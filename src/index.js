@@ -23,10 +23,8 @@ import schellar from './proxy/transformers/schellar';
 import task from './proxy/transformers/task';
 import workflow from './proxy/transformers/workflow';
 
-import metadataWorkflowdefRbac from './proxy/transformers/metadata-workflowdef-rbac';
-import workflowRbac from './proxy/transformers/workflow-rbac';
-import taskProxy from './task-proxy';
-import {adminAccess, generalAccess} from "./proxy/utils";
+import balancingTaskProxy from './balancing-task-proxy';
+import {adminAccess} from "./proxy/utils";
 
 import dotenv from "dotenv";
 
@@ -40,7 +38,6 @@ const proxyTarget =
     process.env.PROXY_TARGET || 'http://conductor-server:8080';
 const schellarTarget = process.env.SCHELLAR_TARGET || 'http://schellar:3000';
 const tenantProxyUrl = 'http://localhost:8088/proxy/';
-const rbacProxyUrl = 'http://localhost:8088/rbac_proxy/';
 
 /*
  User facing proxy architecture (exposed in api_gateway):
@@ -84,7 +81,6 @@ async function init() {
   const proxyRouter = await proxy(
     proxyTarget,
     tenantProxyUrl,
-    rbacProxyUrl,
     schellarTarget,
     // TODO populate from fs
     [
@@ -98,15 +94,10 @@ async function init() {
     ],
     adminAccess,
   );
-  app.use('/', await workflowRouter(tenantProxyUrl));
-  app.use('/proxy', proxyRouter);
+  let tenantRouter = workflowRouter(tenantProxyUrl);
 
-  const rbacConductorRouter: $Application<
-    ExpressRequest,
-    ExpressResponse,
-  > = await workflowRouter(rbacProxyUrl);
   // Expose a simple boolean endpoint to check if current user is privileged
-  rbacConductorRouter.get(
+  proxyRouter.get(
     '/editableworkflows',
     async (req: ExpressRequest, res) => {
       res
@@ -120,39 +111,25 @@ async function init() {
     },
   );
 
-  const rbacRouter = await proxy(
-    proxyTarget,
-    tenantProxyUrl,
-    rbacProxyUrl,
-    'UNSUPPORTED', // Scheduling not allowed
-    [
-      metadataWorkflowdefRbac,
-      workflowRbac,
-      // FIXME override task and bulk and implement user group checks
-      task,
-      bulk,
-    ],
-    generalAccess,
-  );
+  app.use('/', await tenantRouter);
+  app.use('/proxy', proxyRouter);
 
-  app.use('/rbac', rbacConductorRouter);
-  app.use('/rbac_proxy', rbacRouter);
   app.get("/probe/liveness", (req, res) => {
-    if (taskProxy.live()) {
+    if (balancingTaskProxy.live()) {
       res.sendStatus(200);
     } else {
       res.sendStatus(500);
     }
   });
   app.get("/probe/readiness", (req, res) => {
-    if (taskProxy.ready()) {
+    if (balancingTaskProxy.ready()) {
       res.sendStatus(200);
     } else {
       res.sendStatus(500);
     }
   });
   app.listen(userFacingPort);
-  taskProxy.init(proxyTarget, taskProxyPort);
+  balancingTaskProxy.init(proxyTarget, taskProxyPort);
 }
 
 init();

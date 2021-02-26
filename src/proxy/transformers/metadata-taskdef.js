@@ -17,7 +17,7 @@ import {
   assertAllowedSystemTask,
   createProxyOptionsBuffer,
   removeTenantPrefix,
-  withInfixSeparator,
+  withInfixSeparator, adminAccess,
 } from '../utils.js';
 
 import type {
@@ -31,7 +31,13 @@ import type {
 /*
 curl  -H "x-tenant-id: fb-test" "localhost/proxy/api/metadata/taskdefs"
 */
-const getAllTaskdefsAfter: AfterFun = (identity, req, respObj) => {
+const getAllTaskdefsAfter: AfterFun = (identity, req, respObj, res) => {
+  if (!adminAccess(identity)) {
+    res.status(401);
+    res.send('Unauthorized to register tasks');
+    return;
+  }
+
   const tasks = anythingTo<Array<Task>>(respObj);
   // iterate over taskdefs, keep only those belonging to tenantId or global
   const tenantWithInfixSeparator = withInfixSeparator(identity.tenantId);
@@ -47,7 +53,7 @@ const getAllTaskdefsAfter: AfterFun = (identity, req, respObj) => {
       tasks.splice(idx, 1);
     }
   }
-  // remove tenantId prefix, keep GLOBAL prefix
+  // remove tenantId prefix
   removeTenantPrefix(identity.tenantId, tasks, '$[*].name', true);
 };
 
@@ -85,6 +91,12 @@ const postTaskdefsBefore: BeforeFun = (
   res,
   proxyCallback,
 ) => {
+  if (!adminAccess(identity)) {
+    res.status(401);
+    res.send('Unauthorized to register tasks');
+    return;
+  }
+
   // iterate over taskdefs, prefix with tenantId
   const reqObj = req.body;
   if (reqObj != null && Array.isArray(reqObj)) {
@@ -124,6 +136,12 @@ const putTaskdefBefore: BeforeFun = (
   res,
   proxyCallback,
 ) => {
+  if (!adminAccess(identity)) {
+    res.status(401);
+    res.send('Unauthorized to register tasks');
+    return;
+  }
+
   const reqObj = req.body;
   if (reqObj != null && typeof reqObj === 'object') {
     const taskdef = anythingTo<Task>(reqObj);
@@ -146,8 +164,14 @@ const getTaskdefByNameBefore: BeforeFun = (
   res,
   proxyCallback,
 ) => {
+  if (!adminAccess(identity)) {
+    res.status(401);
+    res.send('Unauthorized to register tasks');
+    return;
+  }
+
   const globalPrefix = withInfixSeparator(GLOBAL_PREFIX);
-  if (req.params.name.indexOf(globalPrefix) != 0) {
+  if (req.params.name.indexOf(globalPrefix) !== 0) {
     req.params.name = withInfixSeparator(identity.tenantId) + req.params.name;
     // modify url
     req.url = '/api/metadata/taskdefs/' + req.params.name;
@@ -167,7 +191,7 @@ const getTaskdefByNameAfter: AfterFun = (
   // remove prefix
   if (task.name.indexOf(tenantWithInfixSeparator) === 0) {
     task.name = task.name.substr(tenantWithInfixSeparator.length);
-  } else if (task.name.indexOf(globalPrefix) != 0) {
+  } else if (task.name.indexOf(globalPrefix) !== 0) {
     console.error(
       `Tenant Id prefix '${identity.tenantId}' not found, taskdef name: '${task.name}'`,
     );
@@ -188,6 +212,12 @@ const deleteTaskdefByNameBefore: BeforeFun = (
   res,
   proxyCallback,
 ) => {
+  if (!adminAccess(identity)) {
+    res.status(401);
+    res.send('Unauthorized to register tasks');
+    return;
+  }
+
   req.params.name = withInfixSeparator(identity.tenantId) + req.params.name;
   // modify url
   req.url = '/api/metadata/taskdefs/' + req.params.name;

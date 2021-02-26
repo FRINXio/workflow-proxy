@@ -13,7 +13,7 @@
 
 import qs from 'qs';
 import {
-  addTenantIdPrefix,
+  addTenantIdPrefix, adminAccess,
   anythingTo,
   assertAllowedSystemTask,
   createProxyOptionsBuffer,
@@ -21,7 +21,7 @@ import {
   GLOBAL_PREFIX,
   isDecisionTask,
   isDoWhileTask,
-  isForkTask,
+  isForkTask, isLabeledWithGroup,
   isSubworkflowTask,
   objectToValues,
   withInfixSeparator,
@@ -245,6 +245,12 @@ export const getAllWorkflowsAfter: AfterFun = (
       // remove element
       workflows.splice(workflowIdx, 1);
     }
+
+    /* Rbac (non admin) limitations */
+    // Remove workflows outside of user's groups
+    if (!adminAccess(identity) && !isLabeledWithGroup(workflowdef, identity.groups)) {
+      workflows.splice(workflowIdx, 1);
+    }
   }
 };
 
@@ -261,6 +267,12 @@ const deleteWorkflowBefore: BeforeFun = (
   res,
   proxyCallback,
 ) => {
+  if (!adminAccess(identity)) {
+    res.status(401);
+    res.send('Unauthorized to remove a workflow');
+    return;
+  }
+
   const tenantWithInfixSeparator = withInfixSeparator(identity.tenantId);
   // change URL: add prefix to name
   const name = tenantWithInfixSeparator + req.params.name;
@@ -296,8 +308,19 @@ export const getWorkflowBefore: BeforeFun = (
   proxyCallback();
 };
 
-export const getWorkflowAfter: AfterFun = (identity, req, respObj) => {
+export const getWorkflowAfter: AfterFun = (identity, req, respObj, res) => {
   const workflow = anythingTo<Workflow>(respObj);
+
+  /* Rbac (non admin) limitations */
+  if (!adminAccess(identity) && !isLabeledWithGroup(workflow, identity.groups)) {
+    // fail if workflow is outside of user's groups
+    console.error(
+      `User accessing unauthorized workflow: ${workflow.name} for tenant: ${identity.tenantId}`,
+    );
+    res.status(401).send('User unauthorized to access this endpoint');
+  }
+
+  /* Tenant limitations */
   const ok = sanitizeWorkflowdefAfter(identity.tenantId, workflow);
   if (!ok) {
     console.error(
@@ -367,6 +390,12 @@ const putWorkflowBefore: BeforeFun = (
   res,
   proxyCallback,
 ) => {
+  if (!adminAccess(identity)) {
+    res.status(401);
+    res.send('Unauthorized to create a workflow');
+    return;
+  }
+
   const workflows: Array<Workflow> = anythingTo<Array<Workflow>>(req.body);
   for (const workflowdef of workflows) {
     sanitizeWorkflowdefBefore(identity.tenantId, workflowdef, req);
@@ -411,6 +440,12 @@ const postWorkflowBefore: BeforeFun = (
   res,
   proxyCallback,
 ) => {
+  if (!adminAccess(identity)) {
+    res.status(401);
+    res.send('Unauthorized to create a workflow');
+    return;
+  }
+
   const workflow: Workflow = anythingTo<Workflow>(req.body);
   sanitizeWorkflowdefBefore(identity.tenantId, workflow, req);
   console.info(`Transformed request to ${JSON.stringify(workflow)}`);

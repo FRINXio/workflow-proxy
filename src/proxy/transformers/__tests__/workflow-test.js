@@ -13,6 +13,7 @@ import {findTransformerFx, mockRequest, mockResponse} from './metadata-workflowd
 import streamToString from "stream-to-string/index";
 import {mockIdentity} from "./metadata-workflowdef-rbac-test";
 
+const adminIdentity = {"tenantId": "FACEBOOK", "roles": [], "groups": ["network-admin"]};
 describe('Workflow transformers', () => {
 
   const transformers = workflows({"proxyTarget": "PROXY_TARGET"});
@@ -24,7 +25,7 @@ describe('Workflow transformers', () => {
       let callback = function (input) {
         streamToString(input.buffer).then((workflow) => resolve(workflow));
       };
-      transformer(mockIdentity(), mockRequest(
+      transformer(adminIdentity, mockRequest(
         {"name": "wf1", "version": "1.1"},
         {},
         {'from': "a@fb.com"}),
@@ -52,7 +53,8 @@ describe('Workflow transformers', () => {
       let callback = function () {
         resolve();
       };
-      transformer(mockIdentity(), mockReq, null, callback);
+      transformer(adminIdentity,
+        mockReq, null, callback);
     }).then(() => {
       expect(mockReq.url)
         .toStrictEqual("/api/workflow/search?"
@@ -70,7 +72,7 @@ describe('Workflow transformers', () => {
     const transformer = findTransformerFx(transformers, "/api/workflow/:workflowId", "get", "after");
 
     let exec = workflowExecutionPrefixed();
-    transformer(mockIdentity(), null, exec);
+    transformer(adminIdentity, mockRequest(), exec);
 
     expect(exec).toStrictEqual(workflowExecution());
   });
@@ -84,7 +86,7 @@ describe('Workflow transformers', () => {
     const transformer = findTransformerFx(transformers, "/api/workflow/:workflowId", "get", "after");
 
     let exec = workflowExecutionPrefixed();
-    transformer(mockIdentity(), null, exec);
+    transformer(adminIdentity, mockRequest(), exec);
 
     expect(exec).toStrictEqual(workflowExecution());
   });

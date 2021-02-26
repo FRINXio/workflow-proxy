@@ -28,10 +28,8 @@ import type {
 export default async function(
   proxyTarget: string,
   tenantProxyUrl: string,
-  rbacProxyUrl: string,
   schellarTarget: string,
   transformFx: Array<TransformerRegistrationFun>,
-  authorizationCheck: AuthorizationCheck,
 ) {
   const router = Router<ProxyRequest, ProxyResponse>();
   router.use(bodyParser.urlencoded({extended: false}));
@@ -41,7 +39,6 @@ export default async function(
     {
       proxyTarget,
       tenantProxyUrl,
-      rbacProxyUrl,
       schellarTarget,
     },
     transformFx,
@@ -62,13 +59,6 @@ export default async function(
       const roles = getUserRoles(req);
       const groups = getUserGroups(req);
       const identity: IdentityHeaders = {tenantId, roles, groups};
-
-      if (!authorizationCheck(identity)) {
-        console.warn('User unauthorized to access this endpoint');
-        res.status(401);
-        res.send('User unauthorized to access this endpoint');
-        return;
-      }
 
       console.info(
         `RES ${proxyRes.statusCode} ${req.method} ${req.url} tenantId ${tenantId}`,

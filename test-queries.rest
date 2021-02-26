@@ -3,10 +3,10 @@
 ################ RBAC CHECK ################
 
 ### Check if user has network-operator privileges
-GET http://localhost:8088/rbac/editableworkflows
-x-tenant-id: fb
+GET http://localhost:8088/proxy/editableworkflows
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 > {%
 client.test("test", function() {
@@ -15,8 +15,8 @@ client.test("test", function() {
 %}
 
 ### Check if user has network-operator privileges
-GET http://localhost:8088/rbac/editableworkflows
-x-tenant-id: fb
+GET http://localhost:8088/proxy/editableworkflows
+x-tenant-id: frinx
 from: fb-operator
 x-auth-user-groups: OPERATOR
 
@@ -35,9 +35,9 @@ client.test("test", function() {
 ### Add new workflow def as admin via proxy accessible only to admins
 PUT http://localhost:8088/proxy/api/metadata/workflow
 Content-Type: application/json
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 [
   {
@@ -68,9 +68,9 @@ client.test("test", function() {
 ### Add new workflow def as admin via proxy accessible to also operators and testers
 PUT http://localhost:8088/proxy/api/metadata/workflow
 Content-Type: application/json
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 [
   {
@@ -103,9 +103,9 @@ client.test("test", function() {
 
 ### Get all workflow defs as admin via proxy
 GET http://localhost:8088/proxy/api/metadata/workflow
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 > {%
 client.test("test", function() {
@@ -115,8 +115,8 @@ client.test("test", function() {
 %}
 
 ### Get all workflow defs as operator via rbac_proxy
-GET http://localhost:8088/rbac_proxy/api/metadata/workflow
-x-tenant-id: fb
+GET http://localhost:8088/proxy/api/metadata/workflow
+x-tenant-id: frinx
 from: fb-operator
 x-auth-user-groups: OPERATOR
 
@@ -132,9 +132,9 @@ client.test("test", function() {
 
 ### Get a single workflow def as admin via proxy
 GET http://localhost:8088/proxy/api/metadata/workflow/fx3
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 > {%
 client.test("test", function() {
@@ -144,8 +144,8 @@ client.test("test", function() {
 %}
 
 ### Get a single workflow def as operator via proxy
-GET http://localhost:8088/rbac_proxy/api/metadata/workflow/fx3
-x-tenant-id: fb
+GET http://localhost:8088/proxy/api/metadata/workflow/fx3
+x-tenant-id: frinx
 from: fb-operator
 x-auth-user-groups: OPERATOR
 
@@ -157,8 +157,8 @@ client.test("test", function() {
 %}
 
 ### Get a single workflow def as operator via proxy: FAIL 401
-GET http://localhost:8088/rbac_proxy/api/metadata/workflow/fx1
-x-tenant-id: fb
+GET http://localhost:8088/proxy/api/metadata/workflow/fx1
+x-tenant-id: frinx
 from: fb-operator
 x-auth-user-groups: OPERATOR
 
@@ -177,9 +177,9 @@ client.test("test", function() {
 ### Execute workflow as an admin via proxy
 POST http://localhost:8088/proxy/api/workflow
 Content-Type: application/json
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 {
     "name": "fx1"
@@ -194,11 +194,11 @@ client.global.set("admin_exec_1", response.body);
 
 
 ### Execute workflow as an admin via rbac proxy
-POST http://localhost:8088/rbac_proxy/api/workflow
+POST http://localhost:8088/proxy/api/workflow
 Content-Type: application/json
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 {
   "name": "fx3"
@@ -212,9 +212,9 @@ client.global.set("admin_exec_2", response.body);
 %}
 
 ### Execute workflow as operator via rbac_proxy: FAIL 401 (workflow not accessible for operators)
-POST http://localhost:8088/rbac_proxy/api/workflow
+POST http://localhost:8088/proxy/api/workflow
 Content-Type: application/json
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-operator
 x-auth-user-groups: OPERATOR
 
@@ -229,9 +229,9 @@ client.test("test", function() {
 %}
 
 ### Execute workflow as operator via rbac_proxy # SUCCESS
-POST http://localhost:8088/rbac_proxy/api/workflow
+POST http://localhost:8088/proxy/api/workflow
 Content-Type: application/json
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-operator
 x-auth-user-groups: OPERATOR
 
@@ -255,9 +255,9 @@ java.lang.Thread.sleep(2000)
 
 ### Get all workflow executions as admin via proxy
 GET http://localhost:8088/proxy/api/workflow/search
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 > {%
 client.test("test", function() {
@@ -267,8 +267,8 @@ client.test("test", function() {
 %}
 
 ### Get all workflow executions as operator via proxy
-GET http://localhost:8088/rbac_proxy/api/workflow/search
-x-tenant-id: fb
+GET http://localhost:8088/proxy/api/workflow/search
+x-tenant-id: frinx
 from: fb-operator
 x-auth-user-groups: OPERATOR
 
@@ -284,9 +284,9 @@ client.test("test", function() {
 
 ### Get a single workflow execution as admin via proxy
 GET http://localhost:8088/proxy/api/workflow/{{admin_exec_1}}?includeTasks=true
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 > {%
 client.test("test", function() {
@@ -296,10 +296,10 @@ client.test("test", function() {
 %}
 
 ### Get a single workflow execution as admin via rbac_proxy
-GET http://localhost:8088/rbac_proxy/api/workflow/{{admin_exec_2}}?includeTasks=true
-x-tenant-id: fb
+GET http://localhost:8088/proxy/api/workflow/{{admin_exec_2}}?includeTasks=true
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 > {%
 client.test("test", function() {
@@ -310,7 +310,7 @@ client.test("test", function() {
 
 ### Get a single workflow execution as operator via proxy: FAIL 401
 GET http://localhost:8088/proxy/api/workflow/{{oper_exec_1}}?includeTasks=true
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-operator
 x-auth-user-groups: OPERATOR
 
@@ -321,8 +321,8 @@ client.test("test", function() {
 %}
 
 ### Get a single workflow execution as operator via rbac_proxy: OK correlation ID matches
-GET http://localhost:8088/rbac_proxy/api/workflow/{{oper_exec_1}}?includeTasks=true
-x-tenant-id: fb
+GET http://localhost:8088/proxy/api/workflow/{{oper_exec_1}}?includeTasks=true
+x-tenant-id: frinx
 from: fb-operator
 x-auth-user-groups: OPERATOR
 
@@ -334,8 +334,8 @@ client.test("test", function() {
 %}
 
 ### Get a single workflow execution as operator via rbac_proxy: FAIL 401 correlation ID doesn't match
-GET http://localhost:8088/rbac_proxy/api/workflow/{{admin_exec_1}}?includeTasks=true
-x-tenant-id: fb
+GET http://localhost:8088/proxy/api/workflow/{{admin_exec_1}}?includeTasks=true
+x-tenant-id: frinx
 from: fb-operator
 x-auth-user-groups: OPERATOR
 
@@ -349,9 +349,9 @@ client.test("test", function() {
 
 ### Get filtered workflow executions as admin via proxy (COMPLETED)
 GET http://localhost:8088/proxy/api/workflow/search?query=status+IN+(COMPLETED)
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 > {%
 client.test("test", function() {
@@ -362,9 +362,9 @@ client.test("test", function() {
 
 ### Get filtered workflow executions as admin via proxy (executed by fb-operator)
 GET http://localhost:8088/proxy/api/workflow/search?query=correlationId+IN+(fb-operator)
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 > {%
 client.test("test", function() {
@@ -375,9 +375,9 @@ client.test("test", function() {
 
 ### Get all workflow executions as admin via proxy
 GET http://localhost:8088/proxy/api/workflow/search
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 > {%
 client.test("test", function() {
@@ -387,10 +387,10 @@ client.test("test", function() {
 %}
 
 ### Get all workflow executions as admin via rbac proxy
-GET http://localhost:8088/rbac_proxy/api/workflow/search
-x-tenant-id: fb
+GET http://localhost:8088/proxy/api/workflow/search
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 > {%
 client.test("test", function() {
@@ -400,8 +400,8 @@ client.test("test", function() {
 %}
 
 ### Get all workflow executions as operator via rbac proxy
-GET http://localhost:8088/rbac_proxy/api/workflow/search
-x-tenant-id: fb
+GET http://localhost:8088/proxy/api/workflow/search
+x-tenant-id: frinx
 from: fb-operator
 x-auth-user-groups: OPERATOR
 
@@ -416,8 +416,8 @@ client.test("test", function() {
 ## Delete workflow executions
 
 ### Delete workflow execution as operator via rbac-proxy: FAIL 401 wrong correlation ID
-DELETE http://localhost:8088/rbac_proxy/api/workflow/{{admin_exec_1}}/remove
-x-tenant-id: fb
+DELETE http://localhost:8088/proxy/api/workflow/{{admin_exec_1}}/remove
+x-tenant-id: frinx
 from: fb-operator
 x-auth-user-groups: OPERATOR
 
@@ -428,8 +428,8 @@ client.test("test", function() {
 %}
 
 ### Delete workflow execution as operator via rbac-proxy
-DELETE http://localhost:8088/rbac_proxy/api/workflow/{{oper_exec_1}}/remove
-x-tenant-id: fb
+DELETE http://localhost:8088/proxy/api/workflow/{{oper_exec_1}}/remove
+x-tenant-id: frinx
 from: fb-operator
 x-auth-user-groups: OPERATOR
 
@@ -441,9 +441,9 @@ client.test("test", function() {
 
 ### Delete workflow execution as admin via proxy
 DELETE http://localhost:8088/proxy/api/workflow/{{admin_exec_1}}/remove
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 > {%
 client.test("test", function() {
@@ -453,9 +453,9 @@ client.test("test", function() {
 
 ### Delete workflow execution as admin via proxy
 DELETE http://localhost:8088/proxy/api/workflow/{{admin_exec_2}}/remove
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 > {%
 client.test("test", function() {
@@ -470,8 +470,8 @@ client.test("test", function() {
 ## Delete a single workflow def
 
 ### Delete workflow def as operator via rbac_proxy: FAIL 401
-DELETE http://localhost:8088/rbac_proxy/api/metadata/workflow/fx1/1
-x-tenant-id: fb
+DELETE http://localhost:8088/proxy/api/metadata/workflow/fx1/1
+x-tenant-id: frinx
 from: fb-operator
 x-auth-user-groups: OPERATOR
 
@@ -483,9 +483,9 @@ client.test("test", function() {
 
 ### Delete workflow def as admin via proxy
 DELETE http://localhost:8088/proxy/api/metadata/workflow/fx1/1
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 > {%
 client.test("test", function() {
@@ -495,9 +495,9 @@ client.test("test", function() {
 
 ### Delete workflow def as admin via proxy
 DELETE http://localhost:8088/proxy/api/metadata/workflow/fx3/1
-x-tenant-id: fb
+x-tenant-id: frinx
 from: fb-user
-x-auth-user-roles: OWNER
+x-auth-user-groups: network-admin
 
 > {%
 client.test("test", function() {
@@ -506,3 +506,134 @@ client.test("test", function() {
 %}
 
 ################ WORKFLOW METADATA DELETION END ################
+
+################ TASKS ################
+
+### Register test task
+POST http://localhost:8088/proxy/api/metadata/taskdefs
+Content-Type: application/json
+x-tenant-id: frinx
+from: fb-user
+x-auth-user-groups: network-admin
+
+[{
+  "name": "test_task",
+  "retryCount": 0,
+  "timeoutSeconds": 1200,
+  "pollTimeoutSeconds": 3600,
+  "timeoutPolicy": "TIME_OUT_WF",
+  "retryLogic": "FIXED",
+  "retryDelaySeconds": 600,
+  "responseTimeoutSeconds": 1200,
+  "concurrentExecLimit": 100,
+  "rateLimitFrequencyInSeconds": 60,
+  "rateLimitPerFrequency": 50
+}]
+
+### Update task def (just to verify the PUT endpoint)
+PUT http://localhost:8088/proxy/api/metadata/taskdefs
+Content-Type: application/json
+x-tenant-id: frinx
+from: fb-user
+x-auth-user-groups: network-admin
+
+{
+  "name": "test_task",
+  "retryCount": 0,
+  "timeoutSeconds": 1200,
+  "pollTimeoutSeconds": 3200,
+  "timeoutPolicy": "TIME_OUT_WF",
+  "retryLogic": "FIXED",
+  "retryDelaySeconds": 600,
+  "responseTimeoutSeconds": 1200,
+  "concurrentExecLimit": 100,
+  "rateLimitFrequencyInSeconds": 60,
+  "rateLimitPerFrequency": 50
+}
+
+### Get test task
+GET http://localhost:8088/proxy/api/metadata/taskdefs/test_task
+Content-Type: application/json
+x-tenant-id: frinx
+from: fb-user
+x-auth-user-groups: network-admin
+
+### Get all tasks
+GET http://localhost:8088/proxy/api/metadata/taskdefs
+Content-Type: application/json
+x-tenant-id: frinx
+from: fb-user
+x-auth-user-groups: network-admin
+
+### Register workflow with test task
+PUT http://localhost:8088/proxy/api/metadata/workflow
+Content-Type: application/json
+x-tenant-id: frinx
+from: fb-user
+x-auth-user-groups: network-admin
+
+[
+  {
+    "name": "test_wf1",
+    "ownerEmail": "foo@bar.baz",
+    "version": 1,
+    "schemaVersion": 2,
+    "tasks": [
+      {
+        "name": "test_task",
+        "taskReferenceName": "test",
+        "type": "SIMPLE"
+      }
+    ]
+  }
+]
+
+### Execute workflow with test task
+POST http://localhost:8088/proxy/api/workflow
+Content-Type: application/json
+x-tenant-id: frinx
+from: fb-user
+x-auth-user-groups: network-admin
+
+{
+  "name": "test_wf1"
+}
+
+### Get task queues
+GET http://localhost:8088/proxy/api/tasks/queue/all
+x-tenant-id: frinx
+from: fb-operator
+x-auth-user-groups: network-admin
+
+### Get tasks in batch
+GET http://localhost:8088/proxy/api/tasks/poll/batch/test_task?workerid=test&count=10
+x-tenant-id: frinx
+from: fb-operator
+x-auth-user-groups: network-admin
+
+### Get task
+GET http://localhost:8088/proxy/api/tasks/poll/test_task
+x-tenant-id: frinx
+from: fb-operator
+x-auth-user-groups: network-admin
+
+### ACK task
+POST http://localhost:8088/proxy/api/tasks/671cedd8-61c2-4880-8fba-d02bc75c25d9/ack
+x-tenant-id: frinx
+from: fb-operator
+x-auth-user-groups: network-admin
+
+### Complete task
+POST http://localhost:8088/proxy/api/tasks
+Content-Type: application/json
+x-tenant-id: frinx
+from: fb-operator
+x-auth-user-groups: network-admin
+
+{
+    "workflowInstanceId": "647c7e76-5b12-4368-86e2-0e24037c6474",
+    "taskId": "9cba9d77-8763-47f2-bc62-0f9869417fbe",
+    "status": "COMPLETED"
+}
+
+################ TASKS END ################
