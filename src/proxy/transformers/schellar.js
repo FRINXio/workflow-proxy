@@ -15,7 +15,7 @@ import {
   findValuesByJsonPath,
   removeTenantPrefix,
   withInfixSeparator,
-  getUserEmail,
+  getUserEmail, adminAccess,
 } from '../utils.js';
 import {
   getAllWorkflowsAfter as getAllWorkflowsAfterDelegate,
@@ -68,6 +68,12 @@ curl http://localhost/proxy/schedule \
   -H 'Content-Type: application/json'
 */
 const getAllBefore: BeforeFun = (identity, req, res, proxyCallback) => {
+  if (!adminAccess(identity)) {
+    res.status(401);
+    res.send('Unauthorized to schedule workflows');
+    return;
+  }
+
   req.url = '/schedule';
   proxyCallback({target: schellarTarget});
 };
@@ -112,6 +118,12 @@ curl http://localhost/proxy/schedule/workflow1 \
   -H 'Content-Type: application/json'
 */
 const getBefore: BeforeFun = (identity, req, res, proxyCallback) => {
+  if (!adminAccess(identity)) {
+    res.status(401);
+    res.send('Unauthorized to schedule workflows');
+    return;
+  }
+
   const reqName = req.params.name;
   req.url = '/schedule/' + withInfixSeparator(identity.tenantId) + reqName;
   proxyCallback({target: schellarTarget});
@@ -143,6 +155,12 @@ curl -X POST http://localhost/proxy/schedule \
 '
 */
 const postBefore: BeforeFun = (identity, req, res, proxyCallback) => {
+  if (!adminAccess(identity)) {
+    res.status(401);
+    res.send('Unauthorized to schedule workflows');
+    return;
+  }
+
   req.url = '/schedule';
   const schedule = anythingTo<ScheduleRequest>(req.body);
   sanitizeScheduleBefore(identity.tenantId, schedule, req);
@@ -173,6 +191,12 @@ curl -X PUT http://localhost/proxy/schedule/workflow1 \
 */
 // Renaming is not supported by proxy - url name must be equal to workflowName
 const putBefore: BeforeFun = (identity, req, res, proxyCallback) => {
+  if (!adminAccess(identity)) {
+    res.status(401);
+    res.send('Unauthorized to schedule workflows');
+    return;
+  }
+
   const schedule = anythingTo<ScheduleRequest>(req.body);
   let reqName = req.params.name;
   if (reqName !== schedule.name) {
@@ -197,6 +221,12 @@ curl -X DELETE \
   http://localhost/proxy/schedule/workflow1
 */
 const deleteBefore: BeforeFun = (identity, req, res, proxyCallback) => {
+  if (!adminAccess(identity)) {
+    res.status(401);
+    res.send('Unauthorized to schedule workflows');
+    return;
+  }
+
   const reqName = req.params.name;
   req.url = '/schedule/' + withInfixSeparator(identity.tenantId) + reqName;
   proxyCallback({target: schellarTarget});

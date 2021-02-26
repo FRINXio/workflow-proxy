@@ -55,7 +55,7 @@ describe('Workflow def transformers', () => {
         streamToString(input.buffer).then((workflow) => resolve(workflow));
       };
       let mockReq = mockRequest(workflowDef(), {}, {"from": "testmail"});
-      workflowPost({"tenantId": tenant, "roles": [], "groups": []}, mockReq, null, callback);
+      workflowPost({"tenantId": tenant, "roles": [], "groups": ["network-admin"]}, mockReq, null, callback);
     }).then((workflow) => {
       expect(JSON.parse(workflow)).toStrictEqual(workflowDefPrefixed());
     });
@@ -69,7 +69,7 @@ describe('Workflow def transformers', () => {
         streamToString(input.buffer).then((workflow) => resolve(workflow));
       };
       let mockReq = mockRequest([workflowDef()], {}, {"from": "testmail"});
-      workflowPut({"tenantId": tenant, "roles": [], "groups": []}, mockReq, null, callback);
+      workflowPut({"tenantId": tenant, "roles": [], "groups": ["network-admin"]}, mockReq, null, callback);
     }).then((workflow) => {
       expect(JSON.parse(workflow)).toStrictEqual([workflowDefPrefixed()]);
     });
@@ -83,7 +83,7 @@ describe('Workflow def transformers', () => {
       let callback = function () {
         resolve();
       };
-      workflowGetBefore({"tenantId": tenant, "roles": [], "groups": []}, mockReq, null, callback);
+      workflowGetBefore({"tenantId": tenant, "roles": [], "groups": ["network-admin"]}, mockReq, null, callback);
     }).then(() => {
       expect(mockReq.url).toStrictEqual("/api/metadata/workflow/FACEBOOK___wf31?version=1.1");
     });
@@ -97,7 +97,7 @@ describe('Workflow def transformers', () => {
       let callback = function () {
         resolve();
       };
-      workflowGetBefore({"tenantId": tenant, "roles": [], "groups": []}, mockReq, null, callback);
+      workflowGetBefore({"tenantId": tenant, "roles": [], "groups": ["network-admin"]}, mockReq, null, callback);
     }).then(() => {
       expect(mockReq.url).toStrictEqual("/api/metadata/workflow/FACEBOOK___wf31/1.1");
     });
@@ -116,7 +116,7 @@ describe('Workflow def transformers', () => {
       expect(subWorkflowTask.type).toStrictEqual('SUB_WORKFLOW');
       subWorkflowTask.subWorkflowParam.taskToDomain = { "*" : "NO_DOMAIN"};
       let mockReq = mockRequest(wd, {}, {"from": "testmail"});
-      workflowPost({"tenantId": tenant, "roles": [], "groups": []}, mockReq, null, callback);
+      workflowPost({"tenantId": tenant, "roles": [], "groups": ["network-admin"]}, mockReq, null, callback);
     }).toThrowError(new Error('Attribute taskToDomain in subWorkflowParam is not allowed'));
   });
 });

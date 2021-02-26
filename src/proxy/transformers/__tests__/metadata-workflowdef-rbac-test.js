@@ -7,7 +7,7 @@
  * @flow
  * @format
  */
-import metadataWorkflowdefRbac from '../metadata-workflowdef-rbac';
+import metadataWorkflowdefRbac from '../metadata-workflowdef';
 import {findTransformerFx, mockResponse} from './metadata-workflowdef-test';
 
 const transformers = metadataWorkflowdefRbac();

@@ -7,7 +7,7 @@
  * @format
  */
 
-import HttpClient from './HttpServerSide';
+import HttpClient from './http-server-side';
 import Router from 'express';
 import bodyParser from 'body-parser';
 import filter from 'lodash/fp/filter';
@@ -101,7 +101,7 @@ export default async function(
     try {
       const result = await http.get(baseURLMeta + 'workflow', req);
       let schedules = [];
-  
+
       // combine with schedules
       try {
         schedules = await http.get(baseURLSchedule, req);
@@ -109,7 +109,7 @@ export default async function(
         // continue if Schellar is not reachable
         console.log(err)
       }
-  
+
       for (const workflowDef of result) {
         const expectedScheduleName =
             workflowDef.name + ':' + workflowDef.version;
@@ -117,7 +117,7 @@ export default async function(
         workflowDef.hasSchedule = found != null;
         workflowDef.expectedScheduleName = expectedScheduleName;
       }
-  
+
       res.status(200).send({result});
     } catch (err) {
       next(err);

@@ -45,6 +45,10 @@ const SYSTEM_TASK_TYPES: Array<string> = [
   'TERMINATE',
   'KAFKA_PUBLISH',
   'DO_WHILE',
+  // Allow http system task
+  // TODO remove for cloud multitenant env
+  'HTTP',
+  'LAMBDA'
 ];
 
 export function isLabeledWithGroup(
@@ -100,7 +104,7 @@ export function isForkTask(task: Task): boolean {
 }
 
 export function assertAllowedSystemTask(task: Task): void {
-  if (task.type === 'SIMPLE') {
+  if (!task.type || task.type === 'SIMPLE') {
     // Simple tasks (internal workers) are under our full control
     // no need to assert
     return;
@@ -192,7 +196,6 @@ export function getTenantId(req: ExpressRequest): string {
   }
   return tenantId;
 }
-
 
 export function extractTenantId(workflowName) {
   const idx = workflowName.indexOf(INFIX_SEPARATOR);
@@ -287,7 +290,7 @@ export function removeTenantPrefix(
       }
 
       console.error(
-        `Name must start with tenantId prefix` +
+        `Name must start with tenantId prefix ` +
           `tenantId:'${tenantId}',jsonPath:'${jsonPath}'` +
           `,item:'${item}'`,
         {json},
@@ -336,9 +339,6 @@ const OWNER_ROLE = process.env.ADMIN_ACCESS_ROLE || 'OWNER';
 const NETWORK_ADMIN_GROUP = process.env.ADMIN_ACCESS_ROLE || 'network-admin';
 
 export const adminAccess : AuthorizationCheck = (identity) => {
-  return identity.roles.includes(OWNER_ROLE) || identity.groups.includes(NETWORK_ADMIN_GROUP);
-};
-
-export const generalAccess : AuthorizationCheck = () => {
-  return true;
+  return (identity.roles && identity.roles.includes(OWNER_ROLE))
+    ||(identity.groups && identity.groups.includes(NETWORK_ADMIN_GROUP));
 };
