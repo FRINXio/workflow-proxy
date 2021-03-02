@@ -616,7 +616,26 @@ export default async function(
       next(err);
     }
   });
+  
+  // TODO: deprecated with monorepo-ui  
+  router.get('/schedule/metadata/workflow', async (req: ExpressRequest, res, next) => {
+    try {
+      const result = await http.get(baseURLMeta + 'workflow', req);
+      // combine with schedules
+      const schedules = await http.get(baseURLSchedule, req);
+      for (const workflowDef of result) {
+        const expectedScheduleName =
+            workflowDef.name + ':' + workflowDef.version;
+        const found = findSchedule(schedules, expectedScheduleName);
+        workflowDef.hasSchedule = found != null;
+        workflowDef.expectedScheduleName = expectedScheduleName;
+      }
 
+      res.status(200).send({result});
+    } catch (err) {
+      next(err);
+    }
+  });
 
   return router;
 }
