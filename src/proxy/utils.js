@@ -288,6 +288,10 @@ export function removeTenantPrefix(
         //  and might contain just some default
         continue;
       }
+      if (item.parentProperty === 'taskType') {
+        // Remove tenant prefix from taskType only if present
+        continue;
+      }
 
       console.error(
         `Name must start with tenantId prefix ` +

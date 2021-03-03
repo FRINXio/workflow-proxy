@@ -30,7 +30,7 @@ describe('Task transformers', () => {
       callback);
 
     }).then(() => {
-      expect(mockReq.url).toStrictEqual("/api/tasks/poll/FACEBOOK___testTask");
+      expect(mockReq.url).toStrictEqual("/api/tasks/poll/FACEBOOK___testTask?domain=FACEBOOK");
     });
   });
 
@@ -48,14 +48,14 @@ describe('Task transformers', () => {
       callback);
 
     }).then(() => {
-      expect(mockReq.url).toStrictEqual("/api/tasks/poll/FACEBOOK___testTask?workerid=abcd&domain=DOM");
+      expect(mockReq.url).toStrictEqual("/api/tasks/poll/FACEBOOK___testTask?workerid=abcd&domain=FACEBOOK");
     });
   });
 
   test("GET tasks batch before with additional params", () => {
     const transformer = findTransformerFx(transformers, "/api/tasks/poll/batch/:taskType", "get", "before");
 
-    let mockReq = mockRequest({},{"taskType": "testTask"},{'from': "a@fb.com"}, {'query': "workerid=abcd&domain=DOM&timeout=10"});
+    let mockReq = mockRequest({},{"taskType": "testTask"},{'from': "a@fb.com"}, {'query': "workerid=abcd&domain=DOM&timeout=10&count=5"});
     return new Promise(resolve => {
       let callback = function () {
         resolve();
@@ -66,7 +66,7 @@ describe('Task transformers', () => {
       callback);
 
     }).then(() => {
-      expect(mockReq.url).toStrictEqual("/api/tasks/poll/batch/FACEBOOK___testTask?workerid=abcd&domain=DOM&timeout=10");
+      expect(mockReq.url).toStrictEqual("/api/tasks/poll/batch/FACEBOOK___testTask?workerid=abcd&count=5&timeout=10&domain=FACEBOOK");
     });
   });
 

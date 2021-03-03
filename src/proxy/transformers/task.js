@@ -134,7 +134,7 @@ const getTasksBatchBefore: BeforeFun = (
   }
   const timeout = parsedQuery['timeout'];
   if (timeout) {
-    newQuery += '&timeout=' + count;
+    newQuery += '&timeout=' + timeout;
   }
 
   if (newQuery) {
@@ -165,8 +165,13 @@ const getTaskBefore: BeforeFun = (
   const taskType = tenantWithInfixSeparator + req.params.taskType;
   let newUrl = `/api/tasks/poll/${taskType}`;
 
-  const originalQueryString = req._parsedUrl.query;
-  const parsedQuery = qs.parse(originalQueryString);
+  let parsedQuery;
+  if (req._parsedUrl && req._parsedUrl.query) {
+    const originalQueryString = req._parsedUrl.query;
+    parsedQuery = qs.parse(originalQueryString);
+  } else {
+    parsedQuery = {};
+  }
   let newQuery = "";
 
   const workerid = parsedQuery['workerid'];

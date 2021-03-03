@@ -210,6 +210,7 @@ export const getExecutionStatusAfter: AfterFun = (
     workflowName: false,
     workflowType: false,
     'tasks[*].taskDefName': true,
+    'tasks[*].taskType': true,
     'tasks[*].workflowTask.name': true,
     'tasks[*].workflowTask.taskDefinition.name': true,
     'tasks[*].inputData.subWorkflowName': false,

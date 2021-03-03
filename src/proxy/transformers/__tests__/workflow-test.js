@@ -90,4 +90,18 @@ describe('Workflow transformers', () => {
 
     expect(exec).toStrictEqual(workflowExecution());
   });
+
+  test("GET workflow execution after 2", () => {
+    let workflowExecutionPrefixedText = require('./workflow_defs/workflow_execution2_prefixed.json');
+    const workflowExecutionPrefixed = () => JSON.parse(JSON.stringify(workflowExecutionPrefixedText));
+    let workflowExecutionText = require('./workflow_defs/workflow_execution2.json');
+    const workflowExecution = () => JSON.parse(JSON.stringify(workflowExecutionText));
+
+    const transformer = findTransformerFx(transformers, "/api/workflow/:workflowId", "get", "after");
+
+    let exec = workflowExecutionPrefixed();
+    transformer(adminIdentity, mockRequest(), exec);
+
+    expect(exec).toStrictEqual(workflowExecution());
+  });
 });
