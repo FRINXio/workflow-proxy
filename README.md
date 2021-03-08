@@ -9,33 +9,33 @@ Workflow proxy is an API proxy component for [conductor workflow engine](https:/
 ## Workflow proxy architecture
 
 ```
-               +-------------------------------------------------------------------------------------------+
-               | Workflow proxy                                                                            |
-               |                                                                                           |
-               |                                /rbac                                                      |
-               | /                              /rbac/editableworkflows                                    |
-               |  +----------------------+       +----------------------+                                  |
-               |  | Conductor proxy      |       | Conductor proxy      |                                  |
-               |  |  routes.js           |       |  routes.js           |                                  |
-               |  |                      |       |                      |                                  |
-               |  +----------+-----------+       +-----------+----------+                                  |
-               |             | HTTP                          | HTTP                                        |
-               | /proxy      |                  /rbac_proxy  |                /                            |
-               |  +----------v-----------+       +-----------v----------+      +----------------------+    |
-               |  | Tenant proxy         |       | RBAC proxy           |      | Task proxy           |    |
-               |  |  proxy.js            <-------+  proxy.js            |      |  task-proxy.js       |    |
-               |  |  transformers/*.js   |  HTTP |  trans/*+rbac.js     |      |                      |    |
-               |  +----+------+----------+       +----------+-----------+      +------------+---------+    |
-               |       |      |                             |                               |              |
-               +-------------------------------------------------------------------------------------------+
-                       |      |                             |                               |
-                       |      |                             |                               |
-          +------------+      | HTTP                        | HTTP                          |
-          |                   |                             |                               |
-          |                   |             /api            |                               |
-+---------v--------+      +---v-----------------------------v---+                           |
-| Schellar         |      | Conductor built in REST API         |                           |
-|                  |      |                                     <---------------------------+
++--------------------------------------------------------------------------------------------+
+|                                                                                            |
+|   Workflow proxy                                                                           |
+|                                                                                            |
+|                /                                                                           |
+|                 +----------------------+                                                   |
+|                 | Conductor proxy      |                                                   |
+|                 |  routes.js           |                                                   |
+|                 |                      |                                                   |
+|                 +----------+-----------+                                                   |
+|                            | HTTP                                                          |
+|                /proxy      |                                  /                            |
+|                 +----------v-----------+                       +----------------------+    |
+|                 | Tenant proxy         |                       | Task proxy           |    |
+|                 |  proxy.js            <                       |  task+proxy.js       |    |
+|                 |  transformers/*.js   |                       |                      |    |
+|                 +----+------+----------+                       +-----------+----------+    |
+|                      |      |                                              |               |
+|                      |      |                                              |               |
++--------------------------------------------------------------------------------------------+
+                       |      |                                              |
+          +------------+      | HTTP                                         |
+          |                   |                                              |
+          |                   |             /api                             |
++---------v--------+      +---v---------------------------------+            |
+| Schellar         |      | Conductor built in REST API         |            |
+|                  |      |                                     <------------+
 |                  |      |                                     |
 +------------------+      +-------------------------------------+
 
@@ -46,16 +46,16 @@ The main components are:
   * Additional features (REST api endpoints) required by [frinx-workflow-ui](https://github.com/FRINXio/frinx-workflow-ui)
 * Tenant proxy
   * Multitenancy support
-* RBAC proxy
   * RBAC support
 * Task proxy
   * Tenant aware task distribution to workers 
 
 ## User facing proxy
 
-The tenant proxy + rbac proxy + conductor proxy form a single logical component: **User facing proxy** and are proxying following conductor REST endpoints:
+The tenant & RBAC proxy + conductor proxy form a single logical component: **User facing proxy** and are proxying following conductor REST endpoints:
 * Workflow metadata (workflow definitions)
 * Task metadata (task definitions)
+* Task execution (polling / ACK / updates)
 * Workflow executions
 * Bulk operations for workflow executions
 * Workflow schedules 
@@ -70,9 +70,8 @@ Conductor APIs. It expects following authentication headers:
 
 The execution path from when a request hits User facing proxy is as follows:
 1. Conductor proxy
-2. RBAC proxy
-3. Tenant proxy
-4. Conductor
+2. Tenant & RBAC proxy
+3. Conductor
 
 ### Conductor proxy
 
@@ -96,9 +95,18 @@ List of transformations performed in tenant proxy per endpoint:
   * Filter workflow definitions based on tenant ID prefix when reading workflow definitions
   * Add/remove tenant id to task names (which are part of the workflow definition and are not globally allowed tasks)
   * Add user id into workflow's `ownerEmail` field
+  * Add/remove tenant id to workflowDef.tasks[name=DYNAMIC_FORK&type=SUBWORKFLOW].inputParameters.expectedName
+    * This is a special (conventional) inputParameter required by the UI and DYNAMIC_FORK to enforce all the dynamic tasks going into DYNAMIC_FORK are of the same name and type
+    * Ensuring tasks executed by DYNAMIC_FORK are tenant isolated or GLOBAL or allowed SYSTEM tasks
+    * This parameter has to always be named "expectedName" !!!
 * Task metadata (task definitions)
   * Add/remove tenant id to task defition name as prefix in form of `TENANT___taskType`
   * Filter task definitions based on tenant ID prefix
+* Task executions
+  * Add/remove tenant id to task name
+  * Add/remove tenant id to task.output.dynamic_tasks[*].name
+    * This is a special (conventional) inputParameter required by DYNAMIC_FORK carrying tasks to be dynamically executed
+    * This parameter has to always be named "dynamic_tasks" !!!
 * Workflow executions
   * Add tenant id to workflow name in the workflow execution request
   * Add `taskToDomain` mapping to workflow execution request
@@ -128,13 +136,13 @@ Having dedicated workers for non-trivial task also enables more suitable deploym
 Workflow scheduling is handled by an external component [schellar](https://github.com/FRINXio/schellar).
 Proxy also provides tenant aware REST API proxies for schellar.
 
-### RBAC
+#### RBAC
 
 RBAC proxy adds 2 features on top of tenant proxy:
 * Ensures user authorization to access certain endpoints
 * Filters workflow definitions and workflow executions based on user's roles, groups and userID
 
-RBAC proxy simply distinguishes 2 user types: an admin and everyone else.
+RBAC support simply distinguishes 2 user types: an admin and everyone else.
 An admin has full access to workflow API while ordinary user can only:
 * Read workflow definitions
   * Ordinary user can only view workflow definitions belonging to the same groups
@@ -152,7 +160,9 @@ These are configurable.
 
 ## Task proxy
 
-This proxy should be used by each worker instead of connecting directly to Conductor.
+This proxy should be used by each GLOBAL worker instead of connecting directly to Conductor.
+There is a task proxy in the user facing proxy too. Both allow polling / ACK / update of executed tasks.
+The difference is that user facing proxy only allows tenant isolated execution of tasks where Task proxy allows for GLOBAL workers.
 
 Main responsibility:
 * Prevent single tenant from exhausting a worker by placing too many tasks on the queue
@@ -213,7 +223,6 @@ Some useful pointers for developers:
 * src/proxy/transformers/```__tests__``` - unit tests for transformer functions
 * src/proxy/transformer-registry - transformer function collector
 * src/proxy/proxy - user facing proxy router
-* src/proxy/rbacProxy - user facing rbac proxy router
 * src/task-proxy - task proxy router
 * src/tenant-registry - keycloak client capable of providing all tenant IDs
 * src/routes.js - conductor proxy

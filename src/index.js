@@ -40,38 +40,6 @@ const schellarTarget = process.env.SCHELLAR_TARGET || 'http://schellar:3000';
 const tenantProxyUrl = 'http://localhost:8088/proxy/';
 
 /*
- User facing proxy architecture (exposed in api_gateway):
-
-+-----------------------------------------------------------+
-| Workflow-proxy                                            |
-|                                                           |
-|                                /rbac                      |
-| /                              /rbac/editableworkflows    |
-|  +----------------------+       +----------------------+  |
-|  | Conductor proxy      |       | Conductor proxy      |  |
-|  |  routes.js           |       |  routes.js           |  |
-|  |                      |       |                      |  |
-|  +----------+-----------+       +-----------+----------+  |
-|             | HTTP                          | HTTP        |
-| /proxy      |                  /rbac_proxy  |             |
-|  +----------v-----------+       +-----------v----------+  |
-|  | Tenant proxy         |       | RBAC proxy           |  |
-|  |  proxy.js            <-------+  proxy.js            |  |
-|  |  transformers/*.js   |  HTTP |  trans/*-rbac.js     |  |
-|  +-----------+----------+       +----------------------+  |
-|              |                             |              |
-+-----------------------------------------------------------+
-               |                             |
-               |                             |
-               | HTTP                        | HTTP
-               |                             |
-               |             /api            |
-           +---v-----------------------------v---+
-           | Conductor built in REST API         |
-           |                                     |
-           |                                     |
-           +-------------------------------------+
-
 TODO: merge conductor proxy with tenant / rbac proxy
 TODO: do not make a real HTTP call between rbac_proxy and proxy (extract the functionality from express server if possible)
 .. to remove redundant HTTP calls inside the same process/container
