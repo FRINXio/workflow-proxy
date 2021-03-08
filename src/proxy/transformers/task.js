@@ -18,6 +18,7 @@ import {
 } from '../utils.js';
 import type {BeforeFun, TransformerRegistrationFun} from '../../types';
 import qs from "qs";
+import {sanitizeWorkflowdefTasksBefore} from "./metadata-workflowdef";
 
 let proxyTarget;
 
@@ -223,6 +224,25 @@ const postTaskBefore: BeforeFun = (
     res.status(401);
     res.send('Unauthorized to update tasks');
     return;
+  }
+
+  // Prefix dynamic tasks to be executed
+  // Dynamic_fork task type is often utilized by FRINX workflows.
+  // There usually is a task_A that produces output containing a list of tasks.
+  // This list is then processed and executed by a dynamic_fork task.
+  // The data containing list of tasks to be executed passes via proxy only in this endpoint, where task_A completes
+  // and submits its output to conductor. So this is the only place where we can prefix the names of tasks / subworkflows
+  // to be dynamically executed by dynamic_fork.
+
+  // We rely on the convention of storing "tasks to be dynamically executed" under name "dynamic_tasks".
+
+  // This is the only way of adding prefix to dynamic tasks without having to modify the worker / workflow side of things.
+
+  let taskOutput = req.body;
+  if ("outputData" in taskOutput) {
+    if ("dynamic_tasks" in taskOutput.outputData) {
+      sanitizeWorkflowdefTasksBefore(taskOutput.outputData.dynamic_tasks, identity.tenantId);
+    }
   }
 
   proxyCallback({buffer: createProxyOptionsBuffer(req.body, req)});

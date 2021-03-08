@@ -1,0 +1,18 @@
+{
+  "name": "workflow1",
+  "description": "description - ADMIN,OWNER,TEST",
+  "tasks": [
+    {
+      "name": "Post_to_Slack",
+      "taskReferenceName": "post_to_slack_ref_284C",
+      "type": "SUB_WORKFLOW",
+      "subWorkflowParam": {
+        "name": "Post_to_Slack",
+        "version": 1
+      },
+      "optional": false,
+      "startDelay": 0
+    }
+  ]
+}
+
