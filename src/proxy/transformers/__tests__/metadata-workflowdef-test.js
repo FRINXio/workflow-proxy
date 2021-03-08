@@ -29,6 +29,11 @@ describe('Workflow def transformers', () => {
       require('./workflow_defs/single_subworkflow.json'),
       require('./workflow_defs/single_subworkflow_prefixed.json'),
     ],
+    [
+      'Dynamic_fork.expectedName should also be prefixed',
+      require('./workflow_defs/workflow_with_dynamic_fork.json'),
+      require('./workflow_defs/workflow_with_dynamic_fork_prefixed.json'),
+    ],
   ];
 
   test.each(testCases)('%s', (_, workflowDef, workflowDefPrefixed) => {

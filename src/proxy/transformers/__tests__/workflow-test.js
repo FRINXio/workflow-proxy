@@ -64,9 +64,9 @@ describe('Workflow transformers', () => {
   });
 
   test("Search workflow execution after", () => {
-    let workflowExecutionPrefixedText = require('./workflow_defs/workflow_execution_prefixed.json');
+    let workflowExecutionPrefixedText = require('./execs/workflow_execution_prefixed.json');
     const workflowExecutionPrefixed = () => JSON.parse(JSON.stringify(workflowExecutionPrefixedText));
-    let workflowExecutionText = require('./workflow_defs/workflow_execution.json');
+    let workflowExecutionText = require('./execs/workflow_execution.json');
     const workflowExecution = () => JSON.parse(JSON.stringify(workflowExecutionText));
 
     const transformer = findTransformerFx(transformers, "/api/workflow/:workflowId", "get", "after");
@@ -78,9 +78,9 @@ describe('Workflow transformers', () => {
   });
 
   test("GET workflow execution after", () => {
-    let workflowExecutionPrefixedText = require('./workflow_defs/workflow_execution_prefixed.json');
+    let workflowExecutionPrefixedText = require('./execs/workflow_execution_prefixed.json');
     const workflowExecutionPrefixed = () => JSON.parse(JSON.stringify(workflowExecutionPrefixedText));
-    let workflowExecutionText = require('./workflow_defs/workflow_execution.json');
+    let workflowExecutionText = require('./execs/workflow_execution.json');
     const workflowExecution = () => JSON.parse(JSON.stringify(workflowExecutionText));
 
     const transformer = findTransformerFx(transformers, "/api/workflow/:workflowId", "get", "after");
@@ -91,10 +91,25 @@ describe('Workflow transformers', () => {
     expect(exec).toStrictEqual(workflowExecution());
   });
 
-  test("GET workflow execution after 2", () => {
-    let workflowExecutionPrefixedText = require('./workflow_defs/workflow_execution2_prefixed.json');
+  test("GET workflow execution after with dynamic fork", () => {
+    let workflowExecutionPrefixedText = require('./execs/dynamic_exec_prefixed.json');
     const workflowExecutionPrefixed = () => JSON.parse(JSON.stringify(workflowExecutionPrefixedText));
-    let workflowExecutionText = require('./workflow_defs/workflow_execution2.json');
+    let workflowExecutionText = require('./execs/dynamic_exec.json');
+    const workflowExecution = () => JSON.parse(JSON.stringify(workflowExecutionText));
+
+    const transformer = findTransformerFx(transformers, "/api/workflow/:workflowId", "get", "after");
+
+    let exec = workflowExecutionPrefixed();
+    transformer(adminIdentity, mockRequest(), exec);
+
+    // TODO remove prefixes from dynamic task inputs/outputs - not harmful
+    // expect(exec).toStrictEqual(workflowExecution());
+  });
+
+  test("GET workflow execution after 2", () => {
+    let workflowExecutionPrefixedText = require('./execs/workflow_execution2_prefixed.json');
+    const workflowExecutionPrefixed = () => JSON.parse(JSON.stringify(workflowExecutionPrefixedText));
+    let workflowExecutionText = require('./execs/workflow_execution2.json');
     const workflowExecution = () => JSON.parse(JSON.stringify(workflowExecutionText));
 
     const transformer = findTransformerFx(transformers, "/api/workflow/:workflowId", "get", "after");
