@@ -24,6 +24,11 @@ describe('Workflow def transformers', () => {
       require('./workflow_defs/nested_tasks_decision.json'),
       require('./workflow_defs/nested_tasks_decision_prefixed.json'),
     ],
+    [
+      'Subworkflow should also be prefixed',
+      require('./workflow_defs/single_subworkflow.json'),
+      require('./workflow_defs/single_subworkflow_prefixed.json'),
+    ],
   ];
 
   test.each(testCases)('%s', (_, workflowDef, workflowDefPrefixed) => {

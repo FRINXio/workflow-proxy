@@ -11,6 +11,7 @@
 import tasks from '../task';
 import {findTransformerFx, mockRequest, mockResponse} from './metadata-workflowdef-test';
 import {mockIdentity} from "./metadata-workflowdef-rbac-test";
+import streamToString from "stream-to-string";
 
 describe('Task transformers', () => {
 
@@ -96,5 +97,26 @@ describe('Task transformers', () => {
     transformer(mockIdentity(), null, exec);
 
     expect(exec).toStrictEqual(taskJson());
+  });
+
+  test("POST tasks result with dynamic_tasks", () => {
+    const transformer = findTransformerFx(transformers, "/api/tasks", "post", "before");
+
+    let workflowDefPrefixedText = require('./tasks/task_output_with_dynamictasks_prefixed.json');
+    const workflowDefPrefixed = () => JSON.parse(JSON.stringify(workflowDefPrefixedText));
+    let workflowDefText = require('./tasks/task_output_with_dynamictasks.json');
+    const workflowDef = () => JSON.parse(JSON.stringify(workflowDefText));
+
+    let mockReq = mockRequest(workflowDef(),{"taskType": "testTask"},{'from': "a@fb.com"});
+    return new Promise(resolve => {
+      let callback = function (input) {
+        streamToString(input.buffer).then((workflow) => resolve(workflow));
+      };
+
+      transformer(mockIdentity("FACEBOOK", ["network-admin"]), mockReq, null, callback);
+
+    }).then((workflow) => {
+      expect(JSON.parse(workflow)).toStrictEqual(workflowDefPrefixed());
+    });
   });
 });

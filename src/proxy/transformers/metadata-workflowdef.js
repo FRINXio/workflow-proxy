@@ -32,20 +32,25 @@ import type {AfterFun, BeforeFun, Task, TransformerRegistrationFun, Workflow,} f
 
 // Utility used in PUT, POST before methods to check that submitted workflow
 // and its tasks
+
+export function sanitizeWorkflowdefTasksBefore(tasks, tenantId) {
+  // only whitelisted system tasks are allowed
+  for (const task of tasks) {
+    assertAllowedSystemTask(task);
+  }
+  // add prefix to tasks
+  for (const task of tasks) {
+    sanitizeWorkflowTaskdefBefore(tenantId, task);
+  }
+}
+
 // do not contain any prefix. Prefix is added to workflowdef if input is valid.
 export function sanitizeWorkflowdefBefore(
   tenantId: string,
   workflowdef: Workflow,
   req: ExpressRequest,
 ) {
-  // only whitelisted system tasks are allowed
-  for (const task of workflowdef.tasks) {
-    assertAllowedSystemTask(task);
-  }
-  // add prefix to tasks
-  for (const task of workflowdef.tasks) {
-    sanitizeWorkflowTaskdefBefore(tenantId, task);
-  }
+  sanitizeWorkflowdefTasksBefore(workflowdef.tasks, tenantId);
   // add prefix to workflow
   addTenantIdPrefix(tenantId, workflowdef);
   // add ownerEmail - used to fill correlationId when running periodically
