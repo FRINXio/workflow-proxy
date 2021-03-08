@@ -13,7 +13,8 @@
 
 import qs from 'qs';
 import {
-  addTenantIdPrefix, adminAccess,
+  addTenantIdPrefix,
+  adminAccess,
   anythingTo,
   assertAllowedSystemTask,
   createProxyOptionsBuffer,
@@ -21,7 +22,8 @@ import {
   GLOBAL_PREFIX,
   isDecisionTask,
   isDoWhileTask,
-  isForkTask, isLabeledWithGroup,
+  isForkTask,
+  isLabeledWithGroup,
   isSubworkflowTask,
   objectToValues,
   withInfixSeparator,
@@ -66,6 +68,14 @@ function sanitizeWorkflowTaskdefBefore(tenantId: string, task: Task) {
     // Do not allow overriding taskToDomain in sub workflows
     if (task.subWorkflowParam.taskToDomain != null) {
       throw 'Attribute taskToDomain in subWorkflowParam is not allowed';
+    }
+
+    // Special case for dynamic fork subworkflow to work around the expectedName parameter
+    if (task.name === withInfixSeparator(tenantId) + "DYNAMIC_FORK"
+      && "inputParameters" in task
+      && "expectedName" in task.inputParameters
+      && task.inputParameters.expectedName.indexOf(withInfixSeparator(GLOBAL_PREFIX)) !== 0) {
+      task.inputParameters.expectedName = withInfixSeparator(tenantId) + task.inputParameters.expectedName;
     }
   }
 
@@ -209,6 +219,14 @@ function sanitizeWorkflowTaskdefAfter(
       } else {
         return false;
       }
+    }
+
+    // Special case for dynamic fork subworkflow to work around the expectedName parameter
+    if (task.name === tenantWithInfixSeparator + "DYNAMIC_FORK"
+      && "inputParameters" in task
+      && "expectedName" in task.inputParameters
+      && task.inputParameters.expectedName.indexOf(tenantWithInfixSeparator) === 0) {
+      task.inputParameters.expectedName = task.inputParameters.expectedName.substr(tenantWithInfixSeparator.length);
     }
   }
 

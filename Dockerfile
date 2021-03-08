@@ -11,5 +11,6 @@ COPY . /app/workflow-proxy
 # Start app
 WORKDIR /app/workflow-proxy
 RUN yarn install --frozen-lockfile && yarn cache clean
+RUN yarn test
 RUN yarn run transpile
 CMD yarn start

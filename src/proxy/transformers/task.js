@@ -44,7 +44,7 @@ const getLogBefore: BeforeFun = (
       const task = JSON.parse(body);
       // make sure name starts with prefix
       const tenantWithInfixSeparator = withInfixSeparator(identity.tenantId);
-      if (task.workflowType?.indexOf(tenantWithInfixSeparator) === 0) {
+      if (!("workflowType" in task) || task.workflowType?.indexOf(tenantWithInfixSeparator) === 0) {
         proxyCallback();
       } else {
         console.error(

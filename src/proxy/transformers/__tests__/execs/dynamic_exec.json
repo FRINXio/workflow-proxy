@@ -1,0 +1,1832 @@
+{
+  "ownerApp": "",
+  "createTime": 1615199497666,
+  "updateTime": 1615199498401,
+  "status": "FAILED",
+  "endTime": 1615199498401,
+  "workflowId": "aa8ab065-7fc2-4821-ae69-036cb844fde5",
+  "parentWorkflowId": "f7e6228b-5f67-4972-9570-52a2740378e6",
+  "parentWorkflowTaskId": "7f353acb-43c4-47f1-a6c7-8949bcd8bbd9",
+  "tasks": [
+    {
+      "taskType": "LAMBDA",
+      "status": "COMPLETED",
+      "inputData": {
+        "expectedName": "sub_task",
+        "expectedType": "SUB_WORKFLOW",
+        "scriptExpression": "for (var i = 0; i < $.lambdaValue.length; i = i + 1) {\n  if ($.lambdaValue[i].name !== $.expectedName || $.lambdaValue[i].type !== $.expectedType) {\n    return false\n  }\n}\n\nreturn $.lambdaValue",
+        "lambdaValue": [
+          {
+            "name": "sub_task",
+            "taskReferenceName": "IOS01",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Leaf02",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Leaf04",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Leaf05",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Spine01",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "netconf-testtool",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "XR02",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "VRP01",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Leaf03",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "XR01",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "IOS02",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Leaf01",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Spine02",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          }
+        ]
+      },
+      "referenceTaskName": "lambdaValidator",
+      "retryCount": 0,
+      "seq": 1,
+      "correlationId": "admin-user",
+      "pollCount": 0,
+      "taskDefName": "LAMBDA_TASK",
+      "scheduledTime": 1615199497798,
+      "startTime": 1615199497713,
+      "endTime": 1615199497756,
+      "updateTime": 1615199497756,
+      "startDelayInSeconds": 0,
+      "retried": false,
+      "executed": true,
+      "callbackFromWorker": true,
+      "responseTimeoutSeconds": 0,
+      "workflowInstanceId": "aa8ab065-7fc2-4821-ae69-036cb844fde5",
+      "workflowType": "Dynamic_fork",
+      "taskId": "063fff7f-d8db-473a-a1dc-9021114b6e25",
+      "callbackAfterSeconds": 0,
+      "outputData": {
+        "result": [
+          {
+            "name": "sub_task",
+            "taskReferenceName": "IOS01",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Leaf02",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Leaf04",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Leaf05",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Spine01",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "netconf-testtool",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "XR02",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "VRP01",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Leaf03",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "XR01",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "IOS02",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Leaf01",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Spine02",
+            "type": "SUB_WORKFLOW",
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            }
+          }
+        ]
+      },
+      "workflowTask": {
+        "name": "LAMBDA_TASK",
+        "taskReferenceName": "lambdaValidator",
+        "inputParameters": {
+          "lambdaValue": "${workflow.input.dynamic_tasks}",
+          "scriptExpression": "for (var i = 0; i < $.lambdaValue.length; i = i + 1) {\n  if ($.lambdaValue[i].name !== $.expectedName || $.lambdaValue[i].type !== $.expectedType) {\n    return false\n  }\n}\n\nreturn $.lambdaValue",
+          "expectedName": "${workflow.input.expectedName}",
+          "expectedType": "${workflow.input.expectedType}"
+        },
+        "type": "LAMBDA",
+        "decisionCases": {},
+        "defaultCase": [],
+        "forkTasks": [],
+        "startDelay": 0,
+        "joinOn": [],
+        "optional": false,
+        "defaultExclusiveJoinTask": [],
+        "asyncComplete": false,
+        "loopOver": []
+      },
+      "rateLimitPerFrequency": 0,
+      "rateLimitFrequencyInSeconds": 0,
+      "workflowPriority": 0,
+      "iteration": 0,
+      "taskDefinition": {
+        "present": false
+      },
+      "loopOverTask": false,
+      "queueWaitTime": -85,
+      "taskStatus": "COMPLETED"
+    },
+    {
+      "taskType": "FORK",
+      "status": "COMPLETED",
+      "inputData": {
+        "forkedTaskDefs": [
+          {
+            "name": "sub_task",
+            "taskReferenceName": "IOS01",
+            "inputParameters": {},
+            "type": "SUB_WORKFLOW",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            },
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": []
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Leaf02",
+            "inputParameters": {},
+            "type": "SUB_WORKFLOW",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            },
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": []
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Leaf04",
+            "inputParameters": {},
+            "type": "SUB_WORKFLOW",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            },
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": []
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Leaf05",
+            "inputParameters": {},
+            "type": "SUB_WORKFLOW",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            },
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": []
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Spine01",
+            "inputParameters": {},
+            "type": "SUB_WORKFLOW",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            },
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": []
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "netconf-testtool",
+            "inputParameters": {},
+            "type": "SUB_WORKFLOW",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            },
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": []
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "XR02",
+            "inputParameters": {},
+            "type": "SUB_WORKFLOW",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            },
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": []
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "VRP01",
+            "inputParameters": {},
+            "type": "SUB_WORKFLOW",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            },
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": []
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Leaf03",
+            "inputParameters": {},
+            "type": "SUB_WORKFLOW",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            },
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": []
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "XR01",
+            "inputParameters": {},
+            "type": "SUB_WORKFLOW",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            },
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": []
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "IOS02",
+            "inputParameters": {},
+            "type": "SUB_WORKFLOW",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            },
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": []
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Leaf01",
+            "inputParameters": {},
+            "type": "SUB_WORKFLOW",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            },
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": []
+          },
+          {
+            "name": "sub_task",
+            "taskReferenceName": "Spine02",
+            "inputParameters": {},
+            "type": "SUB_WORKFLOW",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "subWorkflowParam": {
+              "name": "Mount_from_inventory",
+              "version": 1
+            },
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": []
+          }
+        ],
+        "forkedTasks": [
+          "IOS01",
+          "Leaf02",
+          "Leaf04",
+          "Leaf05",
+          "Spine01",
+          "netconf-testtool",
+          "XR02",
+          "VRP01",
+          "Leaf03",
+          "XR01",
+          "IOS02",
+          "Leaf01",
+          "Spine02"
+        ]
+      },
+      "referenceTaskName": "fork",
+      "retryCount": 0,
+      "seq": 2,
+      "correlationId": "admin-user",
+      "pollCount": 0,
+      "taskDefName": "FORK",
+      "scheduledTime": 1615199497853,
+      "startTime": 0,
+      "endTime": 1615199497831,
+      "updateTime": 1615199497901,
+      "startDelayInSeconds": 0,
+      "retried": false,
+      "executed": true,
+      "callbackFromWorker": true,
+      "responseTimeoutSeconds": 0,
+      "workflowInstanceId": "aa8ab065-7fc2-4821-ae69-036cb844fde5",
+      "taskId": "66ca7d36-8a17-4d37-a508-6e66c48067d8",
+      "callbackAfterSeconds": 0,
+      "outputData": {},
+      "workflowTask": {
+        "name": "dynamic_fork",
+        "taskReferenceName": "fork",
+        "inputParameters": {
+          "dynamic_tasks": "${lambdaValidator.output.result}",
+          "dynamic_tasks_i": "${workflow.input.dynamic_tasks_i}"
+        },
+        "type": "FORK_JOIN_DYNAMIC",
+        "decisionCases": {},
+        "dynamicForkTasksParam": "dynamic_tasks",
+        "dynamicForkTasksInputParamName": "dynamic_tasks_i",
+        "defaultCase": [],
+        "forkTasks": [],
+        "startDelay": 0,
+        "joinOn": [],
+        "optional": false,
+        "defaultExclusiveJoinTask": [],
+        "asyncComplete": false,
+        "loopOver": []
+      },
+      "domain": "frinx",
+      "rateLimitPerFrequency": 0,
+      "rateLimitFrequencyInSeconds": 0,
+      "workflowPriority": 0,
+      "iteration": 0,
+      "taskDefinition": {
+        "present": false
+      },
+      "loopOverTask": false,
+      "queueWaitTime": 0,
+      "taskStatus": "COMPLETED"
+    },
+    {
+      "taskType": "SUB_WORKFLOW",
+      "status": "FAILED",
+      "inputData": {
+        "subWorkflowDefinition": null,
+        "workflowInput": {},
+        "device_id": "IOS01",
+        "subWorkflowTaskToDomain": null,
+        "subWorkflowName": "Mount_from_inventory",
+        "subWorkflowVersion": 1
+      },
+      "referenceTaskName": "IOS01",
+      "retryCount": 0,
+      "seq": 3,
+      "correlationId": "admin-user",
+      "pollCount": 1,
+      "taskDefName": "sub_task",
+      "scheduledTime": 1615199497859,
+      "startTime": 1615199497943,
+      "endTime": 1615199498358,
+      "updateTime": 1615199497993,
+      "startDelayInSeconds": 0,
+      "retried": false,
+      "executed": false,
+      "callbackFromWorker": true,
+      "responseTimeoutSeconds": 0,
+      "workflowInstanceId": "aa8ab065-7fc2-4821-ae69-036cb844fde5",
+      "workflowType": "Dynamic_fork",
+      "taskId": "103ca317-4df8-4603-a280-fcf95789847b",
+      "callbackAfterSeconds": 30,
+      "outputData": {
+        "subWorkflowId": "21e823b0-36cb-418b-91ec-5de30d2746c8",
+        "url": "http://pop-os_uniconfig:8181/rests/data/network-topology:network-topology/topology=cli/node=IOS01",
+        "response_code": 200,
+        "response_body": {
+          "node": [
+            {
+              "node-id": "IOS01",
+              "cli-topology:transport-type": "ssh",
+              "cli-topology:host": "sample-topology",
+              "cli-topology:default-commit-error-patterns": {},
+              "cli-topology:journal-size": 500,
+              "cli-topology:default-error-patterns": {
+                "error-pattern": [
+                  "% .* overlaps with \\w",
+                  "(^|\\n)^\\s+\\^.*",
+                  "% Cannot configure the local system as neighbor",
+                  "(^|\\n)% Topology global(?-i).*",
+                  "(^|\\n)% (?i)invalid input(?-i).*",
+                  "(^|\\n)% (?i)BGP(?-i).*",
+                  "(^|\\n)% (?i)Incomplete command(?-i).*",
+                  "% Configure the peer-group .+ first"
+                ]
+              },
+              "cli-topology:device-version": "15.4",
+              "cli-topology:port": 10000,
+              "cli-topology:device-type": "ios",
+              "cli-topology:dry-run-journal-size": 180,
+              "cli-topology:parsing-engine": "tree-parser",
+              "cli-topology:connection-status": "connecting",
+              "cli-topology:username": "cisco",
+              "cli-topology:password": "cisco",
+              "cli-topology:connected-message": "Attemp: [21] Reconnecting due to java.nio.channels.UnresolvedAddressException"
+            }
+          ]
+        }
+      },
+      "workflowTask": {
+        "name": "sub_task",
+        "taskReferenceName": "IOS01",
+        "inputParameters": {},
+        "type": "SUB_WORKFLOW",
+        "decisionCases": {},
+        "defaultCase": [],
+        "forkTasks": [],
+        "startDelay": 0,
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        },
+        "joinOn": [],
+        "optional": false,
+        "defaultExclusiveJoinTask": [],
+        "asyncComplete": false,
+        "loopOver": []
+      },
+      "rateLimitPerFrequency": 0,
+      "rateLimitFrequencyInSeconds": 0,
+      "workflowPriority": 0,
+      "iteration": 0,
+      "subWorkflowId": "21e823b0-36cb-418b-91ec-5de30d2746c8",
+      "taskDefinition": {
+        "present": false
+      },
+      "loopOverTask": false,
+      "queueWaitTime": 97651,
+      "taskStatus": "FAILED"
+    },
+    {
+      "taskType": "SUB_WORKFLOW",
+      "status": "CANCELED",
+      "inputData": {
+        "subWorkflowDefinition": null,
+        "workflowInput": {},
+        "device_id": "Leaf02",
+        "subWorkflowTaskToDomain": null,
+        "subWorkflowName": "Mount_from_inventory",
+        "subWorkflowVersion": 1
+      },
+      "referenceTaskName": "Leaf02",
+      "retryCount": 0,
+      "seq": 4,
+      "correlationId": "admin-user",
+      "pollCount": 1,
+      "taskDefName": "sub_task",
+      "scheduledTime": 1615199497862,
+      "startTime": 1615199497997,
+      "endTime": 1615199498507,
+      "updateTime": 1615199498038,
+      "startDelayInSeconds": 0,
+      "retried": false,
+      "executed": false,
+      "callbackFromWorker": true,
+      "responseTimeoutSeconds": 0,
+      "workflowInstanceId": "aa8ab065-7fc2-4821-ae69-036cb844fde5",
+      "workflowType": "Dynamic_fork",
+      "taskId": "fa595d74-6244-4d9d-9126-4d9fec4eb504",
+      "callbackAfterSeconds": 30,
+      "outputData": {
+        "subWorkflowId": "25876dd2-2fdd-4678-9f9d-cd0ce0f5e31b"
+      },
+      "workflowTask": {
+        "name": "sub_task",
+        "taskReferenceName": "Leaf02",
+        "inputParameters": {},
+        "type": "SUB_WORKFLOW",
+        "decisionCases": {},
+        "defaultCase": [],
+        "forkTasks": [],
+        "startDelay": 0,
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        },
+        "joinOn": [],
+        "optional": false,
+        "defaultExclusiveJoinTask": [],
+        "asyncComplete": false,
+        "loopOver": []
+      },
+      "rateLimitPerFrequency": 0,
+      "rateLimitFrequencyInSeconds": 0,
+      "workflowPriority": 0,
+      "iteration": 0,
+      "subWorkflowId": "25876dd2-2fdd-4678-9f9d-cd0ce0f5e31b",
+      "taskDefinition": {
+        "present": false
+      },
+      "loopOverTask": false,
+      "queueWaitTime": 97606,
+      "taskStatus": "CANCELED"
+    },
+    {
+      "taskType": "SUB_WORKFLOW",
+      "status": "CANCELED",
+      "inputData": {
+        "subWorkflowDefinition": null,
+        "workflowInput": {},
+        "device_id": "Leaf04",
+        "subWorkflowTaskToDomain": null,
+        "subWorkflowName": "Mount_from_inventory",
+        "subWorkflowVersion": 1
+      },
+      "referenceTaskName": "Leaf04",
+      "retryCount": 0,
+      "seq": 5,
+      "correlationId": "admin-user",
+      "pollCount": 1,
+      "taskDefName": "sub_task",
+      "scheduledTime": 1615199497865,
+      "startTime": 1615199498061,
+      "endTime": 1615199498568,
+      "updateTime": 1615199498113,
+      "startDelayInSeconds": 0,
+      "retried": false,
+      "executed": false,
+      "callbackFromWorker": true,
+      "responseTimeoutSeconds": 0,
+      "workflowInstanceId": "aa8ab065-7fc2-4821-ae69-036cb844fde5",
+      "workflowType": "Dynamic_fork",
+      "taskId": "ed5a8d53-e0d4-4660-a7d9-f38280a58852",
+      "callbackAfterSeconds": 30,
+      "outputData": {
+        "subWorkflowId": "ceffa471-1578-40ad-adda-05df473fdc47"
+      },
+      "workflowTask": {
+        "name": "sub_task",
+        "taskReferenceName": "Leaf04",
+        "inputParameters": {},
+        "type": "SUB_WORKFLOW",
+        "decisionCases": {},
+        "defaultCase": [],
+        "forkTasks": [],
+        "startDelay": 0,
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        },
+        "joinOn": [],
+        "optional": false,
+        "defaultExclusiveJoinTask": [],
+        "asyncComplete": false,
+        "loopOver": []
+      },
+      "rateLimitPerFrequency": 0,
+      "rateLimitFrequencyInSeconds": 0,
+      "workflowPriority": 0,
+      "iteration": 0,
+      "subWorkflowId": "ceffa471-1578-40ad-adda-05df473fdc47",
+      "taskDefinition": {
+        "present": false
+      },
+      "loopOverTask": false,
+      "queueWaitTime": 97531,
+      "taskStatus": "CANCELED"
+    },
+    {
+      "taskType": "SUB_WORKFLOW",
+      "status": "CANCELED",
+      "inputData": {
+        "subWorkflowDefinition": null,
+        "workflowInput": {},
+        "device_id": "Leaf05",
+        "subWorkflowTaskToDomain": null,
+        "subWorkflowName": "Mount_from_inventory",
+        "subWorkflowVersion": 1
+      },
+      "referenceTaskName": "Leaf05",
+      "retryCount": 0,
+      "seq": 6,
+      "correlationId": "admin-user",
+      "pollCount": 1,
+      "taskDefName": "sub_task",
+      "scheduledTime": 1615199497869,
+      "startTime": 1615199498114,
+      "endTime": 1615199498625,
+      "updateTime": 1615199498171,
+      "startDelayInSeconds": 0,
+      "retried": false,
+      "executed": false,
+      "callbackFromWorker": true,
+      "responseTimeoutSeconds": 0,
+      "workflowInstanceId": "aa8ab065-7fc2-4821-ae69-036cb844fde5",
+      "workflowType": "Dynamic_fork",
+      "taskId": "6c3aa385-ad98-4171-adc4-3375f2e1c968",
+      "callbackAfterSeconds": 30,
+      "outputData": {
+        "subWorkflowId": "64aa410c-8c7f-444f-b293-a6bdbd6f61b5"
+      },
+      "workflowTask": {
+        "name": "sub_task",
+        "taskReferenceName": "Leaf05",
+        "inputParameters": {},
+        "type": "SUB_WORKFLOW",
+        "decisionCases": {},
+        "defaultCase": [],
+        "forkTasks": [],
+        "startDelay": 0,
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        },
+        "joinOn": [],
+        "optional": false,
+        "defaultExclusiveJoinTask": [],
+        "asyncComplete": false,
+        "loopOver": []
+      },
+      "rateLimitPerFrequency": 0,
+      "rateLimitFrequencyInSeconds": 0,
+      "workflowPriority": 0,
+      "iteration": 0,
+      "subWorkflowId": "64aa410c-8c7f-444f-b293-a6bdbd6f61b5",
+      "taskDefinition": {
+        "present": false
+      },
+      "loopOverTask": false,
+      "queueWaitTime": 97473,
+      "taskStatus": "CANCELED"
+    },
+    {
+      "taskType": "SUB_WORKFLOW",
+      "status": "CANCELED",
+      "inputData": {
+        "subWorkflowDefinition": null,
+        "workflowInput": {},
+        "device_id": "Spine01",
+        "subWorkflowTaskToDomain": null,
+        "subWorkflowName": "Mount_from_inventory",
+        "subWorkflowVersion": 1
+      },
+      "referenceTaskName": "Spine01",
+      "retryCount": 0,
+      "seq": 7,
+      "correlationId": "admin-user",
+      "pollCount": 1,
+      "taskDefName": "sub_task",
+      "scheduledTime": 1615199497872,
+      "startTime": 1615199498170,
+      "endTime": 1615199498682,
+      "updateTime": 1615199498247,
+      "startDelayInSeconds": 0,
+      "retried": false,
+      "executed": false,
+      "callbackFromWorker": true,
+      "responseTimeoutSeconds": 0,
+      "workflowInstanceId": "aa8ab065-7fc2-4821-ae69-036cb844fde5",
+      "workflowType": "Dynamic_fork",
+      "taskId": "150c1667-c242-423b-9217-1b7e30c210c8",
+      "callbackAfterSeconds": 30,
+      "outputData": {
+        "subWorkflowId": "397484ad-b982-4633-88e5-40bf480bc328"
+      },
+      "workflowTask": {
+        "name": "sub_task",
+        "taskReferenceName": "Spine01",
+        "inputParameters": {},
+        "type": "SUB_WORKFLOW",
+        "decisionCases": {},
+        "defaultCase": [],
+        "forkTasks": [],
+        "startDelay": 0,
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        },
+        "joinOn": [],
+        "optional": false,
+        "defaultExclusiveJoinTask": [],
+        "asyncComplete": false,
+        "loopOver": []
+      },
+      "rateLimitPerFrequency": 0,
+      "rateLimitFrequencyInSeconds": 0,
+      "workflowPriority": 0,
+      "iteration": 0,
+      "subWorkflowId": "397484ad-b982-4633-88e5-40bf480bc328",
+      "taskDefinition": {
+        "present": false
+      },
+      "loopOverTask": false,
+      "queueWaitTime": 97397,
+      "taskStatus": "CANCELED"
+    },
+    {
+      "taskType": "SUB_WORKFLOW",
+      "status": "CANCELED",
+      "inputData": {
+        "subWorkflowDefinition": null,
+        "workflowInput": {},
+        "device_id": "netconf-testtool",
+        "subWorkflowTaskToDomain": null,
+        "subWorkflowName": "Mount_from_inventory",
+        "subWorkflowVersion": 1
+      },
+      "referenceTaskName": "netconf-testtool",
+      "retryCount": 0,
+      "seq": 8,
+      "correlationId": "admin-user",
+      "pollCount": 1,
+      "taskDefName": "sub_task",
+      "scheduledTime": 1615199497875,
+      "startTime": 1615199498230,
+      "endTime": 1615199498744,
+      "updateTime": 1615199498292,
+      "startDelayInSeconds": 0,
+      "retried": false,
+      "executed": false,
+      "callbackFromWorker": true,
+      "responseTimeoutSeconds": 0,
+      "workflowInstanceId": "aa8ab065-7fc2-4821-ae69-036cb844fde5",
+      "workflowType": "Dynamic_fork",
+      "taskId": "28896c33-e8c3-467d-91a9-39c0c5587065",
+      "callbackAfterSeconds": 30,
+      "outputData": {
+        "subWorkflowId": "62fd69a5-b1e9-4a8b-bd04-1577d86674b3"
+      },
+      "workflowTask": {
+        "name": "sub_task",
+        "taskReferenceName": "netconf-testtool",
+        "inputParameters": {},
+        "type": "SUB_WORKFLOW",
+        "decisionCases": {},
+        "defaultCase": [],
+        "forkTasks": [],
+        "startDelay": 0,
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        },
+        "joinOn": [],
+        "optional": false,
+        "defaultExclusiveJoinTask": [],
+        "asyncComplete": false,
+        "loopOver": []
+      },
+      "rateLimitPerFrequency": 0,
+      "rateLimitFrequencyInSeconds": 0,
+      "workflowPriority": 0,
+      "iteration": 0,
+      "subWorkflowId": "62fd69a5-b1e9-4a8b-bd04-1577d86674b3",
+      "taskDefinition": {
+        "present": false
+      },
+      "loopOverTask": false,
+      "queueWaitTime": 97352,
+      "taskStatus": "CANCELED"
+    },
+    {
+      "taskType": "SUB_WORKFLOW",
+      "status": "CANCELED",
+      "inputData": {
+        "subWorkflowDefinition": null,
+        "workflowInput": {},
+        "device_id": "XR02",
+        "subWorkflowTaskToDomain": null,
+        "subWorkflowName": "Mount_from_inventory",
+        "subWorkflowVersion": 1
+      },
+      "referenceTaskName": "XR02",
+      "retryCount": 0,
+      "seq": 9,
+      "correlationId": "admin-user",
+      "pollCount": 1,
+      "taskDefName": "sub_task",
+      "scheduledTime": 1615199497878,
+      "startTime": 1615199498284,
+      "endTime": 1615199498800,
+      "updateTime": 1615199498370,
+      "startDelayInSeconds": 0,
+      "retried": false,
+      "executed": false,
+      "callbackFromWorker": true,
+      "responseTimeoutSeconds": 0,
+      "workflowInstanceId": "aa8ab065-7fc2-4821-ae69-036cb844fde5",
+      "workflowType": "Dynamic_fork",
+      "taskId": "4ff0ad1b-7ed8-402e-b4e9-732931eea19b",
+      "callbackAfterSeconds": 30,
+      "outputData": {
+        "subWorkflowId": "800e90f9-f312-4308-93c6-2d70a87a288e"
+      },
+      "workflowTask": {
+        "name": "sub_task",
+        "taskReferenceName": "XR02",
+        "inputParameters": {},
+        "type": "SUB_WORKFLOW",
+        "decisionCases": {},
+        "defaultCase": [],
+        "forkTasks": [],
+        "startDelay": 0,
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        },
+        "joinOn": [],
+        "optional": false,
+        "defaultExclusiveJoinTask": [],
+        "asyncComplete": false,
+        "loopOver": []
+      },
+      "rateLimitPerFrequency": 0,
+      "rateLimitFrequencyInSeconds": 0,
+      "workflowPriority": 0,
+      "iteration": 0,
+      "subWorkflowId": "800e90f9-f312-4308-93c6-2d70a87a288e",
+      "taskDefinition": {
+        "present": false
+      },
+      "loopOverTask": false,
+      "queueWaitTime": 97274,
+      "taskStatus": "CANCELED"
+    },
+    {
+      "taskType": "SUB_WORKFLOW",
+      "status": "CANCELED",
+      "inputData": {
+        "subWorkflowDefinition": null,
+        "workflowInput": {},
+        "device_id": "VRP01",
+        "subWorkflowTaskToDomain": null,
+        "subWorkflowName": "Mount_from_inventory",
+        "subWorkflowVersion": 1
+      },
+      "referenceTaskName": "VRP01",
+      "retryCount": 0,
+      "seq": 10,
+      "correlationId": "admin-user",
+      "pollCount": 1,
+      "taskDefName": "sub_task",
+      "scheduledTime": 1615199497881,
+      "startTime": 1615199498343,
+      "endTime": 1615199498806,
+      "updateTime": 1615199498343,
+      "startDelayInSeconds": 0,
+      "retried": false,
+      "executed": false,
+      "callbackFromWorker": true,
+      "responseTimeoutSeconds": 0,
+      "workflowInstanceId": "aa8ab065-7fc2-4821-ae69-036cb844fde5",
+      "workflowType": "Dynamic_fork",
+      "taskId": "4070c731-3374-4312-98ee-5f1a1661a277",
+      "callbackAfterSeconds": 0,
+      "outputData": {},
+      "workflowTask": {
+        "name": "sub_task",
+        "taskReferenceName": "VRP01",
+        "inputParameters": {},
+        "type": "SUB_WORKFLOW",
+        "decisionCases": {},
+        "defaultCase": [],
+        "forkTasks": [],
+        "startDelay": 0,
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        },
+        "joinOn": [],
+        "optional": false,
+        "defaultExclusiveJoinTask": [],
+        "asyncComplete": false,
+        "loopOver": []
+      },
+      "rateLimitPerFrequency": 0,
+      "rateLimitFrequencyInSeconds": 0,
+      "workflowPriority": 0,
+      "iteration": 0,
+      "taskDefinition": {
+        "present": false
+      },
+      "loopOverTask": false,
+      "queueWaitTime": 462,
+      "taskStatus": "CANCELED"
+    },
+    {
+      "taskType": "SUB_WORKFLOW",
+      "status": "CANCELED",
+      "inputData": {
+        "subWorkflowDefinition": null,
+        "workflowInput": {},
+        "device_id": "Leaf03",
+        "subWorkflowTaskToDomain": null,
+        "subWorkflowName": "Mount_from_inventory",
+        "subWorkflowVersion": 1
+      },
+      "referenceTaskName": "Leaf03",
+      "retryCount": 0,
+      "seq": 11,
+      "correlationId": "admin-user",
+      "pollCount": 0,
+      "taskDefName": "sub_task",
+      "scheduledTime": 1615199497884,
+      "startTime": 0,
+      "endTime": 1615199498818,
+      "updateTime": 1615199498818,
+      "startDelayInSeconds": 0,
+      "retried": false,
+      "executed": false,
+      "callbackFromWorker": true,
+      "responseTimeoutSeconds": 0,
+      "workflowInstanceId": "aa8ab065-7fc2-4821-ae69-036cb844fde5",
+      "workflowType": "Dynamic_fork",
+      "taskId": "83577cb9-1504-4ca9-97e1-06b9b68b79cd",
+      "callbackAfterSeconds": 0,
+      "outputData": {},
+      "workflowTask": {
+        "name": "sub_task",
+        "taskReferenceName": "Leaf03",
+        "inputParameters": {},
+        "type": "SUB_WORKFLOW",
+        "decisionCases": {},
+        "defaultCase": [],
+        "forkTasks": [],
+        "startDelay": 0,
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        },
+        "joinOn": [],
+        "optional": false,
+        "defaultExclusiveJoinTask": [],
+        "asyncComplete": false,
+        "loopOver": []
+      },
+      "rateLimitPerFrequency": 0,
+      "rateLimitFrequencyInSeconds": 0,
+      "workflowPriority": 0,
+      "iteration": 0,
+      "taskDefinition": {
+        "present": false
+      },
+      "loopOverTask": false,
+      "queueWaitTime": 0,
+      "taskStatus": "CANCELED"
+    },
+    {
+      "taskType": "SUB_WORKFLOW",
+      "status": "CANCELED",
+      "inputData": {
+        "subWorkflowDefinition": null,
+        "workflowInput": {},
+        "device_id": "XR01",
+        "subWorkflowTaskToDomain": null,
+        "subWorkflowName": "Mount_from_inventory",
+        "subWorkflowVersion": 1
+      },
+      "referenceTaskName": "XR01",
+      "retryCount": 0,
+      "seq": 12,
+      "correlationId": "admin-user",
+      "pollCount": 0,
+      "taskDefName": "sub_task",
+      "scheduledTime": 1615199497887,
+      "startTime": 0,
+      "endTime": 1615199498829,
+      "updateTime": 1615199498829,
+      "startDelayInSeconds": 0,
+      "retried": false,
+      "executed": false,
+      "callbackFromWorker": true,
+      "responseTimeoutSeconds": 0,
+      "workflowInstanceId": "aa8ab065-7fc2-4821-ae69-036cb844fde5",
+      "workflowType": "Dynamic_fork",
+      "taskId": "a65876d0-9607-4c40-a976-539f35292f47",
+      "callbackAfterSeconds": 0,
+      "outputData": {},
+      "workflowTask": {
+        "name": "sub_task",
+        "taskReferenceName": "XR01",
+        "inputParameters": {},
+        "type": "SUB_WORKFLOW",
+        "decisionCases": {},
+        "defaultCase": [],
+        "forkTasks": [],
+        "startDelay": 0,
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        },
+        "joinOn": [],
+        "optional": false,
+        "defaultExclusiveJoinTask": [],
+        "asyncComplete": false,
+        "loopOver": []
+      },
+      "rateLimitPerFrequency": 0,
+      "rateLimitFrequencyInSeconds": 0,
+      "workflowPriority": 0,
+      "iteration": 0,
+      "taskDefinition": {
+        "present": false
+      },
+      "loopOverTask": false,
+      "queueWaitTime": 0,
+      "taskStatus": "CANCELED"
+    },
+    {
+      "taskType": "SUB_WORKFLOW",
+      "status": "CANCELED",
+      "inputData": {
+        "subWorkflowDefinition": null,
+        "workflowInput": {},
+        "device_id": "IOS02",
+        "subWorkflowTaskToDomain": null,
+        "subWorkflowName": "Mount_from_inventory",
+        "subWorkflowVersion": 1
+      },
+      "referenceTaskName": "IOS02",
+      "retryCount": 0,
+      "seq": 13,
+      "correlationId": "admin-user",
+      "pollCount": 0,
+      "taskDefName": "sub_task",
+      "scheduledTime": 1615199497889,
+      "startTime": 0,
+      "endTime": 1615199498838,
+      "updateTime": 1615199498838,
+      "startDelayInSeconds": 0,
+      "retried": false,
+      "executed": false,
+      "callbackFromWorker": true,
+      "responseTimeoutSeconds": 0,
+      "workflowInstanceId": "aa8ab065-7fc2-4821-ae69-036cb844fde5",
+      "workflowType": "Dynamic_fork",
+      "taskId": "29118f1f-b7cb-4f2d-a229-b350e5a874c0",
+      "callbackAfterSeconds": 0,
+      "outputData": {},
+      "workflowTask": {
+        "name": "sub_task",
+        "taskReferenceName": "IOS02",
+        "inputParameters": {},
+        "type": "SUB_WORKFLOW",
+        "decisionCases": {},
+        "defaultCase": [],
+        "forkTasks": [],
+        "startDelay": 0,
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        },
+        "joinOn": [],
+        "optional": false,
+        "defaultExclusiveJoinTask": [],
+        "asyncComplete": false,
+        "loopOver": []
+      },
+      "rateLimitPerFrequency": 0,
+      "rateLimitFrequencyInSeconds": 0,
+      "workflowPriority": 0,
+      "iteration": 0,
+      "taskDefinition": {
+        "present": false
+      },
+      "loopOverTask": false,
+      "queueWaitTime": 0,
+      "taskStatus": "CANCELED"
+    },
+    {
+      "taskType": "SUB_WORKFLOW",
+      "status": "CANCELED",
+      "inputData": {
+        "subWorkflowDefinition": null,
+        "workflowInput": {},
+        "device_id": "Leaf01",
+        "subWorkflowTaskToDomain": null,
+        "subWorkflowName": "Mount_from_inventory",
+        "subWorkflowVersion": 1
+      },
+      "referenceTaskName": "Leaf01",
+      "retryCount": 0,
+      "seq": 14,
+      "correlationId": "admin-user",
+      "pollCount": 0,
+      "taskDefName": "sub_task",
+      "scheduledTime": 1615199497893,
+      "startTime": 0,
+      "endTime": 1615199498856,
+      "updateTime": 1615199498856,
+      "startDelayInSeconds": 0,
+      "retried": false,
+      "executed": false,
+      "callbackFromWorker": true,
+      "responseTimeoutSeconds": 0,
+      "workflowInstanceId": "aa8ab065-7fc2-4821-ae69-036cb844fde5",
+      "workflowType": "Dynamic_fork",
+      "taskId": "e9758c59-2495-4406-aa06-2d2e7c69b679",
+      "callbackAfterSeconds": 0,
+      "outputData": {},
+      "workflowTask": {
+        "name": "sub_task",
+        "taskReferenceName": "Leaf01",
+        "inputParameters": {},
+        "type": "SUB_WORKFLOW",
+        "decisionCases": {},
+        "defaultCase": [],
+        "forkTasks": [],
+        "startDelay": 0,
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        },
+        "joinOn": [],
+        "optional": false,
+        "defaultExclusiveJoinTask": [],
+        "asyncComplete": false,
+        "loopOver": []
+      },
+      "rateLimitPerFrequency": 0,
+      "rateLimitFrequencyInSeconds": 0,
+      "workflowPriority": 0,
+      "iteration": 0,
+      "taskDefinition": {
+        "present": false
+      },
+      "loopOverTask": false,
+      "queueWaitTime": 0,
+      "taskStatus": "CANCELED"
+    },
+    {
+      "taskType": "SUB_WORKFLOW",
+      "status": "CANCELED",
+      "inputData": {
+        "subWorkflowDefinition": null,
+        "workflowInput": {},
+        "device_id": "Spine02",
+        "subWorkflowTaskToDomain": null,
+        "subWorkflowName": "Mount_from_inventory",
+        "subWorkflowVersion": 1
+      },
+      "referenceTaskName": "Spine02",
+      "retryCount": 0,
+      "seq": 15,
+      "correlationId": "admin-user",
+      "pollCount": 0,
+      "taskDefName": "sub_task",
+      "scheduledTime": 1615199497896,
+      "startTime": 0,
+      "endTime": 1615199498865,
+      "updateTime": 1615199498865,
+      "startDelayInSeconds": 0,
+      "retried": false,
+      "executed": false,
+      "callbackFromWorker": true,
+      "responseTimeoutSeconds": 0,
+      "workflowInstanceId": "aa8ab065-7fc2-4821-ae69-036cb844fde5",
+      "workflowType": "Dynamic_fork",
+      "taskId": "9d4b47f4-7488-464a-94f3-0af2fe4c2791",
+      "callbackAfterSeconds": 0,
+      "outputData": {},
+      "workflowTask": {
+        "name": "sub_task",
+        "taskReferenceName": "Spine02",
+        "inputParameters": {},
+        "type": "SUB_WORKFLOW",
+        "decisionCases": {},
+        "defaultCase": [],
+        "forkTasks": [],
+        "startDelay": 0,
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        },
+        "joinOn": [],
+        "optional": false,
+        "defaultExclusiveJoinTask": [],
+        "asyncComplete": false,
+        "loopOver": []
+      },
+      "rateLimitPerFrequency": 0,
+      "rateLimitFrequencyInSeconds": 0,
+      "workflowPriority": 0,
+      "iteration": 0,
+      "taskDefinition": {
+        "present": false
+      },
+      "loopOverTask": false,
+      "queueWaitTime": 0,
+      "taskStatus": "CANCELED"
+    },
+    {
+      "taskType": "JOIN",
+      "status": "CANCELED",
+      "inputData": {
+        "joinOn": [
+          "IOS01",
+          "Leaf02",
+          "Leaf04",
+          "Leaf05",
+          "Spine01",
+          "netconf-testtool",
+          "XR02",
+          "VRP01",
+          "Leaf03",
+          "XR01",
+          "IOS02",
+          "Leaf01",
+          "Spine02"
+        ]
+      },
+      "referenceTaskName": "join",
+      "retryCount": 0,
+      "seq": 16,
+      "correlationId": "admin-user",
+      "pollCount": 0,
+      "taskDefName": "JOIN",
+      "scheduledTime": 1615199497898,
+      "startTime": 1615199497910,
+      "endTime": 1615199498875,
+      "updateTime": 1615199497910,
+      "startDelayInSeconds": 0,
+      "retried": false,
+      "executed": false,
+      "callbackFromWorker": true,
+      "responseTimeoutSeconds": 0,
+      "workflowInstanceId": "aa8ab065-7fc2-4821-ae69-036cb844fde5",
+      "workflowType": "Dynamic_fork",
+      "taskId": "cdd585ae-ba71-49ee-8518-a9e4e4e28136",
+      "callbackAfterSeconds": 0,
+      "outputData": {
+        "netconf-testtool": {},
+        "IOS02": {},
+        "IOS01": {},
+        "Leaf03": {},
+        "Leaf02": {},
+        "Leaf05": {},
+        "Leaf04": {},
+        "XR01": {},
+        "Leaf01": {},
+        "XR02": {},
+        "VRP01": {},
+        "Spine02": {},
+        "Spine01": {}
+      },
+      "workflowTask": {
+        "name": "join",
+        "taskReferenceName": "join",
+        "inputParameters": {},
+        "type": "JOIN",
+        "decisionCases": {},
+        "defaultCase": [],
+        "forkTasks": [],
+        "startDelay": 0,
+        "joinOn": [],
+        "optional": false,
+        "defaultExclusiveJoinTask": [],
+        "asyncComplete": false,
+        "loopOver": []
+      },
+      "rateLimitPerFrequency": 0,
+      "rateLimitFrequencyInSeconds": 0,
+      "workflowPriority": 0,
+      "iteration": 0,
+      "taskDefinition": {
+        "present": false
+      },
+      "loopOverTask": false,
+      "queueWaitTime": 12,
+      "taskStatus": "CANCELED"
+    }
+  ],
+  "input": {
+    "expectedName": "sub_task",
+    "dynamic_tasks_i": {
+      "IOS01": {
+        "device_id": "IOS01"
+      },
+      "Leaf02": {
+        "device_id": "Leaf02"
+      },
+      "Leaf04": {
+        "device_id": "Leaf04"
+      },
+      "Leaf05": {
+        "device_id": "Leaf05"
+      },
+      "Spine01": {
+        "device_id": "Spine01"
+      },
+      "netconf-testtool": {
+        "device_id": "netconf-testtool"
+      },
+      "XR02": {
+        "device_id": "XR02"
+      },
+      "VRP01": {
+        "device_id": "VRP01"
+      },
+      "Leaf03": {
+        "device_id": "Leaf03"
+      },
+      "XR01": {
+        "device_id": "XR01"
+      },
+      "IOS02": {
+        "device_id": "IOS02"
+      },
+      "Leaf01": {
+        "device_id": "Leaf01"
+      },
+      "Spine02": {
+        "device_id": "Spine02"
+      }
+    },
+    "expectedType": "SUB_WORKFLOW",
+    "dynamic_tasks": [
+      {
+        "name": "sub_task",
+        "taskReferenceName": "IOS01",
+        "type": "SUB_WORKFLOW",
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        }
+      },
+      {
+        "name": "sub_task",
+        "taskReferenceName": "Leaf02",
+        "type": "SUB_WORKFLOW",
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        }
+      },
+      {
+        "name": "sub_task",
+        "taskReferenceName": "Leaf04",
+        "type": "SUB_WORKFLOW",
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        }
+      },
+      {
+        "name": "sub_task",
+        "taskReferenceName": "Leaf05",
+        "type": "SUB_WORKFLOW",
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        }
+      },
+      {
+        "name": "sub_task",
+        "taskReferenceName": "Spine01",
+        "type": "SUB_WORKFLOW",
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        }
+      },
+      {
+        "name": "sub_task",
+        "taskReferenceName": "netconf-testtool",
+        "type": "SUB_WORKFLOW",
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        }
+      },
+      {
+        "name": "sub_task",
+        "taskReferenceName": "XR02",
+        "type": "SUB_WORKFLOW",
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        }
+      },
+      {
+        "name": "sub_task",
+        "taskReferenceName": "VRP01",
+        "type": "SUB_WORKFLOW",
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        }
+      },
+      {
+        "name": "sub_task",
+        "taskReferenceName": "Leaf03",
+        "type": "SUB_WORKFLOW",
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        }
+      },
+      {
+        "name": "sub_task",
+        "taskReferenceName": "XR01",
+        "type": "SUB_WORKFLOW",
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        }
+      },
+      {
+        "name": "sub_task",
+        "taskReferenceName": "IOS02",
+        "type": "SUB_WORKFLOW",
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        }
+      },
+      {
+        "name": "sub_task",
+        "taskReferenceName": "Leaf01",
+        "type": "SUB_WORKFLOW",
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        }
+      },
+      {
+        "name": "sub_task",
+        "taskReferenceName": "Spine02",
+        "type": "SUB_WORKFLOW",
+        "subWorkflowParam": {
+          "name": "Mount_from_inventory",
+          "version": 1
+        }
+      }
+    ]
+  },
+  "output": {
+    "forkedTasks": [
+      "IOS01",
+      "Leaf02",
+      "Leaf04",
+      "Leaf05",
+      "Spine01",
+      "netconf-testtool",
+      "XR02",
+      "VRP01",
+      "Leaf03",
+      "XR01",
+      "IOS02",
+      "Leaf01",
+      "Spine02"
+    ]
+  },
+  "workflowType": "Dynamic_fork",
+  "version": 1,
+  "correlationId": "admin-user",
+  "schemaVersion": 2,
+  "taskToDomain": {
+    "*": "frinx"
+  },
+  "failedReferenceTaskNames": [],
+  "workflowDefinition": {
+    "workflowDefinition": {
+      "createTime": 1615194795385,
+      "updateTime": 1593520012704,
+      "name": "Dynamic_fork",
+      "description": "{\"description\": \"A dynamic fork + join task with input validation\", \"labels\": [\"BASICS\",\"UTILS\"]}",
+      "version": 1,
+      "tasks": [
+        {
+          "name": "LAMBDA_TASK",
+          "taskReferenceName": "lambdaValidator",
+          "inputParameters": {
+            "lambdaValue": "${workflow.input.dynamic_tasks}",
+            "scriptExpression": "for (var i = 0; i < $.lambdaValue.length; i = i + 1) {\n  if ($.lambdaValue[i].name !== $.expectedName || $.lambdaValue[i].type !== $.expectedType) {\n    return false\n  }\n}\n\nreturn $.lambdaValue",
+            "expectedName": "${workflow.input.expectedName}",
+            "expectedType": "${workflow.input.expectedType}"
+          },
+          "type": "LAMBDA",
+          "decisionCases": {},
+          "defaultCase": [],
+          "forkTasks": [],
+          "startDelay": 0,
+          "joinOn": [],
+          "optional": false,
+          "defaultExclusiveJoinTask": [],
+          "asyncComplete": false,
+          "loopOver": []
+        },
+        {
+          "name": "dynamic_fork",
+          "taskReferenceName": "fork",
+          "inputParameters": {
+            "dynamic_tasks": "${lambdaValidator.output.result}",
+            "dynamic_tasks_i": "${workflow.input.dynamic_tasks_i}"
+          },
+          "type": "FORK_JOIN_DYNAMIC",
+          "decisionCases": {},
+          "dynamicForkTasksParam": "dynamic_tasks",
+          "dynamicForkTasksInputParamName": "dynamic_tasks_i",
+          "defaultCase": [],
+          "forkTasks": [],
+          "startDelay": 0,
+          "joinOn": [],
+          "optional": false,
+          "defaultExclusiveJoinTask": [],
+          "asyncComplete": false,
+          "loopOver": []
+        },
+        {
+          "name": "join",
+          "taskReferenceName": "join",
+          "inputParameters": {},
+          "type": "JOIN",
+          "decisionCases": {},
+          "defaultCase": [],
+          "forkTasks": [],
+          "startDelay": 0,
+          "joinOn": [],
+          "optional": false,
+          "defaultExclusiveJoinTask": [],
+          "asyncComplete": false,
+          "loopOver": []
+        }
+      ],
+      "inputParameters": [
+        "{\"dynamic_tasks\":{\"value\":\"\",\"description\":\"\",\"type\":\"string\"},\"expectedName\":{\"value\":\"\",\"description\":\"\",\"type\":\"string\"},\"expectedType\":{\"value\":\"\",\"description\":\"\",\"type\":\"string\"},\"dynamic_tasks_i\":{\"value\":\"\",\"description\":\"\",\"type\":\"string\"}}"
+      ],
+      "outputParameters": {
+        "forkedTasks": "${fork.input.forkedTasks}"
+      },
+      "schemaVersion": 2,
+      "restartable": true,
+      "workflowStatusListenerEnabled": false,
+      "ownerEmail": "uniflow-micros",
+      "timeoutPolicy": "ALERT_ONLY",
+      "timeoutSeconds": 0,
+      "variables": {}
+    },
+    "priority": 0,
+    "variables": {},
+    "lastRetriedTime": 0,
+    "startTime": 1615199497666,
+    "workflowName": "Dynamic_fork",
+    "workflowVersion": 1
+  }
+}
