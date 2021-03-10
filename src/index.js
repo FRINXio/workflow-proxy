@@ -31,7 +31,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = ExpressApplication();
-
+app.use(ExpressApplication.json({limit: '50mb', extended: true}));
 const userFacingPort = process.env.USER_FACING_PORT ?? 8088;
 const taskProxyPort = process.env.TASK_PROXY_PORT ?? 8089;
 const proxyTarget =
