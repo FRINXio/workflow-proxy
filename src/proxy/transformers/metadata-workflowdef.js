@@ -57,6 +57,10 @@ export function sanitizeWorkflowdefBefore(
   addTenantIdPrefix(tenantId, workflowdef);
   // add ownerEmail - used to fill correlationId when running periodically
   workflowdef.ownerEmail = getUserEmail(req);
+  // add tenant prefix to failureWorkflow
+  if (workflowdef.failureWorkflow != null) {
+    workflowdef.failureWorkflow = withInfixSeparator(tenantId) + workflowdef.failureWorkflow;
+  }
 }
 
 function sanitizeWorkflowTaskdefBefore(tenantId: string, task: Task) {
@@ -140,6 +144,10 @@ export function sanitizeWorkflowdefAfter(
     }
     // remove prefix
     workflowdef.name = workflowdef.name.substr(tenantWithInfixSeparator.length);
+    // remove tenant prefix to failureWorkflow
+    if (workflowdef.failureWorkflow != null) {
+      workflowdef.failureWorkflow = workflowdef.failureWorkflow.substr(tenantWithInfixSeparator.length);
+    }
     return true;
   } else {
     return false;
