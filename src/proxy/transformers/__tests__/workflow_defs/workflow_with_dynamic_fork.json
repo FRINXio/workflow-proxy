@@ -61,5 +61,6 @@
   },
   "schemaVersion": 2,
   "restartable": true,
+  "failureWorkflow": "Unmount_all_from_inventory",
   "workflowStatusListenerEnabled": true
 }

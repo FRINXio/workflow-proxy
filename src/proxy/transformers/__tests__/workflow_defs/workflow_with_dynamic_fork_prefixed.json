@@ -62,5 +62,6 @@
   },
   "schemaVersion": 2,
   "restartable": true,
+  "failureWorkflow": "FACEBOOK___Unmount_all_from_inventory",
   "workflowStatusListenerEnabled": true
 }
