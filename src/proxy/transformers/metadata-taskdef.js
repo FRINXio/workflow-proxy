@@ -16,9 +16,12 @@ import {
   anythingTo,
   assertAllowedSystemTask,
   createProxyOptionsBuffer,
+  getUserEmail,
   removeTenantPrefix,
   withInfixSeparator, adminAccess,
 } from '../utils.js';
+
+import type {ExpressRequest} from 'express';
 
 import type {
   AfterFun,
@@ -58,11 +61,13 @@ const getAllTaskdefsAfter: AfterFun = (identity, req, respObj, res) => {
 };
 
 // Used in POST and PUT
-function sanitizeTaskdefBefore(tenantId: string, taskdef: Task): void {
+function sanitizeTaskdefBefore(tenantId: string, taskdef: Task, req: ExpressRequest): void {
   // only whitelisted system tasks are allowed
   assertAllowedSystemTask(taskdef);
   // prepend tenantId
   addTenantIdPrefix(tenantId, taskdef);
+
+  taskdef.ownerEmail = getUserEmail(req);
 }
 // Create new task definition(s)
 // Underscore in name is not allowed.
@@ -102,7 +107,7 @@ const postTaskdefsBefore: BeforeFun = (
   if (reqObj != null && Array.isArray(reqObj)) {
     for (let idx = 0; idx < reqObj.length; idx++) {
       const taskdef = anythingTo<Task>(reqObj[idx]);
-      sanitizeTaskdefBefore(identity.tenantId, taskdef);
+      sanitizeTaskdefBefore(identity.tenantId, taskdef, req);
     }
     proxyCallback({buffer: createProxyOptionsBuffer(reqObj, req)});
   } else {
@@ -145,7 +150,7 @@ const putTaskdefBefore: BeforeFun = (
   const reqObj = req.body;
   if (reqObj != null && typeof reqObj === 'object') {
     const taskdef = anythingTo<Task>(reqObj);
-    sanitizeTaskdefBefore(identity.tenantId, taskdef);
+    sanitizeTaskdefBefore(identity.tenantId, taskdef, req);
     proxyCallback({buffer: createProxyOptionsBuffer(reqObj, req)});
   } else {
     console.error('Expected req.body to be object in putTaskdefBefore');
