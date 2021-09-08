@@ -52,6 +52,9 @@ export default async function(
       const result = await http.get(baseURLMeta + 'taskdefs', req);
       res.status(200).send({result});
     } catch (err) {
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });
@@ -61,7 +64,11 @@ export default async function(
       const result = await http.post(baseURLMeta + 'taskdefs', req.body, req);
       res.status(200).send(result);
     } catch (err) {
-      res.status(400).send(err.response.body);
+      if (err.body) {
+        res.status(500).send(err.body);
+      } else {
+        res.status(400).send(err.response.body);
+      }
       next(err);
     }
   });
@@ -76,6 +83,9 @@ export default async function(
         );
         res.status(200).send({result});
       } catch (err) {
+        if (err.body) {
+          res.status(500).send(err.body);
+        }
         next(err);
       }
     },
@@ -92,6 +102,9 @@ export default async function(
         );
         res.status(200).send({result});
       } catch (err) {
+        if (err.body) {
+          res.status(500).send(err.body);
+        }
         next(err);
       }
     },
@@ -120,6 +133,9 @@ export default async function(
 
       res.status(200).send({result});
     } catch (err) {
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });
@@ -139,6 +155,9 @@ export default async function(
         );
         res.status(200).send({result});
       } catch (err) {
+        if (err.body) {
+          res.status(500).send(err.body);
+        }
         next(err);
       }
     },
@@ -158,6 +177,9 @@ export default async function(
         );
         res.status(200).send({result});
       } catch (err) {
+        if (err.body) {
+          res.status(500).send(err.body);
+        }
         next(err);
       }
     },
@@ -168,7 +190,11 @@ export default async function(
       const result = await http.put(baseURLMeta + 'workflow/', req.body, req);
       res.status(200).send(result);
     } catch (err) {
-      res.status(400).send(err?.response?.body);
+      if (err.body) {
+        res.status(500).send(err.body);
+      } else {
+        res.status(400).send(err?.response?.body);
+      }
       next(err);
     }
   });
@@ -187,7 +213,11 @@ export default async function(
         res.status(200).send(result);
       } catch (e) {
         console.info(`Got exception ${JSON.stringify(e)} while PUTting event`);
-        res.status(400).send('Post and Put failed');
+        if (e.body) {
+          res.status(500).send(e.body);
+        } else {
+          res.status(400).send('Post and Put failed');
+        }
         next(e);
       }
     }
@@ -198,6 +228,9 @@ export default async function(
       const result = await http.post(baseURLWorkflow, req.body, req);
       res.status(200).send(result);
     } catch (err) {
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });
@@ -250,6 +283,9 @@ export default async function(
       const hits = result.results;
       res.status(200).send({result: {hits: hits, totalHits: result.totalHits}});
     } catch (err) {
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });
@@ -263,6 +299,9 @@ export default async function(
       );
       res.status(200).send(result);
     } catch (err) {
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });
@@ -276,6 +315,9 @@ export default async function(
       );
       res.status(200).send(result);
     } catch (err) {
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });
@@ -289,6 +331,9 @@ export default async function(
       );
       res.status(200).send(result);
     } catch (err) {
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });
@@ -302,6 +347,9 @@ export default async function(
       );
       res.status(200).send(result);
     } catch (err) {
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });
@@ -315,6 +363,9 @@ export default async function(
       );
       res.status(200).send(result);
     } catch (err) {
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });
@@ -334,6 +385,9 @@ export default async function(
         );
         res.status(200).send(result);
       } catch (err) {
+        if (err.body) {
+          res.status(500).send(err.body);
+        }
         next(err);
       }
     },
@@ -419,6 +473,9 @@ export default async function(
       res.status(200).send({result, meta, subworkflows: subworkflows});
     } catch (err) {
       console.log(err);
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });
@@ -529,6 +586,10 @@ export default async function(
       }
       res.status(200).send({parents, children, count, hits});
     } catch (err) {
+      console.warn('Unable to construct hierarchical view', {error: err});
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });
@@ -538,6 +599,9 @@ export default async function(
       const result = await http.get(baseURLSchedule, req);
       res.status(200).send(result);
     } catch (err) {
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });
@@ -548,6 +612,9 @@ export default async function(
       res.status(200).send(result);
     } catch (err) {
       console.warn('Failed to GET', {error: err});
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });
@@ -579,6 +646,9 @@ export default async function(
       );
       res.status(result.statusCode).send(result.text);
     } catch (err) {
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });
@@ -588,6 +658,9 @@ export default async function(
       const result = await http.get(baseApiURL + 'event/', req);
       res.status(200).send(result);
     } catch (err) {
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });
@@ -600,6 +673,9 @@ export default async function(
       );
       res.status(200).send(result);
     } catch (err) {
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });
@@ -613,6 +689,9 @@ export default async function(
       }
       res.status(200).send({ polldata });
     } catch (err) {
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });
@@ -633,6 +712,9 @@ export default async function(
 
       res.status(200).send({result});
     } catch (err) {
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
       next(err);
     }
   });

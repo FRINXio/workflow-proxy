@@ -65,7 +65,7 @@ function doHttpRequestWithOptions(options): Promise<FrontendResponse> {
       if (res != null && isSuccess(res)) {
         resolveSuccess(res, resolve);
       } else if (res != null) {
-        reject({message: 'Wrong status code', statusCode: res.statusCode});
+        reject({message: 'Wrong status code', body: res.body, statusCode: res.statusCode});
       } else {
         reject(err);
       }
@@ -91,11 +91,15 @@ const HttpClient = {
       const options = makeOptions('GET', path, parentRequest);
       request(options, function(err, res) {
         if (res != null && isSuccess(res)) {
-          // TODO get rid of explicit json parsing when
-          // conductor's #376 is fixed
-          resolve(JSON.parse(res.body)); // all GET methods return json
+          try {
+            // all GET methods should return json except when there is a failure
+            resolve(JSON.parse(res.body));
+          } catch (err) {
+            console.warn(`Unexpected response body (invalid json): '${res.body}'`)
+            reject({message: 'Unexpected response body (invalid json)', body: res.body, statusCode: res.statusCode});
+          }
         } else if (res != null) {
-          reject({message: 'Wrong status code', statusCode: res.statusCode});
+          reject({message: 'Wrong status code', body: res.body, statusCode: res.statusCode});
         } else {
           reject(err);
         }

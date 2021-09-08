@@ -92,7 +92,7 @@ export default async function(
             throw e;
           }
         } else {
-          // just resend response without modifying it
+          console.info(`Unexpected status code ${res.statusCode}, resending raw response: '${data}'`)
           res.end(data);
         }
       });
