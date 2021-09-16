@@ -48,7 +48,8 @@ const SYSTEM_TASK_TYPES: Array<string> = [
   // Allow http system task
   // TODO remove for cloud multitenant env
   'HTTP',
-  'LAMBDA'
+  'LAMBDA',
+  'JSON_JQ_TRANSFORM'
 ];
 
 export function isLabeledWithGroup(
