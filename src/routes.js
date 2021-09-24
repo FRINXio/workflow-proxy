@@ -21,6 +21,16 @@ import transform from 'lodash/fp/transform';
 import type {$Application, ExpressRequest, ExpressResponse} from 'express';
 import type {TaskType} from './types';
 
+const uuid_regex = /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
+const WORKFLOW_STATUS_TYPES: Array<string> = [
+  'FAILED',
+  'COMPLETED',
+  'TERMINATED',
+  'RUNNING',
+  'PAUSED',
+  'TIMED_OUT'
+];
+
 const http = HttpClient;
 
 const findSchedule = (schedules, name) => {
@@ -237,11 +247,34 @@ export default async function(
 
   router.get('/executions', async (req: ExpressRequest, res, next) => {
     try {
+
       const freeText = [];
-      if (req.query.freeText !== '') {
-        freeText.push(req.query.freeText);
-      } else {
-        freeText.push('*');
+ 
+      if (typeof req.query.workflowId !== 'undefined' && req.query.workflowId !== '' ){
+        if (req.query.workflowId.match(uuid_regex) !== null) {
+            freeText.push("(workflowId:" + req.query.workflowId  + ")");
+        } else if (typeof req.query.workflowId !== 'undefined' && req.query.workflowId.match(uuid_regex) === null) {
+            freeText.push('(*)');
+            freeText.push("(workflowType:/.*" + req.query.workflowId  + ".*/)");
+        }
+      }
+      else {
+          freeText.push('(*)');
+      }
+
+      let orderType = 'DESC'
+      if (typeof req.query.order !== 'undefined' && (req.query.order === 'ASC' || req.query.order === 'DESC' )){
+        orderType = req.query.order;
+      } else if (typeof req.query.order !== 'undefined' && req.query.order !== '' ) {
+        throw [false, "Query input " + req.query.order + " for ordering results is not valid"];
+      }
+
+      if (typeof req.query.status !== 'undefined' && req.query.status !== ''){
+        if (WORKFLOW_STATUS_TYPES.includes(req.query.status)) {
+            freeText.push("(status:" + req.query.status  + ")");
+        } else {
+            throw [false, "Query input " + req.query.status + " for filtering by status is not valid"];
+        }
       }
 
       let h: string = '-1';
@@ -253,15 +286,14 @@ export default async function(
       if (h !== '-1') {
         freeText.push('startTime:[now-' + h + 'h TO now]');
       }
+
       let start: number = 0;
-      if (!isNaN(req.query.start)) {
-        // FIXME: isNaN is sketchy and accepts arrays
+      if (typeof req.query.start !== 'undefined' && !isNaN( req.query.start)) {
         start = req.query.start;
       }
+
       let size: number = 1000;
-      if (req.query.size !== 'undefined' && req.query.size !== '') {
-        /* FIXME req.query is user-controlled input, properties and values
-         in this object are untrusted and should be validated before trusting */
+      if (typeof req.query.size !== 'undefined' && !isNaN( req.query.size) && req.query.size < 500) {
         size = req.query.size;
       }
 
@@ -271,7 +303,7 @@ export default async function(
         baseURLWorkflow +
         'search?size=' +
         size +
-        '&sort=startTime:DESC&freeText=' +
+        '&sort=startTime:' + orderType + '&freeText=' +
         encodeURIComponent(freeText.join(' AND ')) +
         '&start=' +
         start +
@@ -279,12 +311,15 @@ export default async function(
         /* FIXME: req.query is user-controlled input and could
          be an array. Needs to be checked */
         encodeURIComponent(query);
+
       const result = await http.get(url, req);
       const hits = result.results;
       res.status(200).send({result: {hits: hits, totalHits: result.totalHits}});
     } catch (err) {
       if (err.body) {
         res.status(500).send(err.body);
+      } else if ( !err[0] ) {
+        res.status(500).send(JSON.stringify(err[1]));
       }
       next(err);
     }
@@ -480,28 +515,49 @@ export default async function(
     }
   });
 
+
   router.get('/hierarchical', async (req: ExpressRequest, res, next) => {
     try {
-      let size: number = 1000;
-      if (req.query.size !== 'undefined' && req.query.size !== '') {
-        /* FIXME req.query is user-controlled input, properties and values
-         in this object are untrusted and should be validated before trusting */
+
+      let size: number = 500;
+      if (typeof req.query.size !== 'undefined' && !isNaN( req.query.size) && req.query.size < 500) {
         size = req.query.size;
       }
 
       let count = 0;
       let start: number = 0;
-      if (!isNaN(req.query.start)) {
-        // FIXME: isNaN is sketchy and accepts arrays
+      if (typeof req.query.start !== 'undefined' && !isNaN( req.query.start)) {
         start = req.query.start;
         count = Number(start);
       }
 
+      let orderType = 'DESC'
+      if (typeof req.query.order !== 'undefined' && (req.query.order === 'ASC' || req.query.order === 'DESC' )){
+        orderType = req.query.order;
+      } else if (typeof req.query.order !== 'undefined' && req.query.order !== '' ) {
+        throw [false, "Query input " + req.query.order + " for ordering results is not valid"];
+      }
+
       const freeText = [];
-      if (req.query.freeText !== '') {
-        freeText.push(req.query.freeText);
-      } else {
-        freeText.push('*');
+               
+      if (typeof req.query.workflowId !== 'undefined' && req.query.workflowId !== '' ){
+        if (req.query.workflowId.match(uuid_regex) !== null) {
+            freeText.push("(workflowId:" + req.query.workflowId  + ")");
+        } else if (typeof req.query.workflowId !== 'undefined' && req.query.workflowId.match(uuid_regex) === null) {
+          freeText.push('(*)');
+          freeText.push("(workflowType:/.*" + req.query.workflowId  + ".*/)");        
+        }
+      }
+      else {
+          freeText.push('(*)');
+      }
+
+      if (typeof req.query.status !== 'undefined' && req.query.status !== ''){
+        if (WORKFLOW_STATUS_TYPES.includes(req.query.status)) {
+            freeText.push("(status:" + req.query.status  + ")");
+        } else {
+            throw [false, "Query input " + req.query.status + " for filtering by status is not valid"];
+        }
       }
 
       const parents = [];
@@ -513,7 +569,7 @@ export default async function(
           baseURLWorkflow +
           'search?size=' +
           size * 10 +
-          '&sort=startTime:DESC&freeText=' +
+          '&sort=startTime:' + orderType + '&freeText=' +
           encodeURIComponent(freeText.join(' AND ')) +
           '&start=' +
           start +
@@ -559,7 +615,7 @@ export default async function(
           count += checked;
           if (parents.length >= size) break;
         }
-        if (req.query.freeText !== '') {
+        if (typeof req.query.workflowId !== 'undefined' && req.query.workflowId.match(uuid_regex) !== null) {
           for (let i = 0; i < children.length; i++) {
             const parent = await http.get(
               baseURLWorkflow +
@@ -589,11 +645,13 @@ export default async function(
       console.warn('Unable to construct hierarchical view', {error: err});
       if (err.body) {
         res.status(500).send(err.body);
+      } else if ( !err[0] ) {
+        res.status(500).send(JSON.stringify(err[1]));
       }
       next(err);
     }
   });
-
+  
   router.get('/schedule/?', async (req: ExpressRequest, res, next) => {
     try {
       const result = await http.get(baseURLSchedule, req);
