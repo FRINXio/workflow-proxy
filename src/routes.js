@@ -174,15 +174,21 @@ export default async function(
   );
 
   router.get(
-    '/metadata/workflow/:name/:version',
+    '/metadata/workflow/:name',
     async (req: ExpressRequest, res, next) => {
       try {
+
+        let version;
+        if (typeof req.query.version !== 'undefined' && !isNaN(req.query.version)) {
+          version=req.query.version;
+        }
+
         const result = await http.get(
           baseURLMeta +
             'workflow/' +
             req.params.name +
             '?version=' +
-            req.params.version,
+            version,
           req,
         );
         res.status(200).send({result});
@@ -195,7 +201,7 @@ export default async function(
     },
   );
 
-  router.put('/metadata', async (req: ExpressRequest, res, next) => {
+  router.put('/metadata/workflow', async (req: ExpressRequest, res, next) => {
     try {
       const result = await http.put(baseURLMeta + 'workflow/', req.body, req);
       res.status(200).send(result);
@@ -325,7 +331,7 @@ export default async function(
     }
   });
 
-  router.delete('/bulk/terminate', async (req: ExpressRequest, res, next) => {
+  router.delete('/workflow/bulk/terminate', async (req: ExpressRequest, res, next) => {
     try {
       const result = await http.delete(
         baseURLWorkflow + 'bulk/terminate',
@@ -341,7 +347,7 @@ export default async function(
     }
   });
 
-  router.put('/bulk/pause', async (req: ExpressRequest, res, next) => {
+  router.put('/workflow/bulk/pause', async (req: ExpressRequest, res, next) => {
     try {
       const result = await http.put(
         baseURLWorkflow + 'bulk/pause',
@@ -357,7 +363,7 @@ export default async function(
     }
   });
 
-  router.put('/bulk/resume', async (req: ExpressRequest, res, next) => {
+  router.put('/workflow/bulk/resume', async (req: ExpressRequest, res, next) => {
     try {
       const result = await http.put(
         baseURLWorkflow + 'bulk/resume',
@@ -373,7 +379,7 @@ export default async function(
     }
   });
 
-  router.post('/bulk/retry', async (req: ExpressRequest, res, next) => {
+  router.post('/workflow/bulk/retry', async (req: ExpressRequest, res, next) => {
     try {
       const result = await http.post(
         baseURLWorkflow + 'bulk/retry',
@@ -389,7 +395,7 @@ export default async function(
     }
   });
 
-  router.post('/bulk/restart', async (req: ExpressRequest, res, next) => {
+  router.post('/workflow/bulk/restart', async (req: ExpressRequest, res, next) => {
     try {
       const result = await http.post(
         baseURLWorkflow + 'bulk/restart',
@@ -652,7 +658,7 @@ export default async function(
     }
   });
   
-  router.get('/schedule/?', async (req: ExpressRequest, res, next) => {
+  router.get('/schedule', async (req: ExpressRequest, res, next) => {
     try {
       const result = await http.get(baseURLSchedule, req);
       res.status(200).send(result);
@@ -746,29 +752,6 @@ export default async function(
         polldata.push({queueName: name, qsize: queueNamesToSizes[name], lastPollTime: null});
       }
       res.status(200).send({ polldata });
-    } catch (err) {
-      if (err.body) {
-        res.status(500).send(err.body);
-      }
-      next(err);
-    }
-  });
-  
-  // TODO: deprecated with monorepo-ui  
-  router.get('/schedule/metadata/workflow', async (req: ExpressRequest, res, next) => {
-    try {
-      const result = await http.get(baseURLMeta + 'workflow', req);
-      // combine with schedules
-      const schedules = await http.get(baseURLSchedule, req);
-      for (const workflowDef of result) {
-        const expectedScheduleName =
-            workflowDef.name + ':' + workflowDef.version;
-        const found = findSchedule(schedules, expectedScheduleName);
-        workflowDef.hasSchedule = found != null;
-        workflowDef.expectedScheduleName = expectedScheduleName;
-      }
-
-      res.status(200).send({result});
     } catch (err) {
       if (err.body) {
         res.status(500).send(err.body);
