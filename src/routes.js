@@ -42,6 +42,47 @@ const findSchedule = (schedules, name) => {
   return null;
 };
 
+/* This function validate query parameters (workflowId, workflowType, order, status) used for 
+searching executed workflows by freeText search query.
+If input parameters are not valid, function return exception with an array object with status and error message. */
+export function freeText_query(req) {
+    
+  const freeText = [];
+  if (typeof req.query.workflowId !== 'undefined' && req.query.workflowId !== '' ) {
+      if (req.query.workflowId.match(uuid_regex) !== null) {
+          freeText.push("(workflowId:" + req.query.workflowId  + ")");
+      } else if (typeof req.query.workflowId !== 'undefined' && req.query.workflowId.match(uuid_regex) === null) {
+          freeText.push('(*)');
+          freeText.push("(workflowType:/.*" + req.query.workflowId  + ".*/)");
+      }
+  }
+  else {
+      freeText.push('(*)');
+  }
+
+  if (typeof req.query.status !== 'undefined' && req.query.status !== ''){
+      if (WORKFLOW_STATUS_TYPES.includes(req.query.status)) {
+          freeText.push("(status:" + req.query.status  + ")");
+      } else {
+          throw [false, "Query input " + req.query.status + " for filtering by status is not valid"];
+      }
+  }    
+    
+  let orderType = 'DESC'
+  if (typeof req.query.order !== 'undefined' && (req.query.order === 'ASC' || req.query.order === 'DESC' )) {
+      orderType = req.query.order;
+  } else if (typeof req.query.order !== 'undefined' && req.query.order !== '' ) {
+      throw [false, "Query input " + req.query.order + " for ordering results is not valid"];
+  }
+
+  var freeText_query = ''
+  freeText_query = '&sort=startTime:' + orderType + '&freeText=' +
+      encodeURIComponent(freeText.join(' AND '))
+   
+  return freeText_query;
+}
+
+
 //TODO merge with proxy
 export default async function(
   baseURL: string,
@@ -253,36 +294,8 @@ export default async function(
 
   router.get('/executions', async (req: ExpressRequest, res, next) => {
     try {
-
-      const freeText = [];
- 
-      if (typeof req.query.workflowId !== 'undefined' && req.query.workflowId !== '' ){
-        if (req.query.workflowId.match(uuid_regex) !== null) {
-            freeText.push("(workflowId:" + req.query.workflowId  + ")");
-        } else if (typeof req.query.workflowId !== 'undefined' && req.query.workflowId.match(uuid_regex) === null) {
-            freeText.push('(*)');
-            freeText.push("(workflowType:/.*" + req.query.workflowId  + ".*/)");
-        }
-      }
-      else {
-          freeText.push('(*)');
-      }
-
-      let orderType = 'DESC'
-      if (typeof req.query.order !== 'undefined' && (req.query.order === 'ASC' || req.query.order === 'DESC' )){
-        orderType = req.query.order;
-      } else if (typeof req.query.order !== 'undefined' && req.query.order !== '' ) {
-        throw [false, "Query input " + req.query.order + " for ordering results is not valid"];
-      }
-
-      if (typeof req.query.status !== 'undefined' && req.query.status !== ''){
-        if (WORKFLOW_STATUS_TYPES.includes(req.query.status)) {
-            freeText.push("(status:" + req.query.status  + ")");
-        } else {
-            throw [false, "Query input " + req.query.status + " for filtering by status is not valid"];
-        }
-      }
-
+      const freeText_search = freeText_query(req);
+      
       let h: string = '-1';
       if (req.query.h !== 'undefined' && req.query.h !== '') {
         /* FIXME req.query is user-controlled input, properties and values
@@ -309,8 +322,7 @@ export default async function(
         baseURLWorkflow +
         'search?size=' +
         size +
-        '&sort=startTime:' + orderType + '&freeText=' +
-        encodeURIComponent(freeText.join(' AND ')) +
+        freeText_search +
         '&start=' +
         start +
         '&query=' +
@@ -325,6 +337,9 @@ export default async function(
       if (err.body) {
         res.status(500).send(err.body);
       } else if ( !err[0] ) {
+        /* Handling exception from freeText_query method. 
+           This method return array with status (err[0]) and
+           error message (err[1]) */
         res.status(500).send(JSON.stringify(err[1]));
       }
       next(err);
@@ -525,6 +540,8 @@ export default async function(
   router.get('/hierarchical', async (req: ExpressRequest, res, next) => {
     try {
 
+      const freeText_search = freeText_query(req);
+
       let size: number = 500;
       if (typeof req.query.size !== 'undefined' && !isNaN( req.query.size) && req.query.size < 500) {
         size = req.query.size;
@@ -537,35 +554,6 @@ export default async function(
         count = Number(start);
       }
 
-      let orderType = 'DESC'
-      if (typeof req.query.order !== 'undefined' && (req.query.order === 'ASC' || req.query.order === 'DESC' )){
-        orderType = req.query.order;
-      } else if (typeof req.query.order !== 'undefined' && req.query.order !== '' ) {
-        throw [false, "Query input " + req.query.order + " for ordering results is not valid"];
-      }
-
-      const freeText = [];
-               
-      if (typeof req.query.workflowId !== 'undefined' && req.query.workflowId !== '' ){
-        if (req.query.workflowId.match(uuid_regex) !== null) {
-            freeText.push("(workflowId:" + req.query.workflowId  + ")");
-        } else if (typeof req.query.workflowId !== 'undefined' && req.query.workflowId.match(uuid_regex) === null) {
-          freeText.push('(*)');
-          freeText.push("(workflowType:/.*" + req.query.workflowId  + ".*/)");        
-        }
-      }
-      else {
-          freeText.push('(*)');
-      }
-
-      if (typeof req.query.status !== 'undefined' && req.query.status !== ''){
-        if (WORKFLOW_STATUS_TYPES.includes(req.query.status)) {
-            freeText.push("(status:" + req.query.status  + ")");
-        } else {
-            throw [false, "Query input " + req.query.status + " for filtering by status is not valid"];
-        }
-      }
-
       const parents = [];
       const children = [];
 
@@ -575,8 +563,7 @@ export default async function(
           baseURLWorkflow +
           'search?size=' +
           size * 10 +
-          '&sort=startTime:' + orderType + '&freeText=' +
-          encodeURIComponent(freeText.join(' AND ')) +
+          freeText_search +
           '&start=' +
           start +
           '&query=';
@@ -652,6 +639,9 @@ export default async function(
       if (err.body) {
         res.status(500).send(err.body);
       } else if ( !err[0] ) {
+        /* Handling exception from freeText_query method. 
+           This method return array with status (err[0]) and
+           error message (err[1]) */
         res.status(500).send(JSON.stringify(err[1]));
       }
       next(err);
