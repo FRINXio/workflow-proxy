@@ -119,4 +119,62 @@ describe('Workflow transformers', () => {
 
     expect(exec).toStrictEqual(workflowExecution());
   });
+
+  test("FreeText query workflowId parameters ", () => {
+
+    const {freeText_query } = require('../../../routes')
+    var req = {};
+    req['query'] = {  
+      'workflowId': "266663ed-d349-4f87-a490-ee8e653a2308",
+      'order' : 'DESC',
+      'status' : 'COMPLETED',
+    };
+    var test = freeText_query(req)
+
+    expect(test).toStrictEqual('&sort=startTime:DESC&freeText=(workflowId%3A266663ed-d349-4f87-a490-ee8e653a2308)%20AND%20(status%3ACOMPLETED)');
+  });
+
+
+  test("FreeText query workflowType parameters", () => {
+
+    const {freeText_query } = require('../../../routes')
+    var req = {};
+    req['query'] = {  
+      'workflowId': "Post_to_slack",
+      'order' : 'ASC',
+      'status' : 'FAILED',
+    };
+    var test = freeText_query(req)
+
+    expect(test).toStrictEqual('&sort=startTime:ASC&freeText=(*)%20AND%20(workflowType%3A%2F.*Post_to_slack.*%2F)%20AND%20(status%3AFAILED)');
+  });
+
+  test("Hierarchical query wrong parameters 1", () => { 
+
+    const {freeText_query } = require('../../../routes')
+    var req = {};
+    req['query'] = {  
+      'workflowId': "Post_to_slack",
+      'order' : 'ASC',
+      'status' : 'FAILET',
+    };
+    var test = [false, "Query input FAILET for filtering by status is not valid"]
+
+    expect(() => { freeText_query(req)}).toThrow();
+  });
+
+  test("Hierarchical query wrong parameters 2", () => {
+
+    const {freeText_query } = require('../../../routes')
+    var req = {};
+    req['query'] = {  
+      'workflowId': "Post_to_slack",
+      'order' : 'AST',
+      'status' : 'FAILED',
+    };
+    var test = [false, "Query input FAILET for filtering by status is not valid"]
+
+    expect(() => { freeText_query(req)}).toThrow();
+  });
+
 });
