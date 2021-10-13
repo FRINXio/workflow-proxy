@@ -30,8 +30,20 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+var helmet = require('helmet')
 const app = ExpressApplication();
-app.use(ExpressApplication.json({limit: '50mb', extended: true}));
+app.use(ExpressApplication.json({limit: '50mb', extended: true, type: "application/json"}));
+app.use(helmet.contentSecurityPolicy());
+app.use(helmet.dnsPrefetchControl());
+app.use(helmet.expectCt());
+app.use(helmet.frameguard());
+app.use(helmet.hidePoweredBy());
+app.use(helmet.ieNoOpen());
+app.use(helmet.noSniff());
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(helmet.referrerPolicy());
+app.use(helmet.xssFilter());
+
 const userFacingPort = process.env.USER_FACING_PORT ?? 8088;
 const taskProxyPort = process.env.TASK_PROXY_PORT ?? 8089;
 const proxyTarget =
