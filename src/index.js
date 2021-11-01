@@ -22,6 +22,7 @@ import metadataWorkflowdef from './proxy/transformers/metadata-workflowdef';
 import schellar from './proxy/transformers/schellar';
 import task from './proxy/transformers/task';
 import workflow from './proxy/transformers/workflow';
+import postgresExternalStorage from './proxy/transformers/postgres-external-storage';
 
 import balancingTaskProxy from './balancing-task-proxy';
 import {adminAccess} from "./proxy/utils";
@@ -71,6 +72,7 @@ async function init() {
       workflow,
       task,
       schellar,
+      postgresExternalStorage,
     ],
     adminAccess,
   );
