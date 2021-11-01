@@ -750,5 +750,18 @@ export default async function(
     }
   });
 
+  router.get('/external/postgres/:dataId', async (req: ExpressRequest, res, next) => {
+    try {
+      const result = await http.get(baseURL + 'api' + req.originalUrl, req);
+      res.status(200).send(result);
+    } catch (err) {
+      if (err.body) {
+        res.status(500).send(err.body);
+        console.log(err)
+      }
+      next(err);
+    }
+  });
+
   return router;
 }
