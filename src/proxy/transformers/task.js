@@ -297,6 +297,10 @@ const registration: TransformerRegistrationFun = function(ctx) {
       method: 'post',
       url: '/api/tasks/:taskId/ack',
       before: ackTaskBefore,
+    },
+    {
+      method: 'get',
+      url: '/api/tasks/externalstoragelocation',
     }
   ];
 };
