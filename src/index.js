@@ -52,7 +52,7 @@ app.use(helmet.referrerPolicy());
 app.use(helmet.xssFilter());
 
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('/app/workflow-proxy/swagger.json');
+const swaggerDocument = require('/app/workflow-proxy/openapi/uniflow.json');
 
 const userFacingPort = process.env.USER_FACING_PORT ?? 8088;
 const taskProxyPort = process.env.TASK_PROXY_PORT ?? 8089;
