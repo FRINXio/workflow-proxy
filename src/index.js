@@ -34,7 +34,13 @@ dotenv.config();
 var helmet = require('helmet')
 const app = ExpressApplication();
 app.use(ExpressApplication.json({limit: '50mb', extended: true, type: "application/json"}));
-app.use(helmet.contentSecurityPolicy());
+
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
+
 app.use(helmet.dnsPrefetchControl());
 app.use(helmet.expectCt());
 app.use(helmet.frameguard());
