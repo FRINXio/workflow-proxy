@@ -320,16 +320,19 @@
         ],
         "summary": "Terminate workflows execution",
         "operationId": "terminate_1",
-        "parameters": [
-          {
-            "name": "reason",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
             }
-          }
-        ],
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "OK",
