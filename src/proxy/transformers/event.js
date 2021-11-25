@@ -12,7 +12,7 @@ import {
   addTenantIdPrefix,
   anythingTo,
   assertValueIsWithoutInfixSeparator,
-  createProxyOptionsBuffer,
+  createProxyOptionsBuffer, getUserEmail,
   withInfixSeparator,
 } from '../utils.js';
 
@@ -48,11 +48,23 @@ function sanitizeEvent(tenantId: string, event: Event) {
   // conductor:WORKFLOW_NAME:TASK_REFERENCE
   // workflow name must be prefixed.
   const split = event.event.split(':');
-  if (split.length == 3 && split[0] === 'conductor') {
+  if (split.length === 3 && split[0] === 'conductor') {
     let workflowName = split[1];
     assertValueIsWithoutInfixSeparator(workflowName);
     workflowName = withInfixSeparator(tenantId) + workflowName;
     event.event = split[0] + ':' + workflowName + ':' + split[2];
+    event.actions = event.actions.map(action => {
+      if (action.action === "start_workflow") {
+        // Action of type start workflow has to contain the same attributes as a
+        // regular workflow, therefore task domain and correlation id have to be added.
+        // Workflow name has to be prefixed also.
+        action.start_workflow.taskToDomain = {"*": tenantId};
+        action.start_workflow.correlationId = event.correlationId;
+        addTenantIdPrefix(tenantId, action.start_workflow);
+        return action;
+      }
+      return action;
+    });
   } else {
     console.error(
       `Tenant ${tenantId} sent invalid event ` + `${JSON.stringify(event)}`,
@@ -66,7 +78,8 @@ const postEventBefore: BeforeFun = (
   res,
   proxyCallback,
 ) => {
-  const reqObj = req.body;
+  let reqObj = req.body;
+  reqObj.correlationId = getUserEmail(req);
   console.info('Transforming', {reqObj});
   sanitizeEvent(identity.tenantId, anythingTo<Event>(reqObj));
   proxyCallback({buffer: createProxyOptionsBuffer(reqObj, req)});
@@ -78,7 +91,8 @@ const putEventBefore: BeforeFun = (
   res,
   proxyCallback,
 ) => {
-  const reqObj = req.body;
+  let reqObj = req.body;
+  reqObj.correlationId = getUserEmail(req);
   console.info('Transforming', {reqObj});
   sanitizeEvent(identity.tenantId, anythingTo<Event>(reqObj));
   proxyCallback({buffer: createProxyOptionsBuffer(reqObj, req)});
