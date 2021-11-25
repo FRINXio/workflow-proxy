@@ -1,0 +1,16 @@
+{
+  "name": "event_handler",
+  "event": "conductor:invoke_wf:handle_wf",
+  "actions": [
+    {
+      "action": "start_workflow",
+      "start_workflow": {
+        "name": "WF_handler",
+        "input": {
+          "sourceWorkflowId": "workflow"
+        }
+      }
+    }
+  ],
+  "active": true
+}

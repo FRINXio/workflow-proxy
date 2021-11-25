@@ -13,8 +13,8 @@ import streamToString from "stream-to-string/index";
 
 const tenant = 'FACEBOOK';
 
-function findTransformerFx(transformers, uri, post, beforeAfter) {
-  return transformers.find(obj => obj.url === uri && obj.method === post)[beforeAfter];
+function findTransformerFx(transformers, uri, method, beforeAfter) {
+  return transformers.find(obj => obj.url === uri && obj.method === method)[beforeAfter];
 }
 
 describe('Workflow def transformers', () => {
