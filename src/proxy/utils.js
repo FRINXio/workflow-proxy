@@ -62,6 +62,16 @@ export function isLabeledWithGroup(
   );
 }
 
+export function isLabeledWithRole(
+  workflowdef: Workflow,
+  roles: string[],
+): boolean {
+  const lowercaseRoles = roles.map(g => g.toLowerCase());
+  return getWorkflowLabels(workflowdef).some(
+    l => lowercaseRoles.indexOf(l.toLowerCase()) >= 0,
+  );
+}
+
 export function getWorkflowLabels(workflowdef: Workflow): string[] {
   const descr = workflowdef.description;
   try {

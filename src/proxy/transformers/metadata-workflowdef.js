@@ -24,6 +24,7 @@ import {
   isDoWhileTask,
   isForkTask,
   isLabeledWithGroup,
+  isLabeledWithRole,
   isSubworkflowTask,
   objectToValues,
   withInfixSeparator,
@@ -279,7 +280,7 @@ export const getAllWorkflowsAfter: AfterFun = (
 
     /* Rbac (non admin) limitations */
     // Remove workflows outside of user's groups
-    if (!adminAccess(identity) && !isLabeledWithGroup(workflowdef, identity.groups)) {
+    if (!adminAccess(identity) && !isLabeledWithGroup(workflowdef, identity.groups) && !isLabeledWithRole(workflowdef, identity.roles)) {
       workflows.splice(workflowIdx, 1);
     }
   }
@@ -343,7 +344,7 @@ export const getWorkflowAfter: AfterFun = (identity, req, respObj, res) => {
   const workflow = anythingTo<Workflow>(respObj);
 
   /* Rbac (non admin) limitations */
-  if (!adminAccess(identity) && !isLabeledWithGroup(workflow, identity.groups)) {
+  if (!adminAccess(identity) && !isLabeledWithGroup(workflow, identity.groups) && !isLabeledWithRole(workflow, identity.roles)) {
     // fail if workflow is outside of user's groups
     console.error(
       `User accessing unauthorized workflow: ${workflow.name} for tenant: ${identity.tenantId}`,
