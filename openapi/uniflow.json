@@ -181,44 +181,6 @@
       }
     },
     "/workflow/{workflowId}": {
-      "get": {
-        "tags": [
-          "workflow-resource"
-        ],
-        "summary": "Gets the workflow by workflow id",
-        "operationId": "getExecutionStatus",
-        "parameters": [
-          {
-            "name": "workflowId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "includeTasks",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": true
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Workflow"
-                }
-              }
-            }
-          }
-        }
-      },
       "delete": {
         "tags": [
           "workflow-resource"
