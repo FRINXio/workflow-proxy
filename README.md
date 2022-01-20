@@ -214,6 +214,21 @@ Default user role to allow admin access in RBAC proxy: **OWNER**, Env: `ADMIN_AC
 
 Default user group to allow admin access in RBAC proxy: **NETWORK-ADMIN**, Env: `ADMIN_ACCESS_GROUP`
 
+## Swagger UI 
+
+OpenAPI documentation for workflow-proxy is accessible on route `/docs`.  <br>
+Workflow-proxy support OAuth 2.0 Authorization with `authorizationCode flow`!
+
+Read more about configuration on [Swagger Docs](https://swagger.io/docs/specification/authentication/oauth2/).
+
+### Configuration
+
+Enable/Disable oAuth2 authorization: Env: `OAUTH2`, default false
+
+Identity platform authorize URL: **authorizationUrl**, Env: `OAUTH2_AUTH_URL`
+
+Identity platform token URL: **tokenUrl**, Env: `OAUTH2_TOKEN_URL`
+
 ## Developer guide
 
 Workflow proxy is one big http proxy component, relying mostly on `http-proxy` and `express` libraries.

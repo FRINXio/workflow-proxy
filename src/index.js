@@ -106,9 +106,46 @@ async function init() {
   app.use('/proxy', proxyRouter);
 
   app.use(
-    '/docs',
-    swaggerUi.serve, 
-    swaggerUi.setup(swaggerDocument)
+    '/docs', function(req,res,next) {
+  
+      if(process.env.OAUTH2 === 'true') {
+        if ( process.env.OAUTH2_AUTH_URL !== undefined || process.env.OAUTH2_TOKEN_URL !== undefined ) {
+          var oauth_config = {
+            "oauth2_wp": {
+              "type": "oauth2",
+              "description": "This API uses OAuth 2 with the authorizationCode grant flow",
+              "x-tokenName": "id_token",
+              "flows": {
+                "authorizationCode": {
+                  "authorizationUrl":  process.env.OAUTH2_AUTH_URL,
+                  "tokenUrl": process.env.OAUTH2_TOKEN_URL,
+                  "scopes": {
+                    "openid": "Indicate that the application intends to use OIDC to verify the user's identity"
+                  }
+                }
+              }
+            }
+          }
+    
+        // Protect all paths with openid scope
+          var oauth_security = [
+            {
+              "oauth2_wp": [
+                "openid"
+              ]
+            }
+          ]
+    
+          swaggerDocument.security = oauth_security;
+          swaggerDocument.components.securitySchemes = oauth_config;
+    
+        }
+      }
+      
+      req.swaggerDoc = swaggerDocument;
+      
+      next();
+    },swaggerUi.serve, swaggerUi.setup(swaggerDocument)
   );
 
   app.get("/probe/liveness", (req, res) => {
