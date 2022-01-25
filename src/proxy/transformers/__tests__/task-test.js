@@ -9,9 +9,10 @@
  */
 
 import tasks from '../task';
-import {findTransformerFx, mockRequest, mockResponse} from './metadata-workflowdef-test';
+import {findTransformerFx, mockRequest} from './metadata-workflowdef-test';
 import {mockIdentity} from "./metadata-workflowdef-rbac-test";
 import streamToString from "stream-to-string";
+import {createProxyOptionsBuffer} from "../../utils";
 
 describe('Task transformers', () => {
 
@@ -20,15 +21,15 @@ describe('Task transformers', () => {
   test("GET task before", () => {
     const transformer = findTransformerFx(transformers, "/api/tasks/poll/:taskType", "get", "before");
 
-    let mockReq = mockRequest({},{"taskType": "testTask"},{'from': "a@fb.com"}, );
+    let mockReq = mockRequest({}, {"taskType": "testTask"}, {'from': "a@fb.com"},);
     return new Promise(resolve => {
       let callback = function () {
         resolve();
       };
 
       transformer(mockIdentity("FACEBOOK", ["network-admin"], []), mockReq,
-      null,
-      callback);
+        null,
+        callback);
 
     }).then(() => {
       expect(mockReq.url).toStrictEqual("/api/tasks/poll/FACEBOOK___testTask?domain=FACEBOOK");
@@ -38,15 +39,15 @@ describe('Task transformers', () => {
   test("GET task before with additional params", () => {
     const transformer = findTransformerFx(transformers, "/api/tasks/poll/:taskType", "get", "before");
 
-    let mockReq = mockRequest({},{"taskType": "testTask"},{'from': "a@fb.com"}, {'query': "workerid=abcd&domain=DOM"});
+    let mockReq = mockRequest({}, {"taskType": "testTask"}, {'from': "a@fb.com"}, {'query': "workerid=abcd&domain=DOM"});
     return new Promise(resolve => {
       let callback = function () {
         resolve();
       };
 
       transformer(mockIdentity("FACEBOOK", ["network-admin"], []), mockReq,
-      null,
-      callback);
+        null,
+        callback);
 
     }).then(() => {
       expect(mockReq.url).toStrictEqual("/api/tasks/poll/FACEBOOK___testTask?workerid=abcd&domain=FACEBOOK");
@@ -56,15 +57,15 @@ describe('Task transformers', () => {
   test("GET tasks batch before with additional params", () => {
     const transformer = findTransformerFx(transformers, "/api/tasks/poll/batch/:taskType", "get", "before");
 
-    let mockReq = mockRequest({},{"taskType": "testTask"},{'from': "a@fb.com"}, {'query': "workerid=abcd&domain=DOM&timeout=10&count=5"});
+    let mockReq = mockRequest({}, {"taskType": "testTask"}, {'from': "a@fb.com"}, {'query': "workerid=abcd&domain=DOM&timeout=10&count=5"});
     return new Promise(resolve => {
       let callback = function () {
         resolve();
       };
 
       transformer(mockIdentity("FACEBOOK", ["network-admin"], []), mockReq,
-      null,
-      callback);
+        null,
+        callback);
 
     }).then(() => {
       expect(mockReq.url).toStrictEqual("/api/tasks/poll/batch/FACEBOOK___testTask?workerid=abcd&count=5&timeout=10&domain=FACEBOOK");
@@ -107,7 +108,7 @@ describe('Task transformers', () => {
     let workflowDefText = require('./tasks/task_output_with_dynamictasks.json');
     const workflowDef = () => JSON.parse(JSON.stringify(workflowDefText));
 
-    let mockReq = mockRequest(workflowDef(),{"taskType": "testTask"},{'from': "a@fb.com"});
+    let mockReq = mockRequest(workflowDef(), {"taskType": "testTask"}, {'from': "a@fb.com"});
     return new Promise(resolve => {
       let callback = function (input) {
         streamToString(input.buffer).then((workflow) => resolve(workflow));
@@ -118,5 +119,22 @@ describe('Task transformers', () => {
     }).then((workflow) => {
       expect(JSON.parse(workflow)).toStrictEqual(workflowDefPrefixed());
     });
+  });
+
+  test("Response body size with UTF8", () => {
+    let req = mockRequest({}, {}, {});
+    let streamCopy = createProxyOptionsBuffer("ä UTF8 test", req);
+
+    return new Promise(function (resolve, reject) {
+      const Stream = require('stream')
+      const writable = new Stream.Writable({objectMode: true})
+      writable._write = (object, encoding, done) => {
+        resolve(object)
+      }
+      streamCopy.pipe(writable)
+    }).then(function (content) {
+      expect(req.headers["content-length"]).toStrictEqual(12)
+      expect(content).toStrictEqual("ä UTF8 test")
+    })
   });
 });
