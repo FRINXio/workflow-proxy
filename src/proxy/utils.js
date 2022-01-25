@@ -263,7 +263,7 @@ export function createProxyOptionsBuffer(
     modifiedBody = JSON.stringify(modifiedBody);
   }
   if (typeof modifiedBody === 'string') {
-    req.headers['content-length'] = modifiedBody.length;
+    req.headers['content-length'] = Buffer.byteLength(modifiedBody, 'utf8');
     // create an array
     modifiedBody = [modifiedBody];
   } else {
