@@ -346,7 +346,7 @@ export function anythingTo<T>(anything: any): T {
   if (anything != null) {
     return (anything: T);
   } else {
-    throw 'Unexpected: value does not exist';
+    throw new Error('Unexpected: value does not exist');
   }
 }
 
