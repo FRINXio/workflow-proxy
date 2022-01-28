@@ -32,7 +32,7 @@ describe('Workflow transformers', () => {
         streamToString(input.buffer).then((workflow) => resolve(workflow));
       };
       let identity = mockIdentity("FACEBOOK", ["admin", "bbb"]);
-      postWorkflowBeforeHandler(mockExecReq(), identity, null, streamToStringCallback,
+      postWorkflowBeforeHandler(identity, mockExecReq(), null, streamToStringCallback,
         (workflowDefRequest, onWorkflowDefCheck) => {
           onWorkflowDefCheck(null, {"statusCode": 200}, JSON.stringify(singleLabeledWorkflow()));
         });
@@ -51,7 +51,7 @@ describe('Workflow transformers', () => {
     let response = mockResponse();
     return new Promise((resolve) => {
       let identity = mockIdentity("FACEBOOK", ["groups not ok"]);
-      postWorkflowBeforeHandler(mockExecReq(), identity, response, null,
+      postWorkflowBeforeHandler(identity, mockExecReq(), response, null,
         (workflowDefRequest, onWorkflowDefCheck) => {
           onWorkflowDefCheck(null, {"statusCode": 401}, "Unauthorized");
           resolve();
@@ -66,7 +66,7 @@ describe('Workflow transformers', () => {
     let response = mockResponse();
     return new Promise((resolve) => {
       let identity = mockIdentity("FACEBOOK", ["groups not ok"]);
-      postWorkflowBeforeHandler(mockExecReq(), identity, response, null,
+      postWorkflowBeforeHandler(identity, mockExecReq(), response, null,
         (workflowDefRequest, onWorkflowDefCheck) => {
           onWorkflowDefCheck(null, {"statusCode": 500}, JSON.stringify(singleLabeledWorkflow()));
           resolve();

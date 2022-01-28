@@ -148,9 +148,9 @@ const postWorkflowBeforeTenant: BeforeFun = (
   proxyCallback({buffer: createProxyOptionsBuffer(reqObj, req)});
 };
 
-export function postWorkflowBeforeRbac(req, identity, res, proxyCallback, checkAndExecute) {
+export function postWorkflowBeforeRbac(identity, req, res, proxyCallback, checkAndExecute) {
   const workflow: WorkflowExecution = anythingTo<WorkflowExecution>(req.body);
-  let url = rbacProxyUrl + 'api/metadata/workflow/' + workflow.name;
+  let url = tenantProxyUrl + 'api/metadata/workflow/' + workflow.name;
   if (workflow.version) {
     url += '?version=' + workflow.version;
   }
@@ -295,7 +295,7 @@ const removeWorkflowBeforeTenant: BeforeFun = (
 };
 
 function removeWorkflowBeforeRbac(req, identity, res, proxyCallback, checkAndExecute) {
-  let url = rbacProxyUrl + 'api/workflow/' + req.params.workflowId;
+  let url = tenantProxyUrl + 'api/workflow/' + req.params.workflowId;
   const requestOptions = {
     url,
     method: 'GET',
@@ -329,11 +329,11 @@ function removeWorkflowBeforeRbac(req, identity, res, proxyCallback, checkAndExe
 }
 
 let proxyTarget: string;
-let rbacProxyUrl: string;
+let tenantProxyUrl: string;
 
 const registration: TransformerRegistrationFun = function(ctx) {
   proxyTarget = ctx.proxyTarget;
-  rbacProxyUrl = ctx.rbacProxyUrl;
+  tenantProxyUrl = ctx.tenantProxyUrl;
 
   return [
     {
