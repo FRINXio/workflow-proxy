@@ -51,7 +51,7 @@ const getLogBefore: BeforeFun = (
           `Error trying to get task of different tenant: ${identity.tenantId},`,
           {task},
         );
-        res.status(401);
+        res.status(427);
         res.send('Unauthorized');
       }
     } else {
@@ -82,7 +82,7 @@ Sample input:
 */
 const getQueueAllAfter: AfterFun = (identity, req, respObj, res) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to retrieve queue information');
     return;
   }
@@ -112,7 +112,7 @@ const getTasksBatchBefore: BeforeFun = (
   proxyCallback,
 ) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to retrieve tasks');
     return;
   }
@@ -157,7 +157,7 @@ const getTaskBefore: BeforeFun = (
   proxyCallback,
 ) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to retrieve tasks');
     return;
   }
@@ -221,7 +221,7 @@ const postTaskBefore: BeforeFun = (
   proxyCallback,
 ) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to update tasks');
     return;
   }
@@ -255,7 +255,7 @@ const ackTaskBefore: BeforeFun = (
   proxyCallback,
 ) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to ack tasks');
     return;
   }

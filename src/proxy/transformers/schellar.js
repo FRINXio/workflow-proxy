@@ -69,7 +69,7 @@ curl http://localhost/proxy/schedule \
 */
 const getAllBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to schedule workflows');
     return;
   }
@@ -119,7 +119,7 @@ curl http://localhost/proxy/schedule/workflow1 \
 */
 const getBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to schedule workflows');
     return;
   }
@@ -156,7 +156,7 @@ curl -X POST http://localhost/proxy/schedule \
 */
 const postBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to schedule workflows');
     return;
   }
@@ -192,7 +192,7 @@ curl -X PUT http://localhost/proxy/schedule/workflow1 \
 // Renaming is not supported by proxy - url name must be equal to workflowName
 const putBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to schedule workflows');
     return;
   }
@@ -222,7 +222,7 @@ curl -X DELETE \
 */
 const deleteBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to schedule workflows');
     return;
   }

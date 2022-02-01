@@ -300,7 +300,7 @@ const deleteWorkflowBefore: BeforeFun = (
   proxyCallback,
 ) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to remove a workflow');
     return;
   }
@@ -349,7 +349,7 @@ export const getWorkflowAfter: AfterFun = (identity, req, respObj, res) => {
     console.error(
       `User accessing unauthorized workflow: ${workflow.name} for tenant: ${identity.tenantId}`,
     );
-    res.status(401).send('User unauthorized to access this endpoint');
+    res.status(427).send('User unauthorized to access this endpoint');
   }
 
   /* Tenant limitations */
@@ -423,7 +423,7 @@ const putWorkflowBefore: BeforeFun = (
   proxyCallback,
 ) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to create a workflow');
     return;
   }
@@ -473,7 +473,7 @@ const postWorkflowBefore: BeforeFun = (
   proxyCallback,
 ) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to create a workflow');
     return;
   }

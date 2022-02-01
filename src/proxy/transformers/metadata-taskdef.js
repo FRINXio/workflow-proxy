@@ -36,7 +36,7 @@ curl  -H "x-tenant-id: fb-test" "localhost/proxy/api/metadata/taskdefs"
 */
 const getAllTaskdefsAfter: AfterFun = (identity, req, respObj, res) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to register tasks');
     return;
   }
@@ -97,7 +97,7 @@ const postTaskdefsBefore: BeforeFun = (
   proxyCallback,
 ) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to register tasks');
     return;
   }
@@ -142,7 +142,7 @@ const putTaskdefBefore: BeforeFun = (
   proxyCallback,
 ) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to register tasks');
     return;
   }
@@ -170,7 +170,7 @@ const getTaskdefByNameBefore: BeforeFun = (
   proxyCallback,
 ) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to register tasks');
     return;
   }
@@ -218,7 +218,7 @@ const deleteTaskdefByNameBefore: BeforeFun = (
   proxyCallback,
 ) => {
   if (!adminAccess(identity)) {
-    res.status(401);
+    res.status(427);
     res.send('Unauthorized to register tasks');
     return;
   }
