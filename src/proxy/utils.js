@@ -56,7 +56,7 @@ export function isLabeledWithGroup(
   workflowdef: Workflow,
   groups: string[],
 ): boolean {
-  const lowercaseGroups = groups.map(g => g.toLowerCase());
+  const lowercaseGroups = groups.map(g => g.toLowerCase().replace(/\s/g, ""));
   return getWorkflowLabels(workflowdef).some(
     l => lowercaseGroups.indexOf(l.toLowerCase()) >= 0,
   );
@@ -66,7 +66,7 @@ export function isLabeledWithRole(
   workflowdef: Workflow,
   roles: string[],
 ): boolean {
-  const lowercaseRoles = roles.map(g => g.toLowerCase());
+  const lowercaseRoles = roles.map(g => g.toLowerCase().replace(/\s/g, ""));
   return getWorkflowLabels(workflowdef).some(
     l => lowercaseRoles.indexOf(l.toLowerCase()) >= 0,
   );
