@@ -53,11 +53,11 @@ describe('Workflow transformers', () => {
       let identity = mockIdentity("FACEBOOK", ["groups not ok"]);
       postWorkflowBeforeHandler(identity, mockExecReq(), response, null,
         (workflowDefRequest, onWorkflowDefCheck) => {
-          onWorkflowDefCheck(null, {"statusCode": 401}, "Unauthorized");
+          onWorkflowDefCheck(null, {"statusCode": 427}, "Unauthorized");
           resolve();
         });
     }).then(() => {
-      expect(response.status).toStrictEqual(401);
+      expect(response.status).toStrictEqual(427);
       expect(response.msg).toStrictEqual("Unauthorized");
     });
   });
@@ -102,6 +102,6 @@ describe('Workflow transformers', () => {
     let res = mockResponse();
     let mockReq = mockRequest("", {}, {"from": "user"});
     correlationIdCheck({"correlationId": "notMatching"}, mockReq, res);
-    expect(res.status).toStrictEqual(401);
+    expect(res.status).toStrictEqual(427);
   });
 });

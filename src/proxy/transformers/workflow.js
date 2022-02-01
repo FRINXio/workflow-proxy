@@ -228,7 +228,7 @@ export const getExecutionStatusAfter: AfterFun = (
 
 export function correlationIdCheck(respObj, req, res) {
   if (respObj.correlationId !== getUserEmail(req)) {
-    res.status(401);
+    res.status(427);
     res.send("Unauthorized");
   }
 }
@@ -284,7 +284,7 @@ const removeWorkflowBeforeTenant: BeforeFun = (
           `Error trying to delete workflow of different tenant: ${identity.tenantId},` +
             ` workflow: ${JSON.stringify(workflow)}`,
         );
-        res.status(401);
+        res.status(427);
         res.send('Unauthorized');
       }
     } else {

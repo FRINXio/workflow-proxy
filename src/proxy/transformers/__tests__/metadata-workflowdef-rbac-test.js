@@ -29,7 +29,7 @@ describe('Workflow def RBAC transformers', () => {
     let input = unfilteredWorkflowsPrefixed()[0];
     const res = mockResponse();
     singleWorkflowMetaTransformer(mockIdentity(), null, input, res);
-    expect(res["status"]).toEqual(401);
+    expect(res["status"]).toEqual(427);
     expect(res["msg"]).toEqual("User unauthorized to access this endpoint");
   });
 
