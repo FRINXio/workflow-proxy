@@ -52,7 +52,8 @@ app.use(helmet.referrerPolicy());
 app.use(helmet.xssFilter());
 
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('/app/workflow-proxy/openapi/uniflow.json');
+const uniflowSwaggerDocument = require('/app/workflow-proxy/openapi/uniflow.json');
+const uniconfigSwaggerDocument = require('/app/workflow-proxy/openapi/uniconfig.json');
 
 const userFacingPort = process.env.USER_FACING_PORT ?? 8088;
 const taskProxyPort = process.env.TASK_PROXY_PORT ?? 8089;
@@ -136,17 +137,61 @@ async function init() {
             }
           ]
     
-          swaggerDocument.security = oauth_security;
-          swaggerDocument.components.securitySchemes = oauth_config;
+          uniflowSwaggerDocument.security = oauth_security;
+          uniflowSwaggerDocument.components.securitySchemes = oauth_config;
     
         }
       }
       
-      req.swaggerDoc = swaggerDocument;
+      req.swaggerDoc = uniflowSwaggerDocument;
       
       next();
-    },swaggerUi.serve, swaggerUi.setup(swaggerDocument)
+    },swaggerUi.serve, swaggerUi.setup(uniflowSwaggerDocument)
   );
+
+  app.use(
+    '/docs-uniconfig', function(req,res,next) {
+  
+      if(process.env.OAUTH2 === 'true') {
+        if ( process.env.OAUTH2_AUTH_URL !== undefined || process.env.OAUTH2_TOKEN_URL !== undefined ) {
+          var oauth_config = {
+            "oauth2_uc": {
+              "type": "oauth2",
+              "description": "This API uses OAuth 2 with the authorizationCode grant flow",
+              "x-tokenName": "id_token",
+              "flows": {
+                "authorizationCode": {
+                  "authorizationUrl":  process.env.OAUTH2_AUTH_URL,
+                  "tokenUrl": process.env.OAUTH2_TOKEN_URL,
+                  "scopes": {
+                    "openid": "Indicate that the application intends to use OIDC to verify the user's identity"
+                  }
+                }
+              }
+            }
+          }
+    
+        // Protect all paths with openid scope
+          var oauth_security = [
+            {
+              "oauth2_uc": [
+                "openid"
+              ]
+            }
+          ]
+    
+          uniconfigSwaggerDocument.security = oauth_security;
+          uniconfigSwaggerDocument.components.securitySchemes = oauth_config;
+    
+        }
+      }
+      
+      req.swaggerDoc = uniconfigSwaggerDocument;
+      
+      next();
+    },swaggerUi.serve, swaggerUi.setup(uniconfigSwaggerDocument)
+  );
+
 
   app.get("/probe/liveness", (req, res) => {
     if (balancingTaskProxy.live()) {
