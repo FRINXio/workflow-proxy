@@ -114,12 +114,11 @@ async function init() {
           var oauth_config = {
             "oauth2_wp": {
               "type": "oauth2",
-              "description": "This API uses OAuth 2 with the authorizationCode grant flow",
+              "description": "This API uses OAuth 2 with the implicit flow",
               "x-tokenName": "id_token",
               "flows": {
-                "authorizationCode": {
+                "implicit": {
                   "authorizationUrl":  process.env.OAUTH2_AUTH_URL,
-                  "tokenUrl": process.env.OAUTH2_TOKEN_URL,
                   "scopes": {
                     "openid": "Indicate that the application intends to use OIDC to verify the user's identity"
                   }
@@ -157,12 +156,11 @@ async function init() {
           var oauth_config = {
             "oauth2_uc": {
               "type": "oauth2",
-              "description": "This API uses OAuth 2 with the authorizationCode grant flow",
+              "description": "This API uses OAuth 2 with the implicit flow",
               "x-tokenName": "id_token",
               "flows": {
-                "authorizationCode": {
+                "implicit": {
                   "authorizationUrl":  process.env.OAUTH2_AUTH_URL,
-                  "tokenUrl": process.env.OAUTH2_TOKEN_URL,
                   "scopes": {
                     "openid": "Indicate that the application intends to use OIDC to verify the user's identity"
                   }
