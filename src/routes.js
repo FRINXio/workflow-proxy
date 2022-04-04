@@ -346,9 +346,25 @@ export default async function(
     }
   });
 
+  router.post('/workflow/bulk/terminate', async (req: ExpressRequest, res, next) => {
+    try {
+      const result = await http.post(
+        baseURLWorkflow + 'bulk/terminate',
+        req.body,
+        req,
+      );
+      res.status(200).send(result);
+    } catch (err) {
+      if (err.body) {
+        res.status(500).send(err.body);
+      }
+      next(err);
+    }
+  });
+
   router.delete('/workflow/bulk/terminate', async (req: ExpressRequest, res, next) => {
     try {
-      const result = await http.delete(
+      const result = await http.post(
         baseURLWorkflow + 'bulk/terminate',
         req.body,
         req,

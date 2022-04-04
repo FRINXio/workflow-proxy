@@ -28,6 +28,11 @@ curl  -H "x-tenant-id: fb-test" \
     -d '["381f879d-3225-4605-b1c4-91e1c00f8ab9"]'
 
 curl  -H "x-tenant-id: fb-test" \
+    "localhost/proxy/api/workflow/bulk/terminate" -v -X POST \
+    -H "Content-Type: application/json" \
+    -d '["7d40eb5f-6a0d-438d-a35c-3b2111e2744b"]'
+
+curl  -H "x-tenant-id: fb-test" \
     "localhost/proxy/api/workflow/bulk/terminate" -v -X DELETE \
     -H "Content-Type: application/json" \
     -d '["7d40eb5f-6a0d-438d-a35c-3b2111e2744b"]'
@@ -114,6 +119,11 @@ let proxyTarget: string;
 const registration: TransformerRegistrationFun = ctx => {
   proxyTarget = ctx.proxyTarget;
   return [
+    {
+      method: 'post',
+      url: '/api/workflow/bulk/terminate',
+      before: bulkOperationBefore,
+    },
     {
       method: 'delete',
       url: '/api/workflow/bulk/terminate',

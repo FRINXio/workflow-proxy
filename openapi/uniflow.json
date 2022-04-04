@@ -280,6 +280,38 @@
         "tags": [
           "workflow-bulk-resource"
         ],
+        "summary": "Terminate workflows execution (deprecated)",
+        "operationId": "terminate_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "workflow-bulk-resource"
+        ],
         "summary": "Terminate workflows execution",
         "operationId": "terminate_1",
         "requestBody": {
