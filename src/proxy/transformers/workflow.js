@@ -49,6 +49,9 @@ export const getSearchBefore: BeforeFun = (
     newQueryString = updateQuery(newQueryString, limitToUser);
   }
 
+  /* If search by freeText workflowType, add tenant___ to search query */
+  newQueryString=newQueryString.replace('workflowType:*',`workflowType:${identity.tenantId}___`);
+
   /* Tenant limitations */
   // prefix query with workflowType STARTS_WITH tenantId_
   const limitToTenant = `workflowType STARTS_WITH '${identity.tenantId}_'`;

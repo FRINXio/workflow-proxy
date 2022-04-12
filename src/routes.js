@@ -45,15 +45,18 @@ const findSchedule = (schedules, name) => {
 /* This function validate query parameters (workflowId, workflowType, order, status) used for 
 searching executed workflows by freeText search query.
 If input parameters are not valid, function return exception with an array object with status and error message. */
-export function freeText_query(req) {
-    
+export function freeText_query(req, condition) {
+
   const freeText = [];
+
+  if (condition.length > 0) freeText.push(condition);
+
   if (typeof req.query.workflowId !== 'undefined' && req.query.workflowId !== '' ) {
       if (req.query.workflowId.match(uuid_regex) !== null) {
           freeText.push("(workflowId:" + req.query.workflowId  + ")");
       } else if (typeof req.query.workflowId !== 'undefined' && req.query.workflowId.match(uuid_regex) === null) {
-          freeText.push('(*)');
-          freeText.push("(workflowType:/.*" + req.query.workflowId  + ".*/)");
+          // freeText.push('(*)');
+          freeText.push('(workflowType:*' + req.query.workflowId  + '*)');
       }
   }
   else {
@@ -75,9 +78,7 @@ export function freeText_query(req) {
       throw [false, "Query input " + req.query.order + " for ordering results is not valid"];
   }
 
-  var freeText_query = ''
-  freeText_query = '&sort=startTime:' + orderType + '&freeText=' +
-      encodeURIComponent(freeText.join(' AND '))
+  var freeText_query = '&sort=startTime:' + orderType + '&freeText=' + freeText.join('AND');
    
   return freeText_query;
 }
@@ -304,7 +305,7 @@ export default async function(
 
   router.get('/executions', async (req: ExpressRequest, res, next) => {
     try {
-      const freeText_search = freeText_query(req);
+      const freeText_search = freeText_query(req, '');
       
       let h: string = '-1';
       if (req.query.h !== 'undefined' && req.query.h !== '') {
@@ -321,7 +322,7 @@ export default async function(
         start = req.query.start;
       }
 
-      let size: number = 1000;
+      let size: number = 5000;
       if (typeof req.query.size !== 'undefined' && !isNaN( req.query.size)) {
         size = req.query.size;
       }
@@ -590,10 +591,10 @@ export default async function(
   router.get('/hierarchical', async (req: ExpressRequest, res, next) => {
     try {
 
-      const freeText_search = freeText_query(req);
+      const freeText_search = freeText_query(req, "NOT(parentWorkflowId:*)");
 
-      let size: number = 500;
-      if (typeof req.query.size !== 'undefined' && !isNaN( req.query.size) && req.query.size < 500) {
+      let size: number = 5000;
+      if (typeof req.query.size !== 'undefined' && !isNaN( req.query.size)) {
         size = req.query.size;
       }
 
@@ -604,86 +605,18 @@ export default async function(
         count = Number(start);
       }
 
-      const parents = [];
-      const children = [];
+      const url =
+        baseURLWorkflow +
+        'search?size=' +
+        size +
+        freeText_search +
+        '&start=' +
+        start +
+        '&query=';
 
-      let hits = 0;
-      while (parents.length < size) {
-        const url =
-          baseURLWorkflow +
-          'search?size=' +
-          size * 10 +
-          freeText_search +
-          '&start=' +
-          start +
-          '&query=';
-        const result = await http.get(url, req);
-        const allData = result.results ? result.results : [];
-        hits = result.totalHits ? result.totalHits : 0;
-
-        const separatedWfs = [];
-        const chunk = 5;
-
-        for (let i = 0, j = allData.length; i < j; i += chunk) {
-          separatedWfs.push(allData.slice(i, i + chunk));
-        }
-
-        for (let i = 0; i < separatedWfs.length; i++) {
-          const wfs = async function(sepWfs) {
-            return await Promise.all(
-              sepWfs.map(wf =>
-                http.get(
-                  baseURLWorkflow + wf.workflowId + '?includeTasks=false',
-                  req,
-                ),
-              ),
-            );
-          };
-          let checked = 0;
-          const responses = await wfs(separatedWfs[i]);
-          for (let j = 0; j < responses.length; j++) {
-            if (responses[j].parentWorkflowId) {
-              separatedWfs[i][j]['parentWorkflowId'] =
-                responses[j].parentWorkflowId;
-              children.push(separatedWfs[i][j]);
-            } else {
-              parents.push(separatedWfs[i][j]);
-              if (parents.length === size) {
-                checked = j + 1;
-                break;
-              }
-            }
-            checked = j + 1;
-          }
-          count += checked;
-          if (parents.length >= size) break;
-        }
-        if (typeof req.query.workflowId !== 'undefined' && req.query.workflowId.match(uuid_regex) !== null) {
-          for (let i = 0; i < children.length; i++) {
-            const parent = await http.get(
-              baseURLWorkflow +
-                children[i].parentWorkflowId +
-                '?includeTasks=false',
-              req,
-            );
-            parent.startTime = new Date(parent.startTime);
-            parent.endTime = new Date(parent.endTime);
-            if (
-              parent.parentWorkflowId &&
-              !children.find(wf => wf.workflowId === parent.workflowId)
-            )
-              children.push(parent);
-            if (
-              !parent.parentWorkflowId &&
-              !parents.find(wf => wf.workflowId === parent.workflowId)
-            )
-              parents.push(parent);
-          }
-        }
-        start = Number(start) + size * 10;
-        if (Number(start) >= hits) break;
-      }
-      res.status(200).send({parents, children, count, hits});
+      const result = await http.get(url, req);
+      const hits = result.results;
+      res.status(200).send({result: {hits: hits, totalHits: result.totalHits}});
     } catch (err) {
       console.warn('Unable to construct hierarchical view', {error: err});
       if (err.body && err.statusCode) {
@@ -824,7 +757,6 @@ export default async function(
       } else if (err.body) {
         res.status(500).send(err.body);
         console.log(err)
-
       }
       next(err);
     }

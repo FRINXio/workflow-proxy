@@ -129,9 +129,9 @@ describe('Workflow transformers', () => {
       'order' : 'DESC',
       'status' : 'COMPLETED',
     };
-    var test = freeText_query(req)
+    var test = freeText_query(req,'')
 
-    expect(test).toStrictEqual('&sort=startTime:DESC&freeText=(workflowId%3A266663ed-d349-4f87-a490-ee8e653a2308)%20AND%20(status%3ACOMPLETED)');
+    expect(test).toStrictEqual('&sort=startTime:DESC&freeText=(workflowId:266663ed-d349-4f87-a490-ee8e653a2308)AND(status:COMPLETED)');
   });
 
 
@@ -144,9 +144,9 @@ describe('Workflow transformers', () => {
       'order' : 'ASC',
       'status' : 'FAILED',
     };
-    var test = freeText_query(req)
+    var test = freeText_query(req,"NOT(parentWorkflowId:*)")
 
-    expect(test).toStrictEqual('&sort=startTime:ASC&freeText=(*)%20AND%20(workflowType%3A%2F.*Post_to_slack.*%2F)%20AND%20(status%3AFAILED)');
+    expect(test).toStrictEqual('&sort=startTime:ASC&freeText=NOT(parentWorkflowId:*)AND(workflowType:*Post_to_slack*)AND(status:FAILED)');
   });
 
   test("Hierarchical query wrong parameters 1", () => { 
@@ -160,7 +160,7 @@ describe('Workflow transformers', () => {
     };
     var test = [false, "Query input FAILET for filtering by status is not valid"]
 
-    expect(() => { freeText_query(req)}).toThrow();
+    expect(() => { freeText_query(req,'')}).toThrow();
   });
 
   test("Hierarchical query wrong parameters 2", () => {
@@ -174,7 +174,7 @@ describe('Workflow transformers', () => {
     };
     var test = [false, "Query input FAILET for filtering by status is not valid"]
 
-    expect(() => { freeText_query(req)}).toThrow();
+    expect(() => { freeText_query(req,'')}).toThrow();
   });
 
 });
