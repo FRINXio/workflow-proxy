@@ -150,7 +150,20 @@ async function init() {
 
   app.use(
     '/docs-uniconfig', function(req,res,next) {
-  
+      if ( process.env.UNICONFIG_ZONES_LIST !== undefined ) {
+
+        var servers = []
+
+        process.env.UNICONFIG_ZONES_LIST.split(',').forEach(function(host){
+          servers.push({
+                    "url": "/api/" + host,
+                    "description": "Frinx APi gateway for zone: " + host
+            })
+        });
+        
+        uniconfigSwaggerDocument.servers = servers;
+      }
+
       if(process.env.OAUTH2 === 'true') {
         if ( process.env.OAUTH2_AUTH_URL !== undefined || process.env.OAUTH2_TOKEN_URL !== undefined ) {
           var oauth_config = {
