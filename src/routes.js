@@ -244,11 +244,19 @@ export default async function(
 
   router.put('/metadata/workflow', async (req: ExpressRequest, res, next) => {
     try {
+      req.body.forEach(function(body){
+        if( body.name === undefined || body.name.length === 0 ) {
+          throw "Empty or undefined workflow name in workflow definiton"
+        }
+      })
+
       const result = await http.put(baseURLMeta + 'workflow/', req.body, req);
       res.status(200).send(result);
     } catch (err) {
       if (err.body) {
         res.status(500).send(err.body);
+      } else if (err) {
+        res.status(500).send(err);
       } else {
         res.status(400).send(err?.response?.body);
       }
