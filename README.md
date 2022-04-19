@@ -229,6 +229,9 @@ Identity platform authorize URL: **authorizationUrl**, Env: `OAUTH2_AUTH_URL`
 
 Identity platform token URL: **tokenUrl**, Env: `OAUTH2_TOKEN_URL`
 
+Define uniconfig swagger servers: Env: `UNICONFIG_ZONES_LIST`, default uniconfig
+  - example: UNICONFIG_ZONES_LIST=uniconfig1,uniconfig2
+
 ## Developer guide
 
 Workflow proxy is one big http proxy component, relying mostly on `http-proxy` and `express` libraries.
