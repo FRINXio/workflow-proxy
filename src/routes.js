@@ -293,7 +293,9 @@ export default async function(
       const result = await http.post(baseURLWorkflow, req.body, req);
       res.status(200).send(result);
     } catch (err) {
-      if (err.body) {
+      if (err.body && err.statusCode) {
+        res.status(err.statusCode).send(err.body);
+      } else if (err.body) {
         res.status(500).send(err.body);
       }
       next(err);
@@ -342,7 +344,9 @@ export default async function(
       const hits = result.results;
       res.status(200).send({result: {hits: hits, totalHits: result.totalHits}});
     } catch (err) {
-      if (err.body) {
+      if (err.body && err.statusCode) {
+        res.status(err.statusCode).send(err.body);
+      } else if (err.body) {
         res.status(500).send(err.body);
       } else if ( !err[0] ) {
         /* Handling exception from freeText_query method. 
@@ -363,7 +367,9 @@ export default async function(
       );
       res.status(200).send(result);
     } catch (err) {
-      if (err.body) {
+      if (err.body && err.statusCode) {
+        res.status(err.statusCode).send(err.body);
+      } else if (err.body) {
         res.status(500).send(err.body);
       }
       next(err);
@@ -379,7 +385,9 @@ export default async function(
       );
       res.status(200).send(result);
     } catch (err) {
-      if (err.body) {
+      if (err.body && err.statusCode) {
+        res.status(err.statusCode).send(err.body);
+      } else if (err.body) {
         res.status(500).send(err.body);
       }
       next(err);
@@ -395,7 +403,9 @@ export default async function(
       );
       res.status(200).send(result);
     } catch (err) {
-      if (err.body) {
+      if (err.body && err.statusCode) {
+        res.status(err.statusCode).send(err.body);
+      } else if (err.body) {
         res.status(500).send(err.body);
       }
       next(err);
@@ -411,7 +421,9 @@ export default async function(
       );
       res.status(200).send(result);
     } catch (err) {
-      if (err.body) {
+      if (err.body && err.statusCode) {
+        res.status(err.statusCode).send(err.body);
+      } else if (err.body) {
         res.status(500).send(err.body);
       }
       next(err);
@@ -443,7 +455,9 @@ export default async function(
       );
       res.status(200).send(result);
     } catch (err) {
-      if (err.body) {
+      if (err.body && err.statusCode) {
+        res.status(err.statusCode).send(err.body);
+      } else if (err.body) {
         res.status(500).send(err.body);
       }
       next(err);
@@ -465,7 +479,9 @@ export default async function(
         );
         res.status(200).send(result);
       } catch (err) {
-        if (err.body) {
+        if (err.body && err.statusCode) {
+          res.status(err.statusCode).send(err.body);
+        } else if (err.body) {
           res.status(500).send(err.body);
         }
         next(err);
@@ -553,7 +569,9 @@ export default async function(
       res.status(200).send({result, meta, subworkflows: subworkflows});
     } catch (err) {
       console.log(err);
-      if (err.body) {
+      if (err.body && err.statusCode) {
+        res.status(err.statusCode).send(err.body);
+      } else if (err.body) {
         res.status(500).send(err.body);
       }
       next(err);
@@ -660,7 +678,9 @@ export default async function(
       res.status(200).send({parents, children, count, hits});
     } catch (err) {
       console.warn('Unable to construct hierarchical view', {error: err});
-      if (err.body) {
+      if (err.body && err.statusCode) {
+        res.status(err.statusCode).send(err.body);
+      } else if (err.body) {
         res.status(500).send(err.body);
       } else if ( !err[0] ) {
         /* Handling exception from freeText_query method. 
@@ -677,7 +697,9 @@ export default async function(
       const result = await http.get(baseURLSchedule, req);
       res.status(200).send(result);
     } catch (err) {
-      if (err.body) {
+      if (err.body && err.statusCode) {
+        res.status(err.statusCode).send(err.body);
+      } else if (err.body) {
         res.status(500).send(err.body);
       }
       next(err);
@@ -690,7 +712,9 @@ export default async function(
       res.status(200).send(result);
     } catch (err) {
       console.warn('Failed to GET', {error: err});
-      if (err.body) {
+      if (err.body && err.statusCode) {
+        res.status(err.statusCode).send(err.body);
+      } else if (err.body) {
         res.status(500).send(err.body);
       }
       next(err);
@@ -724,7 +748,9 @@ export default async function(
       );
       res.status(result.statusCode).send(result.text);
     } catch (err) {
-      if (err.body) {
+      if (err.body && err.statusCode) {
+        res.status(err.statusCode).send(err.body);
+      } else if (err.body) {
         res.status(500).send(err.body);
       }
       next(err);
@@ -736,7 +762,9 @@ export default async function(
       const result = await http.get(baseApiURL + 'event/', req);
       res.status(200).send(result);
     } catch (err) {
-      if (err.body) {
+      if (err.body && err.statusCode) {
+        res.status(err.statusCode).send(err.body);
+      } else if (err.body) {
         res.status(500).send(err.body);
       }
       next(err);
@@ -751,7 +779,9 @@ export default async function(
       );
       res.status(200).send(result);
     } catch (err) {
-      if (err.body) {
+      if (err.body && err.statusCode) {
+        res.status(err.statusCode).send(err.body);
+      } else if (err.body) {
         res.status(500).send(err.body);
       }
       next(err);
@@ -767,7 +797,9 @@ export default async function(
       }
       res.status(200).send({ polldata });
     } catch (err) {
-      if (err.body) {
+      if (err.body && err.statusCode) {
+        res.status(err.statusCode).send(err.body);
+      } else if (err.body) {
         res.status(500).send(err.body);
       }
       next(err);
@@ -779,9 +811,12 @@ export default async function(
       const result = await http.get(baseURL + 'api' + req.originalUrl, req);
       res.status(200).send(result);
     } catch (err) {
-      if (err.body) {
+      if (err.body && err.statusCode) {
+        res.status(err.statusCode).send(err.body);
+      } else if (err.body) {
         res.status(500).send(err.body);
         console.log(err)
+
       }
       next(err);
     }
