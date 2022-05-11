@@ -491,10 +491,18 @@ export default async function(
 
   router.get('/id/:workflowId', async (req: ExpressRequest, res, next) => {
     try {
+
+      let include_task="includeTasks=true";
+
+      if (req.query.includeTasks === 'false') {
+        include_task="includeTasks=false";
+      }
+
       const result = await http.get(
-        baseURLWorkflow + req.params.workflowId + '?includeTasks=true',
+        baseURLWorkflow + req.params.workflowId + '?' + include_task,
         req,
       );
+
       let meta = result.workflowDefinition;
       if (!meta) {
         meta = await http.get(

@@ -164,6 +164,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "includeTasks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "true"
+            }
           }
         ],
         "responses": {
