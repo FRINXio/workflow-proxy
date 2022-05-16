@@ -1,0 +1,23 @@
+name: Docker
+
+on: pull_request
+
+env:
+  IMAGE_NAME: frinx/workflow-proxy
+
+jobs:
+  security-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Build image
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+
+      - uses: Azure/container-scan@v0
+        with:
+          image-name: ${{ env.IMAGE_NAME }}:latest
+          # severity-threshold: CRITICAL
