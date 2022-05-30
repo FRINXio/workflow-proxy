@@ -322,7 +322,7 @@ export default async function(
       }
 
       let size: number = 1000;
-      if (typeof req.query.size !== 'undefined' && !isNaN( req.query.size) && req.query.size < 500) {
+      if (typeof req.query.size !== 'undefined' && !isNaN( req.query.size)) {
         size = req.query.size;
       }
 
