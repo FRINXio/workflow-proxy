@@ -45,6 +45,7 @@ const SYSTEM_TASK_TYPES: Array<string> = [
   'TERMINATE',
   'KAFKA_PUBLISH',
   'DO_WHILE',
+  'SET_VARIABLE',
   // Allow http system task
   // TODO remove for cloud multitenant env
   'HTTP',
