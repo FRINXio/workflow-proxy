@@ -126,12 +126,12 @@ describe('Workflow transformers', () => {
     var req = {};
     req['query'] = {  
       'workflowId': "266663ed-d349-4f87-a490-ee8e653a2308",
-      'order' : 'DESC',
+      'order' : 'startTime:DESC,workflowId',
       'status' : 'COMPLETED',
     };
     var test = freeText_query(req,'')
 
-    expect(test).toStrictEqual('&sort=startTime:DESC&freeText=(workflowId:266663ed-d349-4f87-a490-ee8e653a2308)AND(status:COMPLETED)');
+    expect(test).toStrictEqual('&sort=startTime:DESC&sort=workflowId&freeText=(workflowId:266663ed-d349-4f87-a490-ee8e653a2308)AND(status:COMPLETED)');
   });
 
 
@@ -141,7 +141,7 @@ describe('Workflow transformers', () => {
     var req = {};
     req['query'] = {  
       'workflowId': "Post_to_slack",
-      'order' : 'ASC',
+      'order' : 'startTime:ASC',
       'status' : 'FAILED',
     };
     var test = freeText_query(req,"NOT(parentWorkflowId:*)")
@@ -155,7 +155,7 @@ describe('Workflow transformers', () => {
     var req = {};
     req['query'] = {  
       'workflowId': "Post_to_slack",
-      'order' : 'ASC',
+      'order' : 'startTime:ASC,',
       'status' : 'FAILET',
     };
     var test = [false, "Query input FAILET for filtering by status is not valid"]
@@ -172,7 +172,7 @@ describe('Workflow transformers', () => {
       'order' : 'AST',
       'status' : 'FAILED',
     };
-    var test = [false, "Query input FAILET for filtering by status is not valid"]
+    var test = [false, "Query input order=AST for sorting is not valid"]
 
     expect(() => { freeText_query(req,'')}).toThrow();
   });

@@ -22,6 +22,24 @@ import type {$Application, ExpressRequest, ExpressResponse} from 'express';
 import type {TaskType} from './types';
 
 const uuid_regex = /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
+const WORKFLOW_SORT_TYPES: Array<string> = [
+  'workflowId',
+  'workflowType',
+  'startTime',
+  'endTime',
+  'status',
+  'workflowId:ASC',
+  'workflowId:DESC',
+  'workflowType:ASC',
+  'workflowType:DESC',
+  'startTime:ASC',
+  'startTime:DESC',
+  'endTime:ASC',
+  'endTime:DESC',
+  'status:ASC',
+  'status:DESC'
+];
+
 const WORKFLOW_STATUS_TYPES: Array<string> = [
   'FAILED',
   'COMPLETED',
@@ -70,16 +88,22 @@ export function freeText_query(req, condition) {
           throw [false, "Query input " + req.query.status + " for filtering by status is not valid"];
       }
   }    
-    
-  let orderType = 'DESC'
-  if (typeof req.query.order !== 'undefined' && (req.query.order === 'ASC' || req.query.order === 'DESC' )) {
-      orderType = req.query.order;
-  } else if (typeof req.query.order !== 'undefined' && req.query.order !== '' ) {
-      throw [false, "Query input " + req.query.order + " for ordering results is not valid"];
+
+  const orderQuery = [];
+
+  if (typeof req.query.order !== 'undefined' && req.query.order !== '') {
+    req.query.order.split(",").forEach(element => {
+      if (WORKFLOW_SORT_TYPES.includes(element)) {
+        orderQuery.push("sort=" + element);
+      } else {
+        throw [false, "Query input order=" + element + " for sorting is not valid"];
+      }
+    });
+  } else {
+    orderQuery.push("sort=startTime:DESC"); 
   }
 
-  var freeText_query = '&sort=startTime:' + orderType + '&freeText=' + freeText.join('AND');
-   
+  var freeText_query = "&" + orderQuery.join('&') + '&freeText=' + freeText.join('AND');
   return freeText_query;
 }
 
