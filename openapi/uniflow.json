@@ -17,7 +17,7 @@
           "workflow-search"
         ],
         "summary": "Search for workflows based on payload and other parameters",
-        "description": "use sort options as sort=<field>:ASC|DESC e.g. sort=name&sort=workflowId:DESC. If order is not specified, defaults to ASC.",
+        "description": "use order options as order=<field>:ASC|DESC e.g. order=name,workflowId:DESC. If order is not specified, defaults to ASC.",
         "operationId": "search",
         "parameters": [
           {
@@ -41,7 +41,7 @@
             }
           },
           {
-            "name": "sort",
+            "name": "order",
             "in": "query",
             "required": false,
             "schema": {
@@ -86,7 +86,7 @@
           "workflow-search"
         ],
         "summary": "Search for workflows and tasks based on payload and other parameters",
-        "description": "use sort options as sort=<field>:ASC|DESC e.g. sort=name&sort=workflowId:DESC. If order is not specified, defaults to ASC.",
+        "description": "use order options as order=<field>:ASC|DESC e.g. order=name,workflowId:DESC. If order is not specified, defaults to ASC.",
         "operationId": "executions",
         "parameters": [
           {
@@ -110,7 +110,7 @@
             }
           },
           {
-            "name": "sort",
+            "name": "order",
             "in": "query",
             "required": false,
             "schema": {
