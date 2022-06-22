@@ -198,6 +198,8 @@ Default port for user facing proxy: **8088**, Env: `USER_FACING_PORT`
 
 Default port for task proxy: **8089**, Env: `TASK_PROXY_PORT`
 
+Default limit for task proxy: **'50mb'**, Env: `TASK_PROXY_LIMIT`
+
 Default conductor URL to proxy: **http://conductor-server:8080**, Env: `PROXY_TARGET`
 
 Default schellar URL to proxy: **http://schellar:3000**, Env: `SCHELLAR_TARGET`
