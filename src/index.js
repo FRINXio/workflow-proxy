@@ -33,7 +33,7 @@ dotenv.config();
 
 var helmet = require('helmet')
 const app = ExpressApplication();
-app.use(ExpressApplication.json({limit: '50mb', extended: true, type: "application/json"}));
+app.use(ExpressApplication.json({limit: process.env.TASK_PROXY_LIMIT ?? '50mb', extended: true, type: "application/json"}));
 
 app.use(
   helmet({
