@@ -38,6 +38,9 @@ app.use(ExpressApplication.json({limit: process.env.TASK_PROXY_LIMIT ?? '50mb', 
 app.use(
   helmet({
     contentSecurityPolicy: false,
+    crossOriginOpenerPolicy: {
+      policy: 'unsafe-none',
+    }
   })
 );
 
