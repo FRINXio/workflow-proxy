@@ -902,37 +902,6 @@
         }
       }
     },
-    "/schedule": {
-      "post": {
-        "tags": [
-          "workflow-schedule"
-        ],
-        "summary": "Schedule a workflow",
-        "operationId": "scheduleWorkflow",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ScheduleData"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/schedule/{name}:{version}": {
       "get": {
         "tags": [
