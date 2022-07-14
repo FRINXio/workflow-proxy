@@ -74,7 +74,7 @@ export function freeText_query(req, condition) {
           freeText.push("(workflowId:" + req.query.workflowId  + ")");
       } else if (typeof req.query.workflowId !== 'undefined' && req.query.workflowId.match(uuid_regex) === null) {
           // freeText.push('(*)');
-          freeText.push('(workflowType:*' + req.query.workflowId  + '*)');
+          freeText.push('(workflowType:**' + req.query.workflowId  + '*)');
       }
   }
   else {

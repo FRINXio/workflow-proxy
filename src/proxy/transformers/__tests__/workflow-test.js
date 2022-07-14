@@ -146,7 +146,7 @@ describe('Workflow transformers', () => {
     };
     var test = freeText_query(req,"NOT(parentWorkflowId:*)")
 
-    expect(test).toStrictEqual('&sort=startTime:ASC&freeText=NOT(parentWorkflowId:*)AND(workflowType:*Post_to_slack*)AND(status:FAILED)');
+    expect(test).toStrictEqual('&sort=startTime:ASC&freeText=NOT(parentWorkflowId:*)AND(workflowType:**Post_to_slack*)AND(status:FAILED)');
   });
 
   test("Hierarchical query wrong parameters 1", () => { 
