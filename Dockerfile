@@ -12,6 +12,7 @@ RUN yarn run transpile
 
 FROM node:12-alpine3.15
 
+RUN apk update && apk upgrade && rm -rf /var/cache/apt/*
 WORKDIR /app/workflow-proxy
 
 COPY --from=build /app/workflow-proxy/lib /app/workflow-proxy/lib
