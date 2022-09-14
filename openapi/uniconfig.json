@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "uniconfig",
-    "version": "5.0.14"
+    "version": "5.0.15"
   },
   "servers": [
     {
@@ -2939,6 +2939,65 @@
                   "properties": {
                     "output": {
                       "$ref": "#/components/schemas/subtree.manager.calculatesubtreegitlikediff.Output"
+                    }
+                  }
+                },
+                "encoding": {
+                  "application/json": {
+                    "contentType": "application/json"
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "No response"
+          },
+          "400": {
+            "description": "Internal error"
+          },
+          "401": {
+            "description": "No response"
+          }
+        }
+      }
+    },
+    "/operations/bulk-edit": {
+      "post": {
+        "tags": [
+          "subtree-manager"
+        ],
+        "operationId": "rpc_bulk-edit",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/subtree.manager.bulkedit.Input"
+                  }
+                }
+              },
+              "encoding": {
+                "application/json": {
+                  "contentType": "application/json"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Correct response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "output": {
+                      "$ref": "#/components/schemas/subtree.manager.bulkedit.Output"
                     }
                   }
                 },
@@ -5983,6 +6042,39 @@
             "type": "boolean",
             "description": "Check whether the host is reachable or not using ICMP protocol"
           },
+          "tcp-port": {
+            "type": "array",
+            "description": "",
+            "items": {
+              "title": "device.discovery.inputport.TcpPort",
+              "properties": {
+                "end-port": {
+                  "maximum": 65535,
+                  "minimum": 0,
+                  "type": "integer",
+                  "description": "",
+                  "format": "int32",
+                  "x-choice": "type-of-port:port-range-case"
+                },
+                "port": {
+                  "maximum": 65535,
+                  "minimum": 0,
+                  "type": "integer",
+                  "description": "",
+                  "format": "int32",
+                  "x-choice": "type-of-port:scalar-case"
+                },
+                "start-port": {
+                  "maximum": 65535,
+                  "minimum": 0,
+                  "type": "integer",
+                  "description": "",
+                  "format": "int32",
+                  "x-choice": "type-of-port:port-range-case"
+                }
+              }
+            }
+          },
           "address": {
             "type": "array",
             "description": "",
@@ -6023,39 +6115,6 @@
                   "type": "string",
                   "description": "IP address with a subnet mask either in IPv4 or IPv6 format,\nthe syntax then determines which version is used",
                   "x-choice": "type-of-address:network-case"
-                }
-              }
-            }
-          },
-          "tcp-port": {
-            "type": "array",
-            "description": "",
-            "items": {
-              "title": "device.discovery.inputport.TcpPort",
-              "properties": {
-                "end-port": {
-                  "maximum": 65535,
-                  "minimum": 0,
-                  "type": "integer",
-                  "description": "",
-                  "format": "int32",
-                  "x-choice": "type-of-port:port-range-case"
-                },
-                "port": {
-                  "maximum": 65535,
-                  "minimum": 0,
-                  "type": "integer",
-                  "description": "",
-                  "format": "int32",
-                  "x-choice": "type-of-port:scalar-case"
-                },
-                "start-port": {
-                  "maximum": 65535,
-                  "minimum": 0,
-                  "type": "integer",
-                  "description": "",
-                  "format": "int32",
-                  "x-choice": "type-of-port:port-range-case"
                 }
               }
             }
@@ -6207,6 +6266,14 @@
           }
         },
         "description": ""
+      },
+      "frinx.types.DataTreeOperation": {
+        "type": "string",
+        "enum": [
+          "merge",
+          "replace",
+          "remove"
+        ]
       },
       "frinx.types.ErrorType": {
         "type": "string",
@@ -6853,6 +6920,77 @@
           "OPERATIONAL"
         ]
       },
+      "subtree.manager.bulkedit.Input": {
+        "properties": {
+          "node-id": {
+            "type": "array",
+            "description": "List of nodes representing target nodes for list of modifications.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "topology-id": {
+            "type": "string",
+            "description": "Identifier of the topology which contains target nodes."
+          },
+          "edit": {
+            "type": "array",
+            "description": "List of intended modifications.",
+            "items": {
+              "title": "subtree.manager.bulkeditinputfields.Edit",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "Path to modified subtree. Path must be complaint to RFC-8040 and relative\nto parent top-level node 'configuration' container."
+                },
+                "data": {
+                  "type": "string",
+                  "description": "JSON-formatted subtree representing applied subtree configuration."
+                },
+                "operation": {
+                  "$ref": "#/components/schemas/frinx.types.DataTreeOperation"
+                }
+              }
+            }
+          }
+        },
+        "description": ""
+      },
+      "subtree.manager.bulkedit.Output": {
+        "properties": {
+          "error-message": {
+            "type": "string",
+            "description": "Error message that describe overall problem."
+          },
+          "node-result": {
+            "type": "array",
+            "description": "List of target nodes with results.",
+            "items": {
+              "title": "subtree.manager.bulkeditoutputfields.NodeResult",
+              "properties": {
+                "node-id": {
+                  "type": "string",
+                  "description": ""
+                },
+                "error-type": {
+                  "$ref": "#/components/schemas/frinx.types.ErrorType"
+                },
+                "error-message": {
+                  "type": "string",
+                  "description": "Error message describing cause of error."
+                },
+                "status": {
+                  "$ref": "#/components/schemas/frinx.types.OperationResultType"
+                }
+              }
+            }
+          },
+          "overall-status": {
+            "$ref": "#/components/schemas/frinx.types.OperationResultType"
+          }
+        },
+        "description": ""
+      },
       "subtree.manager.calculatesubtreediff.Input": {
         "properties": {
           "source-datastore": {
@@ -6891,10 +7029,6 @@
               }
             }
           },
-          "error-message": {
-            "type": "string",
-            "description": "Error message describing cause of error."
-          },
           "updated-data": {
             "type": "array",
             "description": "Updated intended configuration against actual.",
@@ -6919,6 +7053,10 @@
                 }
               }
             }
+          },
+          "error-message": {
+            "type": "string",
+            "description": "Error message describing cause of error."
           },
           "source-path": {
             "type": "string",
