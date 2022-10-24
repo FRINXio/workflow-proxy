@@ -55,7 +55,7 @@ app.use(helmet.referrerPolicy());
 app.use(helmet.xssFilter());
 
 const swaggerUi = require('swagger-ui-express');
-const uniflowSwaggerDocument = require('/app/workflow-proxy/openapi/uniflow.json');
+const workflowManagerSwaggerDocument = require('/app/workflow-proxy/openapi/workflow-manager.json');
 const uniconfigSwaggerDocument = require('/app/workflow-proxy/openapi/uniconfig.json');
 
 const userFacingPort = process.env.USER_FACING_PORT ?? 8088;
@@ -139,16 +139,16 @@ async function init() {
             }
           ]
     
-          uniflowSwaggerDocument.security = oauth_security;
-          uniflowSwaggerDocument.components.securitySchemes = oauth_config;
+          workflowManagerSwaggerDocument.security = oauth_security;
+          workflowManagerSwaggerDocument.components.securitySchemes = oauth_config;
     
         }
       }
       
-      req.swaggerDoc = uniflowSwaggerDocument;
+      req.swaggerDoc = workflowManagerSwaggerDocument;
       
       next();
-    },swaggerUi.serve, swaggerUi.setup(uniflowSwaggerDocument)
+    },swaggerUi.serve, swaggerUi.setup(workflowManagerSwaggerDocument)
   );
 
   app.use(

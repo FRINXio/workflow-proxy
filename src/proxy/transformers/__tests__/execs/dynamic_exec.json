@@ -1817,7 +1817,7 @@
       "schemaVersion": 2,
       "restartable": true,
       "workflowStatusListenerEnabled": false,
-      "ownerEmail": "uniflow-micros",
+      "ownerEmail": "workflow-manager-base",
       "timeoutPolicy": "ALERT_ONLY",
       "timeoutSeconds": 0,
       "variables": {}
