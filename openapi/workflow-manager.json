@@ -1,12 +1,12 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "FRINX Uniflow OpenAPI",
+    "title": "FRINX Workflow-Manager OpenAPI",
     "version": "v0"
   },
   "servers": [
     {
-      "url": "/api/uniflow",
+      "url": "/api/workflow",
       "description": "Frinx APi gateway"
     }
   ],
