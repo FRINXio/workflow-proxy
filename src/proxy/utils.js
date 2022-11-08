@@ -351,10 +351,11 @@ export function anythingTo<T>(anything: any): T {
   }
 }
 
-const OWNER_ROLE = process.env.ADMIN_ACCESS_ROLE || 'OWNER';
-const NETWORK_ADMIN_GROUP = process.env.ADMIN_ACCESS_ROLE || 'network-admin';
+const OWNER_ROLE = (process.env.ADMIN_ACCESS_ROLE || 'OWNER').trim().split(',').filter(elm => elm);
+const NETWORK_ADMIN_GROUP = (process.env.ADMIN_ACCESS_ROLE || 'network-admin').trim().split(',').filter(elm => elm);
+const NETWORK_OWNER=OWNER_ROLE.concat(NETWORK_ADMIN_GROUP);
 
 export const adminAccess : AuthorizationCheck = (identity) => {
-  return (identity.roles && identity.roles.includes(OWNER_ROLE))
-    ||(identity.groups && identity.groups.includes(NETWORK_ADMIN_GROUP));
+  return identity.roles.filter(value => NETWORK_OWNER.includes(value)).length > 0 ||
+    identity.groups.filter(value => NETWORK_OWNER.includes(value)).length > 0;
 };
