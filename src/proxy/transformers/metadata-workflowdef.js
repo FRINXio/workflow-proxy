@@ -30,8 +30,14 @@ import {
   withInfixSeparator,
 } from '../utils.js';
 
-import type {ExpressRequest} from 'express';
-import type {AfterFun, BeforeFun, Task, TransformerRegistrationFun, Workflow,} from '../../types';
+import type { ExpressRequest } from 'express';
+import type {
+  AfterFun,
+  BeforeFun,
+  Task,
+  TransformerRegistrationFun,
+  Workflow,
+} from '../../types';
 
 // Utility used in PUT, POST before methods to check that submitted workflow
 // and its tasks
@@ -60,7 +66,8 @@ export function sanitizeWorkflowdefBefore(
   workflowdef.ownerEmail = getUserEmail(req);
   // add tenant prefix to failureWorkflow
   if (workflowdef.failureWorkflow != null) {
-    workflowdef.failureWorkflow = withInfixSeparator(tenantId) + workflowdef.failureWorkflow;
+    workflowdef.failureWorkflow =
+      withInfixSeparator(tenantId) + workflowdef.failureWorkflow;
   }
 }
 
@@ -76,11 +83,16 @@ function sanitizeWorkflowTaskdefBefore(tenantId: string, task: Task) {
     }
 
     // Special case for dynamic fork subworkflow to work around the expectedName parameter
-    if (task.name === withInfixSeparator(tenantId) + "DYNAMIC_FORK"
-      && "inputParameters" in task
-      && "expectedName" in task.inputParameters
-      && task.inputParameters.expectedName.indexOf(withInfixSeparator(GLOBAL_PREFIX)) !== 0) {
-      task.inputParameters.expectedName = withInfixSeparator(tenantId) + task.inputParameters.expectedName;
+    if (
+      task.name === withInfixSeparator(tenantId) + 'DYNAMIC_FORK' &&
+      'inputParameters' in task &&
+      'expectedName' in task.inputParameters &&
+      task.inputParameters.expectedName.indexOf(
+        withInfixSeparator(GLOBAL_PREFIX),
+      ) !== 0
+    ) {
+      task.inputParameters.expectedName =
+        withInfixSeparator(tenantId) + task.inputParameters.expectedName;
     }
   }
 
@@ -147,7 +159,9 @@ export function sanitizeWorkflowdefAfter(
     workflowdef.name = workflowdef.name.substr(tenantWithInfixSeparator.length);
     // remove tenant prefix to failureWorkflow
     if (workflowdef.failureWorkflow != null) {
-      workflowdef.failureWorkflow = workflowdef.failureWorkflow.substr(tenantWithInfixSeparator.length);
+      workflowdef.failureWorkflow = workflowdef.failureWorkflow.substr(
+        tenantWithInfixSeparator.length,
+      );
     }
     return true;
   } else {
@@ -187,9 +201,7 @@ function sanitizeWorkflowTaskdefAfter(
   if (isDoWhileTask(task)) {
     const loopOver: Array<Task> = task.loopOver ? task.loopOver : [];
     for (const nestedTask of loopOver) {
-      if (
-        !sanitizeWorkflowTaskdefAfter(tenantWithInfixSeparator, nestedTask)
-      ) {
+      if (!sanitizeWorkflowTaskdefAfter(tenantWithInfixSeparator, nestedTask)) {
         return false;
       }
     }
@@ -220,7 +232,7 @@ function sanitizeWorkflowTaskdefAfter(
   // remove prefix from SUB_WORKFLOW tasks' referenced workflows
   if (isSubworkflowTask(task)) {
     if (task.subWorkflowParam != null) {
-      const namedObject: {name: string} = task.subWorkflowParam;
+      const namedObject: { name: string } = task.subWorkflowParam;
       if (namedObject.name.indexOf(tenantWithInfixSeparator) === 0) {
         namedObject.name = namedObject.name.substr(
           tenantWithInfixSeparator.length,
@@ -231,11 +243,16 @@ function sanitizeWorkflowTaskdefAfter(
     }
 
     // Special case for dynamic fork subworkflow to work around the expectedName parameter
-    if (task.name === tenantWithInfixSeparator + "DYNAMIC_FORK"
-      && "inputParameters" in task
-      && "expectedName" in task.inputParameters
-      && task.inputParameters.expectedName.indexOf(tenantWithInfixSeparator) === 0) {
-      task.inputParameters.expectedName = task.inputParameters.expectedName.substr(tenantWithInfixSeparator.length);
+    if (
+      task.name === tenantWithInfixSeparator + 'DYNAMIC_FORK' &&
+      'inputParameters' in task &&
+      'expectedName' in task.inputParameters &&
+      task.inputParameters.expectedName.indexOf(tenantWithInfixSeparator) === 0
+    ) {
+      task.inputParameters.expectedName =
+        task.inputParameters.expectedName.substr(
+          tenantWithInfixSeparator.length,
+        );
     }
   }
 
@@ -254,11 +271,7 @@ function sanitizeWorkflowTaskdefAfter(
 /*
 curl -H "x-tenant-id: fb-test" "localhost/proxy/api/metadata/workflow"
 */
-export const getAllWorkflowsAfter: AfterFun = (
-  identity,
-  req,
-  respObj,
-) => {
+export const getAllWorkflowsAfter: AfterFun = (identity, req, respObj) => {
   const workflows: Array<Workflow> = anythingTo<Array<Workflow>>(respObj);
   // iterate over workflows, keep only those belonging to tenantId
   for (
@@ -280,7 +293,11 @@ export const getAllWorkflowsAfter: AfterFun = (
 
     /* Rbac (non admin) limitations */
     // Remove workflows outside of user's groups
-    if (!adminAccess(identity) && !isLabeledWithGroup(workflowdef, identity.groups) && !isLabeledWithRole(workflowdef, identity.roles)) {
+    if (
+      !adminAccess(identity) &&
+      !isLabeledWithGroup(workflowdef, identity.groups) &&
+      !isLabeledWithRole(workflowdef, identity.roles)
+    ) {
       workflows.splice(workflowIdx, 1);
     }
   }
@@ -293,12 +310,7 @@ export const getAllWorkflowsAfter: AfterFun = (
 curl -H "x-tenant-id: fb-test" \
   "localhost/proxy/api/metadata/workflow/2/2" -X DELETE
 */
-const deleteWorkflowBefore: BeforeFun = (
-  identity,
-  req,
-  res,
-  proxyCallback,
-) => {
+const deleteWorkflowBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   if (!adminAccess(identity)) {
     res.status(427);
     res.send('Unauthorized to remove a workflow');
@@ -344,7 +356,11 @@ export const getWorkflowAfter: AfterFun = (identity, req, respObj, res) => {
   const workflow = anythingTo<Workflow>(respObj);
 
   /* Rbac (non admin) limitations */
-  if (!adminAccess(identity) && !isLabeledWithGroup(workflow, identity.groups) && !isLabeledWithRole(workflow, identity.roles)) {
+  if (
+    !adminAccess(identity) &&
+    !isLabeledWithGroup(workflow, identity.groups) &&
+    !isLabeledWithRole(workflow, identity.roles)
+  ) {
     // fail if workflow is outside of user's groups
     console.error(
       `User accessing unauthorized workflow: ${workflow.name} for tenant: ${identity.tenantId}`,
@@ -359,8 +375,10 @@ export const getWorkflowAfter: AfterFun = (identity, req, respObj, res) => {
       `Possible error in code: response contains invalid task or` +
         `workflowdef name, tenant Id: ${identity.tenantId}`,
     );
-    throw 'Possible error in code: response contains' +
-      ' invalid task or workflowdef name'; // TODO create Exception class
+    throw (
+      'Possible error in code: response contains' +
+      ' invalid task or workflowdef name'
+    ); // TODO create Exception class
   }
 };
 
@@ -416,12 +434,7 @@ curl -X PUT -H "x-tenant-id: fb-test" \
     }
 ]'
 */
-const putWorkflowBefore: BeforeFun = (
-  identity,
-  req,
-  res,
-  proxyCallback,
-) => {
+const putWorkflowBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   if (!adminAccess(identity)) {
     res.status(427);
     res.send('Unauthorized to create a workflow');
@@ -433,7 +446,7 @@ const putWorkflowBefore: BeforeFun = (
     sanitizeWorkflowdefBefore(identity.tenantId, workflowdef, req);
   }
   console.info(`Transformed request to ${JSON.stringify(workflows)}`);
-  proxyCallback({buffer: createProxyOptionsBuffer(workflows, req)});
+  proxyCallback({ buffer: createProxyOptionsBuffer(workflows, req) });
 };
 
 // Create a new workflow definition
@@ -466,12 +479,7 @@ curl -X POST -H "x-tenant-id: fb-test" \
     }
 '
 */
-const postWorkflowBefore: BeforeFun = (
-  identity,
-  req,
-  res,
-  proxyCallback,
-) => {
+const postWorkflowBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   if (!adminAccess(identity)) {
     res.status(427);
     res.send('Unauthorized to create a workflow');
@@ -481,7 +489,7 @@ const postWorkflowBefore: BeforeFun = (
   const workflow: Workflow = anythingTo<Workflow>(req.body);
   sanitizeWorkflowdefBefore(identity.tenantId, workflow, req);
   console.info(`Transformed request to ${JSON.stringify(workflow)}`);
-  proxyCallback({buffer: createProxyOptionsBuffer(workflow, req)});
+  proxyCallback({ buffer: createProxyOptionsBuffer(workflow, req) });
 };
 
 const registration: TransformerRegistrationFun = () => [

@@ -18,10 +18,11 @@ import map from 'lodash/fp/map';
 import moment from 'moment';
 import transform from 'lodash/fp/transform';
 
-import type {$Application, ExpressRequest, ExpressResponse} from 'express';
-import type {TaskType} from './types';
+import type { $Application, ExpressRequest, ExpressResponse } from 'express';
+import type { TaskType } from './types';
 
-const uuid_regex = /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
+const uuid_regex =
+  /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
 const WORKFLOW_SORT_TYPES: Array<string> = [
   'workflowId',
   'workflowType',
@@ -37,7 +38,7 @@ const WORKFLOW_SORT_TYPES: Array<string> = [
   'endTime:ASC',
   'endTime:DESC',
   'status:ASC',
-  'status:DESC'
+  'status:DESC',
 ];
 
 const WORKFLOW_STATUS_TYPES: Array<string> = [
@@ -46,7 +47,7 @@ const WORKFLOW_STATUS_TYPES: Array<string> = [
   'TERMINATED',
   'RUNNING',
   'PAUSED',
-  'TIMED_OUT'
+  'TIMED_OUT',
 ];
 
 const http = HttpClient;
@@ -64,52 +65,64 @@ const findSchedule = (schedules, name) => {
 searching executed workflows by freeText search query.
 If input parameters are not valid, function return exception with an array object with status and error message. */
 export function freeText_query(req, condition) {
-
   const freeText = [];
 
   if (condition.length > 0) freeText.push(condition);
 
-  if (typeof req.query.workflowId !== 'undefined' && req.query.workflowId !== '' ) {
-      if (req.query.workflowId.match(uuid_regex) !== null) {
-          freeText.push("(workflowId:" + req.query.workflowId  + ")");
-      } else if (typeof req.query.workflowId !== 'undefined' && req.query.workflowId.match(uuid_regex) === null) {
-          // freeText.push('(*)');
-          freeText.push('(workflowType:**' + req.query.workflowId  + '*)');
-      }
-  }
-  else {
-      freeText.push('(*)');
+  if (
+    typeof req.query.workflowId !== 'undefined' &&
+    req.query.workflowId !== ''
+  ) {
+    if (req.query.workflowId.match(uuid_regex) !== null) {
+      freeText.push('(workflowId:' + req.query.workflowId + ')');
+    } else if (
+      typeof req.query.workflowId !== 'undefined' &&
+      req.query.workflowId.match(uuid_regex) === null
+    ) {
+      // freeText.push('(*)');
+      freeText.push('(workflowType:**' + req.query.workflowId + '*)');
+    }
+  } else {
+    freeText.push('(*)');
   }
 
-  if (typeof req.query.status !== 'undefined' && req.query.status !== ''){
-      if (WORKFLOW_STATUS_TYPES.includes(req.query.status)) {
-          freeText.push("(status:" + req.query.status  + ")");
-      } else {
-          throw [false, "Query input " + req.query.status + " for filtering by status is not valid"];
-      }
-  }    
+  if (typeof req.query.status !== 'undefined' && req.query.status !== '') {
+    if (WORKFLOW_STATUS_TYPES.includes(req.query.status)) {
+      freeText.push('(status:' + req.query.status + ')');
+    } else {
+      throw [
+        false,
+        'Query input ' +
+          req.query.status +
+          ' for filtering by status is not valid',
+      ];
+    }
+  }
 
   const orderQuery = [];
 
   if (typeof req.query.order !== 'undefined' && req.query.order !== '') {
-    req.query.order.split(",").forEach(element => {
+    req.query.order.split(',').forEach((element) => {
       if (WORKFLOW_SORT_TYPES.includes(element)) {
-        orderQuery.push("sort=" + element);
+        orderQuery.push('sort=' + element);
       } else {
-        throw [false, "Query input order=" + element + " for sorting is not valid"];
+        throw [
+          false,
+          'Query input order=' + element + ' for sorting is not valid',
+        ];
       }
     });
   } else {
-    orderQuery.push("sort=startTime:DESC"); 
+    orderQuery.push('sort=startTime:DESC');
   }
 
-  var freeText_query = "&" + orderQuery.join('&') + '&freeText=' + freeText.join('AND');
+  var freeText_query =
+    '&' + orderQuery.join('&') + '&freeText=' + freeText.join('AND');
   return freeText_query;
 }
 
-
 //TODO merge with proxy
-export default async function(
+export default async function (
   baseURL: string,
 ): Promise<$Application<ExpressRequest, ExpressResponse>> {
   const router = Router();
@@ -120,13 +133,13 @@ export default async function(
   const eventURL = baseApiURL + 'event';
   const baseURLSchedule = baseURL + 'schedule/';
 
-  router.use(bodyParser.urlencoded({extended: false}));
+  router.use(bodyParser.urlencoded({ extended: false }));
   router.use('/', bodyParser.json());
 
   router.get('/metadata/taskdefs', async (req: ExpressRequest, res, next) => {
     try {
       const result = await http.get(baseURLMeta + 'taskdefs', req);
-      res.status(200).send({result});
+      res.status(200).send({ result });
     } catch (err) {
       if (err.body) {
         res.status(500).send(err.body);
@@ -157,7 +170,7 @@ export default async function(
           baseURLMeta + 'taskdefs/' + req.params.name,
           req,
         );
-        res.status(200).send({result});
+        res.status(200).send({ result });
       } catch (err) {
         if (err.body) {
           res.status(500).send(err.body);
@@ -176,7 +189,7 @@ export default async function(
           null,
           req,
         );
-        res.status(200).send({result});
+        res.status(200).send({ result });
       } catch (err) {
         if (err.body) {
           res.status(500).send(err.body);
@@ -194,20 +207,20 @@ export default async function(
       // combine with schedules
       try {
         schedules = await http.get(baseURLSchedule, req);
-      } catch(err) {
+      } catch (err) {
         // continue if Schellar is not reachable
-        console.log(err)
+        console.log(err);
       }
 
       for (const workflowDef of result) {
         const expectedScheduleName =
-            workflowDef.name + ':' + workflowDef.version;
+          workflowDef.name + ':' + workflowDef.version;
         const found = findSchedule(schedules, expectedScheduleName);
         workflowDef.hasSchedule = found != null;
         workflowDef.expectedScheduleName = expectedScheduleName;
       }
 
-      res.status(200).send({result});
+      res.status(200).send({ result });
     } catch (err) {
       if (err.body) {
         res.status(500).send(err.body);
@@ -229,7 +242,7 @@ export default async function(
           null,
           req,
         );
-        res.status(200).send({result});
+        res.status(200).send({ result });
       } catch (err) {
         if (err.body) {
           res.status(500).send(err.body);
@@ -243,21 +256,19 @@ export default async function(
     '/metadata/workflow/:name',
     async (req: ExpressRequest, res, next) => {
       try {
-
         let version;
-        if (typeof req.query.version !== 'undefined' && !isNaN(req.query.version)) {
-          version=req.query.version;
+        if (
+          typeof req.query.version !== 'undefined' &&
+          !isNaN(req.query.version)
+        ) {
+          version = req.query.version;
         }
 
         const result = await http.get(
-          baseURLMeta +
-            'workflow/' +
-            req.params.name +
-            '?version=' +
-            version,
+          baseURLMeta + 'workflow/' + req.params.name + '?version=' + version,
           req,
         );
-        res.status(200).send({result});
+        res.status(200).send({ result });
       } catch (err) {
         if (err.body) {
           res.status(500).send(err.body);
@@ -269,11 +280,11 @@ export default async function(
 
   router.put('/metadata/workflow', async (req: ExpressRequest, res, next) => {
     try {
-      req.body.forEach(function(body){
-        if( body.name === undefined || body.name.length === 0 ) {
-          throw "Empty or undefined workflow name in workflow definiton"
+      req.body.forEach(function (body) {
+        if (body.name === undefined || body.name.length === 0) {
+          throw 'Empty or undefined workflow name in workflow definiton';
         }
-      })
+      });
 
       const result = await http.put(baseURLMeta + 'workflow/', req.body, req);
       res.status(200).send(result);
@@ -330,7 +341,7 @@ export default async function(
   router.get('/executions', async (req: ExpressRequest, res, next) => {
     try {
       const freeText_search = freeText_query(req, '');
-      
+      let freeText;
       let h: string = '-1';
       if (req.query.h !== 'undefined' && req.query.h !== '') {
         /* FIXME req.query is user-controlled input, properties and values
@@ -342,12 +353,12 @@ export default async function(
       }
 
       let start: number = 0;
-      if (typeof req.query.start !== 'undefined' && !isNaN( req.query.start)) {
+      if (typeof req.query.start !== 'undefined' && !isNaN(req.query.start)) {
         start = req.query.start;
       }
 
       let size: number = 5000;
-      if (typeof req.query.size !== 'undefined' && !isNaN( req.query.size)) {
+      if (typeof req.query.size !== 'undefined' && !isNaN(req.query.size)) {
         size = req.query.size;
       }
 
@@ -367,13 +378,15 @@ export default async function(
 
       const result = await http.get(url, req);
       const hits = result.results;
-      res.status(200).send({result: {hits: hits, totalHits: result.totalHits}});
+      res
+        .status(200)
+        .send({ result: { hits: hits, totalHits: result.totalHits } });
     } catch (err) {
       if (err.body && err.statusCode) {
         res.status(err.statusCode).send(err.body);
       } else if (err.body) {
         res.status(500).send(err.body);
-      } else if ( !err[0] ) {
+      } else if (!err[0]) {
         /* Handling exception from freeText_query method. 
            This method return array with status (err[0]) and
            error message (err[1]) */
@@ -383,41 +396,47 @@ export default async function(
     }
   });
 
-  router.post('/workflow/bulk/terminate', async (req: ExpressRequest, res, next) => {
-    try {
-      const result = await http.post(
-        baseURLWorkflow + 'bulk/terminate',
-        req.body,
-        req,
-      );
-      res.status(200).send(result);
-    } catch (err) {
-      if (err.body && err.statusCode) {
-        res.status(err.statusCode).send(err.body);
-      } else if (err.body) {
-        res.status(500).send(err.body);
+  router.post(
+    '/workflow/bulk/terminate',
+    async (req: ExpressRequest, res, next) => {
+      try {
+        const result = await http.post(
+          baseURLWorkflow + 'bulk/terminate',
+          req.body,
+          req,
+        );
+        res.status(200).send(result);
+      } catch (err) {
+        if (err.body && err.statusCode) {
+          res.status(err.statusCode).send(err.body);
+        } else if (err.body) {
+          res.status(500).send(err.body);
+        }
+        next(err);
       }
-      next(err);
-    }
-  });
+    },
+  );
 
-  router.delete('/workflow/bulk/terminate', async (req: ExpressRequest, res, next) => {
-    try {
-      const result = await http.post(
-        baseURLWorkflow + 'bulk/terminate',
-        req.body,
-        req,
-      );
-      res.status(200).send(result);
-    } catch (err) {
-      if (err.body && err.statusCode) {
-        res.status(err.statusCode).send(err.body);
-      } else if (err.body) {
-        res.status(500).send(err.body);
+  router.delete(
+    '/workflow/bulk/terminate',
+    async (req: ExpressRequest, res, next) => {
+      try {
+        const result = await http.post(
+          baseURLWorkflow + 'bulk/terminate',
+          req.body,
+          req,
+        );
+        res.status(200).send(result);
+      } catch (err) {
+        if (err.body && err.statusCode) {
+          res.status(err.statusCode).send(err.body);
+        } else if (err.body) {
+          res.status(500).send(err.body);
+        }
+        next(err);
       }
-      next(err);
-    }
-  });
+    },
+  );
 
   router.put('/workflow/bulk/pause', async (req: ExpressRequest, res, next) => {
     try {
@@ -437,57 +456,66 @@ export default async function(
     }
   });
 
-  router.put('/workflow/bulk/resume', async (req: ExpressRequest, res, next) => {
-    try {
-      const result = await http.put(
-        baseURLWorkflow + 'bulk/resume',
-        req.body,
-        req,
-      );
-      res.status(200).send(result);
-    } catch (err) {
-      if (err.body && err.statusCode) {
-        res.status(err.statusCode).send(err.body);
-      } else if (err.body) {
-        res.status(500).send(err.body);
+  router.put(
+    '/workflow/bulk/resume',
+    async (req: ExpressRequest, res, next) => {
+      try {
+        const result = await http.put(
+          baseURLWorkflow + 'bulk/resume',
+          req.body,
+          req,
+        );
+        res.status(200).send(result);
+      } catch (err) {
+        if (err.body && err.statusCode) {
+          res.status(err.statusCode).send(err.body);
+        } else if (err.body) {
+          res.status(500).send(err.body);
+        }
+        next(err);
       }
-      next(err);
-    }
-  });
+    },
+  );
 
-  router.post('/workflow/bulk/retry', async (req: ExpressRequest, res, next) => {
-    try {
-      const result = await http.post(
-        baseURLWorkflow + 'bulk/retry',
-        req.body,
-        req,
-      );
-      res.status(200).send(result);
-    } catch (err) {
-      if (err.body) {
-        res.status(500).send(err.body);
+  router.post(
+    '/workflow/bulk/retry',
+    async (req: ExpressRequest, res, next) => {
+      try {
+        const result = await http.post(
+          baseURLWorkflow + 'bulk/retry',
+          req.body,
+          req,
+        );
+        res.status(200).send(result);
+      } catch (err) {
+        if (err.body) {
+          res.status(500).send(err.body);
+        }
+        next(err);
       }
-      next(err);
-    }
-  });
+    },
+  );
 
-  router.post('/workflow/bulk/restart', async (req: ExpressRequest, res, next) => {
-    try {
-      const result = await http.post(
-        baseURLWorkflow + 'bulk/restart',
-        req.body,
-        req,
-      );
-      res.status(200).send(result);
-    } catch (err) {
-      if (err.body && err.statusCode) {
-        res.status(err.statusCode).send(err.body);
-      } else if (err.body) {
-        res.status(500).send(err.body);
+  router.post(
+    '/workflow/bulk/restart',
+    async (req: ExpressRequest, res, next) => {
+      try {
+        const result = await http.post(
+          baseURLWorkflow + 'bulk/restart',
+          req.body,
+          req,
+        );
+        res.status(200).send(result);
+      } catch (err) {
+        if (err.body && err.statusCode) {
+          res.status(err.statusCode).send(err.body);
+        } else if (err.body) {
+          res.status(500).send(err.body);
+        }
+        next(err);
       }
-      next(err);
-    }
-  });
+    },
+  );
 
   router.delete(
     '/workflow/:workflowId',
@@ -516,11 +544,10 @@ export default async function(
 
   router.get('/id/:workflowId', async (req: ExpressRequest, res, next) => {
     try {
-
-      let include_task="includeTasks=true";
+      let include_task = 'includeTasks=true';
 
       if (req.query.includeTasks === 'false') {
-        include_task="includeTasks=false";
+        include_task = 'includeTasks=false';
       }
 
       const result = await http.get(
@@ -557,49 +584,49 @@ export default async function(
         })(result.tasks || []),
       );
 
-      const logs = map(task =>
+      const logs = map((task) =>
         Promise.all([task, http.get(baseURLTask + task.taskId + '/log', req)]),
       )(result.tasks);
       const LOG_DATE_FORMAT = 'MM/DD/YY, HH:mm:ss:SSS';
 
-      await Promise.all(logs).then(result => {
+      await Promise.all(logs).then((result) => {
         forEach(([task, logs]) => {
           if (logs) {
             task.logs = map(
-              ({createdTime, log}) =>
+              ({ createdTime, log }) =>
                 `${moment(createdTime).format(LOG_DATE_FORMAT)} : ${log}`,
             )(logs);
           }
         })(result);
       });
 
-      const fun: (
-        Array<TaskType>,
-      ) => Array<
-        Promise<mixed>,
-      > = map(({name, version, subWorkflowId, referenceTaskName}) =>
-        Promise.all([
-          referenceTaskName,
-          http.get(
-            baseURLMeta + 'workflow/' + name + '?version=' + version,
-            req,
-          ),
-          http.get(baseURLWorkflow + subWorkflowId + '?includeTasks=true', req),
-        ]),
+      const fun: (Array<TaskType>) => Array<Promise<mixed>> = map(
+        ({ name, version, subWorkflowId, referenceTaskName }) =>
+          Promise.all([
+            referenceTaskName,
+            http.get(
+              baseURLMeta + 'workflow/' + name + '?version=' + version,
+              req,
+            ),
+            http.get(
+              baseURLWorkflow + subWorkflowId + '?includeTasks=true',
+              req,
+            ),
+          ]),
       );
       const promises = fun(subs);
 
-      const subworkflows = await Promise.all(promises).then(result => {
+      const subworkflows = await Promise.all(promises).then((result) => {
         return transform(
           result,
           (result, [key, meta, wfe]) => {
-            result[key] = {meta, wfe};
+            result[key] = { meta, wfe };
           },
           {},
         );
       });
 
-      res.status(200).send({result, meta, subworkflows: subworkflows});
+      res.status(200).send({ result, meta, subworkflows: subworkflows });
     } catch (err) {
       console.log(err);
       if (err.body && err.statusCode) {
@@ -611,22 +638,18 @@ export default async function(
     }
   });
 
-
   router.get('/hierarchical', async (req: ExpressRequest, res, next) => {
     try {
-
-      const freeText_search = freeText_query(req, "NOT(parentWorkflowId:*)");
+      const freeText_search = freeText_query(req, 'NOT(parentWorkflowId:*)');
 
       let size: number = 5000;
-      if (typeof req.query.size !== 'undefined' && !isNaN( req.query.size)) {
+      if (typeof req.query.size !== 'undefined' && !isNaN(req.query.size)) {
         size = req.query.size;
       }
 
-      let count = 0;
       let start: number = 0;
-      if (typeof req.query.start !== 'undefined' && !isNaN( req.query.start)) {
+      if (typeof req.query.start !== 'undefined' && !isNaN(req.query.start)) {
         start = req.query.start;
-        count = Number(start);
       }
 
       const url =
@@ -640,14 +663,16 @@ export default async function(
 
       const result = await http.get(url, req);
       const hits = result.results;
-      res.status(200).send({result: {hits: hits, totalHits: result.totalHits}});
+      res
+        .status(200)
+        .send({ result: { hits: hits, totalHits: result.totalHits } });
     } catch (err) {
-      console.warn('Unable to construct hierarchical view', {error: err});
+      console.warn('Unable to construct hierarchical view', { error: err });
       if (err.body && err.statusCode) {
         res.status(err.statusCode).send(err.body);
       } else if (err.body) {
         res.status(500).send(err.body);
-      } else if ( !err[0] ) {
+      } else if (!err[0]) {
         /* Handling exception from freeText_query method. 
            This method return array with status (err[0]) and
            error message (err[1]) */
@@ -656,7 +681,7 @@ export default async function(
       next(err);
     }
   });
-  
+
   router.get('/schedule', async (req: ExpressRequest, res, next) => {
     try {
       const result = await http.get(baseURLSchedule, req);
@@ -676,7 +701,7 @@ export default async function(
       const result = await http.get(baseURLSchedule + req.params.name, req);
       res.status(200).send(result);
     } catch (err) {
-      console.warn('Failed to GET', {error: err});
+      console.warn('Failed to GET', { error: err });
       if (err.body && err.statusCode) {
         res.status(err.statusCode).send(err.body);
       } else if (err.body) {
@@ -698,7 +723,7 @@ export default async function(
         const result = await http.put(urlWithName, req.body, req);
         res.status(result.statusCode).send(result.text);
       } catch (putError) {
-        console.warn('Failed to POST,PUT', {postError, putError});
+        console.warn('Failed to POST,PUT', { postError, putError });
         next(putError);
       }
     }
@@ -753,12 +778,16 @@ export default async function(
     }
   });
 
-  router.get("/queue/data", async (req, res, next) => {
+  router.get('/queue/data', async (req, res, next) => {
     try {
-      const queueNamesToSizes = await http.get(baseURLTask + "queue/all", req);
+      const queueNamesToSizes = await http.get(baseURLTask + 'queue/all', req);
       const polldata = [];
       for (const name in queueNamesToSizes) {
-        polldata.push({queueName: name, qsize: queueNamesToSizes[name], lastPollTime: null});
+        polldata.push({
+          queueName: name,
+          qsize: queueNamesToSizes[name],
+          lastPollTime: null,
+        });
       }
       res.status(200).send({ polldata });
     } catch (err) {
@@ -771,20 +800,23 @@ export default async function(
     }
   });
 
-  router.get('/external/postgres/:dataId', async (req: ExpressRequest, res, next) => {
-    try {
-      const result = await http.get(baseURL + 'api' + req.originalUrl, req);
-      res.status(200).send(result);
-    } catch (err) {
-      if (err.body && err.statusCode) {
-        res.status(err.statusCode).send(err.body);
-      } else if (err.body) {
-        res.status(500).send(err.body);
-        console.log(err)
+  router.get(
+    '/external/postgres/:dataId',
+    async (req: ExpressRequest, res, next) => {
+      try {
+        const result = await http.get(baseURL + 'api' + req.originalUrl, req);
+        res.status(200).send(result);
+      } catch (err) {
+        if (err.body && err.statusCode) {
+          res.status(err.statusCode).send(err.body);
+        } else if (err.body) {
+          res.status(500).send(err.body);
+          console.log(err);
+        }
+        next(err);
       }
-      next(err);
-    }
-  });
+    },
+  );
 
   return router;
 }

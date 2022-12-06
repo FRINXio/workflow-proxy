@@ -14,7 +14,7 @@ import type {
   TransformerRegistrationFun,
 } from '../types';
 
-export default async function(
+export default async function (
   registrationCtx: TransformerCtx,
   transformFx: Array<TransformerRegistrationFun>,
 ): Promise<Array<TransformerEntry>> {

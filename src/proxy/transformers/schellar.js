@@ -15,13 +15,12 @@ import {
   findValuesByJsonPath,
   removeTenantPrefix,
   withInfixSeparator,
-  getUserEmail, adminAccess,
+  getUserEmail,
+  adminAccess,
 } from '../utils.js';
-import {
-  getAllWorkflowsAfter as getAllWorkflowsAfterDelegate,
-} from './metadata-workflowdef.js';
+import { getAllWorkflowsAfter as getAllWorkflowsAfterDelegate } from './metadata-workflowdef.js';
 
-import type {ExpressRequest} from 'express';
+import type { ExpressRequest } from 'express';
 import type {
   AfterFun,
   BeforeFun,
@@ -41,7 +40,7 @@ function sanitizeScheduleBefore(
   const expectedName =
     schedule.workflowName + versionSeparator + schedule.workflowVersion;
   if (schedule.name !== expectedName) {
-    console.error('Unexpected schedule name', {schedule, expectedName});
+    console.error('Unexpected schedule name', { schedule, expectedName });
     throw 'Unexpected schedule name';
   }
   if (expectedName.indexOf('/') > -1) {
@@ -58,7 +57,7 @@ function sanitizeScheduleBefore(
   schedule.correlationId = getUserEmail(req); // TODO: include roles and groups
   // Add taskToDomain so that schellar executes the workflow tasks in the per-tenant queue.
   // See readme for more details.
-  schedule.taskToDomain = { "*": tenantId};
+  schedule.taskToDomain = { '*': tenantId };
   console.debug('sanitizeScheduleBefore', schedule);
 }
 
@@ -75,7 +74,7 @@ const getAllBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   }
 
   req.url = '/schedule';
-  proxyCallback({target: schellarTarget});
+  proxyCallback({ target: schellarTarget });
 };
 
 function removeWrongPrefixesFromArray(
@@ -103,11 +102,15 @@ function removeWrongPrefixesFromArray(
 
 const getAllAfter: AfterFun = (identity, req, respObj) => {
   if (respObj != null && Array.isArray(respObj)) {
-    removeWrongPrefixesFromArray(identity.tenantId, anythingTo(respObj), '$.name');
+    removeWrongPrefixesFromArray(
+      identity.tenantId,
+      anythingTo(respObj),
+      '$.name',
+    );
     removeTenantPrefix(identity.tenantId, respObj, '$[*].workflowName', false);
     removeTenantPrefix(identity.tenantId, respObj, '$[*].name', false);
   } else {
-    console.error('Unexpected response', {respObj});
+    console.error('Unexpected response', { respObj });
     throw 'Unexpected response';
   }
 };
@@ -126,7 +129,7 @@ const getBefore: BeforeFun = (identity, req, res, proxyCallback) => {
 
   const reqName = req.params.name;
   req.url = '/schedule/' + withInfixSeparator(identity.tenantId) + reqName;
-  proxyCallback({target: schellarTarget});
+  proxyCallback({ target: schellarTarget });
 };
 const getAfter: AfterFun = (identity, req, respObj) => {
   removeTenantPrefix(identity.tenantId, respObj, '$.workflowName', false);
@@ -165,7 +168,7 @@ const postBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   const schedule = anythingTo<ScheduleRequest>(req.body);
   sanitizeScheduleBefore(identity.tenantId, schedule, req);
   const buffer = createProxyOptionsBuffer(schedule, req);
-  proxyCallback({target: schellarTarget, buffer});
+  proxyCallback({ target: schellarTarget, buffer });
 };
 
 /*
@@ -211,7 +214,7 @@ const putBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   reqName = schedule.name;
   req.url = '/schedule/' + reqName;
   const buffer = createProxyOptionsBuffer(schedule, req);
-  proxyCallback({target: schellarTarget, buffer});
+  proxyCallback({ target: schellarTarget, buffer });
 };
 
 /*
@@ -229,10 +232,10 @@ const deleteBefore: BeforeFun = (identity, req, res, proxyCallback) => {
 
   const reqName = req.params.name;
   req.url = '/schedule/' + withInfixSeparator(identity.tenantId) + reqName;
-  proxyCallback({target: schellarTarget});
+  proxyCallback({ target: schellarTarget });
 };
 
-const registration: TransformerRegistrationFun = function(ctx) {
+const registration: TransformerRegistrationFun = function (ctx) {
   schellarTarget = ctx.schellarTarget;
   return [
     {

@@ -8,18 +8,15 @@
  * @format
  */
 
-import type {TransformerRegistrationFun} from '../../types';
+import type { TransformerRegistrationFun } from '../../types';
 
-let proxyTarget: string;
-
-const registration: TransformerRegistrationFun = function(ctx) {
-    proxyTarget = ctx.proxyTarget;
-    return [
-        {
-            method: 'get',
-            url: '/api/external/postgres/:dataId',
-        },
-    ];
+const registration: TransformerRegistrationFun = function () {
+  return [
+    {
+      method: 'get',
+      url: '/api/external/postgres/:dataId',
+    },
+  ];
 };
 
 export default registration;

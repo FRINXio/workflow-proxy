@@ -12,13 +12,14 @@ import {
   addTenantIdPrefix,
   anythingTo,
   assertValueIsWithoutInfixSeparator,
-  createProxyOptionsBuffer, getUserEmail,
+  createProxyOptionsBuffer,
+  getUserEmail,
   withInfixSeparator,
 } from '../utils.js';
 
-import {removeTenantPrefix} from '../utils';
-import type {AfterFun} from '../../types';
-import type {BeforeFun, Event, TransformerRegistrationFun} from '../../types';
+import { removeTenantPrefix } from '../utils';
+import type { AfterFun } from '../../types';
+import type { BeforeFun, Event, TransformerRegistrationFun } from '../../types';
 
 /*
 curl -H "x-tenant-id: fb-test" \
@@ -53,12 +54,12 @@ function sanitizeEvent(tenantId: string, event: Event) {
     assertValueIsWithoutInfixSeparator(workflowName);
     workflowName = withInfixSeparator(tenantId) + workflowName;
     event.event = split[0] + ':' + workflowName + ':' + split[2];
-    event.actions = event.actions.map(action => {
-      if (action.action === "start_workflow") {
+    event.actions = event.actions.map((action) => {
+      if (action.action === 'start_workflow') {
         // Action of type start workflow has to contain the same attributes as a
         // regular workflow, therefore task domain and correlation id have to be added.
         // Workflow name has to be prefixed also.
-        action.start_workflow.taskToDomain = {"*": tenantId};
+        action.start_workflow.taskToDomain = { '*': tenantId };
         action.start_workflow.correlationId = event.correlationId;
         addTenantIdPrefix(tenantId, action.start_workflow);
         return action;
@@ -72,30 +73,20 @@ function sanitizeEvent(tenantId: string, event: Event) {
   }
 }
 
-const postEventBefore: BeforeFun = (
-  identity,
-  req,
-  res,
-  proxyCallback,
-) => {
+const postEventBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   let reqObj = req.body;
   reqObj.correlationId = getUserEmail(req);
-  console.info('Transforming', {reqObj});
+  console.info('Transforming', { reqObj });
   sanitizeEvent(identity.tenantId, anythingTo<Event>(reqObj));
-  proxyCallback({buffer: createProxyOptionsBuffer(reqObj, req)});
+  proxyCallback({ buffer: createProxyOptionsBuffer(reqObj, req) });
 };
 
-const putEventBefore: BeforeFun = (
-  identity,
-  req,
-  res,
-  proxyCallback,
-) => {
+const putEventBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   let reqObj = req.body;
   reqObj.correlationId = getUserEmail(req);
-  console.info('Transforming', {reqObj});
+  console.info('Transforming', { reqObj });
   sanitizeEvent(identity.tenantId, anythingTo<Event>(reqObj));
-  proxyCallback({buffer: createProxyOptionsBuffer(reqObj, req)});
+  proxyCallback({ buffer: createProxyOptionsBuffer(reqObj, req) });
 };
 
 const getEventAfter: AfterFun = (identity, req, respObj) => {
@@ -105,7 +96,7 @@ const getEventAfter: AfterFun = (identity, req, respObj) => {
   for (const evnt of events) {
     const split = evnt.event.split(':');
     if (split.length === 3 && split[0] === 'conductor') {
-      wfName = {name: split[1]};
+      wfName = { name: split[1] };
       removeTenantPrefix(identity.tenantId, wfName, '$.name', false);
       evnt.event = `${split[0]}:${wfName.name}:${split[2]}`;
     }

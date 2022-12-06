@@ -12,27 +12,25 @@ import bodyParser from 'body-parser';
 import httpProxy from 'http-proxy';
 
 import transformerRegistry from './transformer-registry';
-import {getTenantId, getUserGroups, getUserRoles} from './utils.js';
+import { getTenantId, getUserGroups, getUserRoles } from './utils.js';
 import type {
-  AuthorizationCheck,
   ExpressRouter,
-  GroupLoadingStrategy,
-  RoleLoadingStrategy,
   ProxyCallback,
   ProxyNext,
   ProxyRequest,
   ProxyResponse,
-  TransformerRegistrationFun, IdentityHeaders,
+  TransformerRegistrationFun,
+  IdentityHeaders,
 } from '../types';
 
-export default async function(
+export default async function (
   proxyTarget: string,
   tenantProxyUrl: string,
   schellarTarget: string,
   transformFx: Array<TransformerRegistrationFun>,
 ) {
   const router = Router<ProxyRequest, ProxyResponse>();
-  router.use(bodyParser.urlencoded({extended: false}));
+  router.use(bodyParser.urlencoded({ extended: false }));
   router.use('/', bodyParser.json());
 
   const transformers = await transformerRegistry(
@@ -54,20 +52,20 @@ export default async function(
       // TODO set timeouts
     });
 
-    proxy.on('proxyRes', async function(proxyRes, req, res) {
+    proxy.on('proxyRes', async function (proxyRes, req, res) {
       const tenantId = getTenantId(req);
       const roles = getUserRoles(req);
       const groups = getUserGroups(req);
-      const identity: IdentityHeaders = {tenantId, roles, groups};
+      const identity: IdentityHeaders = { tenantId, roles, groups };
 
       console.info(
         `RES ${proxyRes.statusCode} ${req.method} ${req.url} tenantId ${tenantId}`,
       );
       const body = [];
-      proxyRes.on('data', function(chunk) {
+      proxyRes.on('data', function (chunk) {
         body.push(chunk);
       });
-      proxyRes.on('end', function() {
+      proxyRes.on('end', function () {
         const data = Buffer.concat(body).toString();
         res.statusCode = proxyRes.statusCode;
         if (
@@ -87,12 +85,14 @@ export default async function(
             entry.after(identity, req, respObj, res);
             res.end(JSON.stringify(respObj));
           } catch (e) {
-            console.error('Error while modifying response', {error: e});
+            console.error('Error while modifying response', { error: e });
             res.end('Internal server error');
             throw e;
           }
         } else {
-          console.info(`Unexpected status code ${res.statusCode}, resending raw response: '${data}'`)
+          console.info(
+            `Unexpected status code ${res.statusCode}, resending raw response: '${data}'`,
+          );
           res.end(data);
         }
       });
@@ -109,17 +109,21 @@ export default async function(
           tenantId = getTenantId(req);
           roles = getUserRoles(req);
           groups = getUserGroups(req);
-          identity = {tenantId, roles, groups};
+          identity = { tenantId, roles, groups };
         } catch (err) {
-          console.error('Cannot get tenantId', {tenantId, roles, groups}, err);
+          console.error(
+            'Cannot get tenantId',
+            { tenantId, roles, groups },
+            err,
+          );
           res.status(400);
           res.send('Cannot get tenantId:' + err);
           return;
         }
         // start with 'before'
         console.info(`REQ ${req.method} ${req.url} tenantId ${tenantId}`);
-        const proxyCallback: ProxyCallback = function(proxyOptions) {
-          proxy.web(req, res, proxyOptions, function(e) {
+        const proxyCallback: ProxyCallback = function (proxyOptions) {
+          proxy.web(req, res, proxyOptions, function (e) {
             console.error('Inline error handler', e);
             next(e);
           });
