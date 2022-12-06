@@ -9,11 +9,11 @@
  */
 'use strict';
 
-import type {$Application, ExpressRequest, ExpressResponse} from 'express';
+import type { ExpressRequest } from 'express';
 import ExpressApplication from 'express';
 import proxy from './proxy/proxy';
 import workflowRouter from './routes';
-import {getUserGroups, getUserRoles} from './proxy/utils.js';
+import { getUserGroups, getUserRoles } from './proxy/utils.js';
 
 import bulk from './proxy/transformers/bulk';
 import event from './proxy/transformers/event';
@@ -25,23 +25,29 @@ import workflow from './proxy/transformers/workflow';
 import postgresExternalStorage from './proxy/transformers/postgres-external-storage';
 
 import balancingTaskProxy from './balancing-task-proxy';
-import {adminAccess} from "./proxy/utils";
+import { adminAccess } from './proxy/utils';
 
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 
 dotenv.config();
 
-var helmet = require('helmet')
+var helmet = require('helmet');
 const app = ExpressApplication();
-app.use(ExpressApplication.json({limit: process.env.TASK_PROXY_LIMIT ?? '50mb', extended: true, type: "application/json"}));
+app.use(
+  ExpressApplication.json({
+    limit: process.env.TASK_PROXY_LIMIT ?? '50mb',
+    extended: true,
+    type: 'application/json',
+  }),
+);
 
 app.use(
   helmet({
     contentSecurityPolicy: false,
     crossOriginOpenerPolicy: {
       policy: 'unsafe-none',
-    }
-  })
+    },
+  }),
 );
 
 app.use(helmet.dnsPrefetchControl());
@@ -60,8 +66,7 @@ const uniconfigSwaggerDocument = require('/app/workflow-proxy/openapi/uniconfig.
 
 const userFacingPort = process.env.USER_FACING_PORT ?? 8088;
 const taskProxyPort = process.env.TASK_PROXY_PORT ?? 8089;
-const proxyTarget =
-    process.env.PROXY_TARGET || 'http://conductor-server:8080';
+const proxyTarget = process.env.PROXY_TARGET || 'http://conductor-server:8080';
 const schellarTarget = process.env.SCHELLAR_TARGET || 'http://schellar:3000';
 const tenantProxyUrl = 'http://localhost:8088/proxy/';
 
@@ -92,129 +97,131 @@ async function init() {
   let tenantRouter = workflowRouter(tenantProxyUrl);
 
   // Expose a simple boolean endpoint to check if current user is privileged
-  proxyRouter.get(
-    '/editableworkflows',
-    async (req: ExpressRequest, res) => {
-      res
-        .status(200)
-        .send(
-          adminAccess({
-            "tenantId": "",
-            roles: getUserRoles(req),
-            groups: getUserGroups(req)}),
-        );
-    },
-  );
+  proxyRouter.get('/editableworkflows', async (req: ExpressRequest, res) => {
+    res.status(200).send(
+      adminAccess({
+        tenantId: '',
+        roles: getUserRoles(req),
+        groups: getUserGroups(req),
+      }),
+    );
+  });
 
   app.use('/', await tenantRouter);
   app.use('/proxy', proxyRouter);
 
   app.use(
-    '/docs', function(req,res,next) {
-  
-      if(process.env.OAUTH2 === 'true') {
-        if ( process.env.OAUTH2_AUTH_URL !== undefined || process.env.OAUTH2_TOKEN_URL !== undefined ) {
+    '/docs',
+    function (req, res, next) {
+      if (process.env.OAUTH2 === 'true') {
+        if (
+          process.env.OAUTH2_AUTH_URL !== undefined ||
+          process.env.OAUTH2_TOKEN_URL !== undefined
+        ) {
           var oauth_config = {
-            "oauth2_wp": {
-              "type": "oauth2",
-              "description": "This API uses OAuth 2 with the implicit flow",
-              "x-tokenName": "id_token",
-              "flows": {
-                "implicit": {
-                  "authorizationUrl":  process.env.OAUTH2_AUTH_URL,
-                  "scopes": {
-                    "openid": "Indicate that the application intends to use OIDC to verify the user's identity"
-                  }
-                }
-              }
-            }
-          }
-    
-        // Protect all paths with openid scope
+            oauth2_wp: {
+              type: 'oauth2',
+              description: 'This API uses OAuth 2 with the implicit flow',
+              'x-tokenName': 'id_token',
+              flows: {
+                implicit: {
+                  authorizationUrl: process.env.OAUTH2_AUTH_URL,
+                  scopes: {
+                    openid:
+                      "Indicate that the application intends to use OIDC to verify the user's identity",
+                  },
+                },
+              },
+            },
+          };
+
+          // Protect all paths with openid scope
           var oauth_security = [
             {
-              "oauth2_wp": [
-                "openid"
-              ]
-            }
-          ]
-    
+              oauth2_wp: ['openid'],
+            },
+          ];
+
           workflowManagerSwaggerDocument.security = oauth_security;
-          workflowManagerSwaggerDocument.components.securitySchemes = oauth_config;
-    
+          workflowManagerSwaggerDocument.components.securitySchemes =
+            oauth_config;
         }
       }
-      
+
       req.swaggerDoc = workflowManagerSwaggerDocument;
-      
+
       next();
-    },swaggerUi.serve, swaggerUi.setup(workflowManagerSwaggerDocument)
+    },
+    swaggerUi.serve,
+    swaggerUi.setup(workflowManagerSwaggerDocument),
   );
 
   app.use(
-    '/docs-uniconfig', function(req,res,next) {
-      if ( process.env.UNICONFIG_ZONES_LIST !== undefined ) {
+    '/docs-uniconfig',
+    function (req, res, next) {
+      if (process.env.UNICONFIG_ZONES_LIST !== undefined) {
+        var servers = [];
 
-        var servers = []
-
-        process.env.UNICONFIG_ZONES_LIST.split(',').forEach(function(host){
+        process.env.UNICONFIG_ZONES_LIST.split(',').forEach(function (host) {
           servers.push({
-                    "url": "/api/" + host,
-                    "description": "Frinx APi gateway for zone: " + host
-            })
+            url: '/api/' + host,
+            description: 'Frinx APi gateway for zone: ' + host,
+          });
         });
-        
+
         uniconfigSwaggerDocument.servers = servers;
       }
 
-      if(process.env.OAUTH2 === 'true') {
-        if ( process.env.OAUTH2_AUTH_URL !== undefined || process.env.OAUTH2_TOKEN_URL !== undefined ) {
+      if (process.env.OAUTH2 === 'true') {
+        if (
+          process.env.OAUTH2_AUTH_URL !== undefined ||
+          process.env.OAUTH2_TOKEN_URL !== undefined
+        ) {
           var oauth_config = {
-            "oauth2_uc": {
-              "type": "oauth2",
-              "description": "This API uses OAuth 2 with the implicit flow",
-              "x-tokenName": "id_token",
-              "flows": {
-                "implicit": {
-                  "authorizationUrl":  process.env.OAUTH2_AUTH_URL,
-                  "scopes": {
-                    "openid": "Indicate that the application intends to use OIDC to verify the user's identity"
-                  }
-                }
-              }
-            }
-          }
-    
-        // Protect all paths with openid scope
+            oauth2_uc: {
+              type: 'oauth2',
+              description: 'This API uses OAuth 2 with the implicit flow',
+              'x-tokenName': 'id_token',
+              flows: {
+                implicit: {
+                  authorizationUrl: process.env.OAUTH2_AUTH_URL,
+                  scopes: {
+                    openid:
+                      "Indicate that the application intends to use OIDC to verify the user's identity",
+                  },
+                },
+              },
+            },
+          };
+
+          // Protect all paths with openid scope
           var oauth_security = [
             {
-              "oauth2_uc": [
-                "openid"
-              ]
-            }
-          ]
-    
+              oauth2_uc: ['openid'],
+            },
+          ];
+
           uniconfigSwaggerDocument.security = oauth_security;
           uniconfigSwaggerDocument.components.securitySchemes = oauth_config;
-    
         }
       }
-      
+
       req.swaggerDoc = uniconfigSwaggerDocument;
-      
+
       next();
-    },swaggerUi.serve, swaggerUi.setup(uniconfigSwaggerDocument)
+    },
+    swaggerUi.serve,
+    swaggerUi.setup(uniconfigSwaggerDocument),
   );
 
-
-  app.get("/probe/liveness", (req, res) => {
+  app.get('/probe/liveness', (req, res) => {
     if (balancingTaskProxy.live()) {
       res.sendStatus(200);
     } else {
       res.sendStatus(500);
     }
   });
-  app.get("/probe/readiness", (req, res) => {
+  app.get('/probe/readiness', (req, res) => {
     if (balancingTaskProxy.ready()) {
       res.sendStatus(200);
     } else {

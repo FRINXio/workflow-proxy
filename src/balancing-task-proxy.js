@@ -4,10 +4,8 @@ For each batch poll, every tenant's task queue is queried. All results are then 
 Workers send 'count' query parameter to limit number of results. However, they can receive
 up to (tenants.length * count) results.
 */
-import request from 'request-promise-native';
 import ExpressApplication from 'express';
 import genericProxy from './generic-proxy';
-import qs from 'querystring';
 
 const app = ExpressApplication();
 
@@ -71,10 +69,9 @@ const balancingTaskProxy = {
     return true;
   },
 
-  ready: function() {
+  ready: function () {
     return true;
   },
-
 };
 
 export default balancingTaskProxy;

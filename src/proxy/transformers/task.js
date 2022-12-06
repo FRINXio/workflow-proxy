@@ -11,23 +11,21 @@
 import request from 'request';
 import {
   adminAccess,
-  assertAllowedSystemTask,
   createProxyOptionsBuffer,
   removeTenantPrefixes,
-  withInfixSeparator
+  withInfixSeparator,
 } from '../utils.js';
-import type {BeforeFun, TransformerRegistrationFun} from '../../types';
-import qs from "qs";
-import {sanitizeWorkflowdefTasksBefore} from "./metadata-workflowdef";
+import type {
+  AfterFun,
+  BeforeFun,
+  TransformerRegistrationFun,
+} from '../../types';
+import qs from 'qs';
+import { sanitizeWorkflowdefTasksBefore } from './metadata-workflowdef';
 
 let proxyTarget;
 
-const getLogBefore: BeforeFun = (
-  identity,
-  req,
-  res,
-  proxyCallback,
-) => {
+const getLogBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   const url = proxyTarget + '/api/tasks/' + req.params.taskId;
   // first make a HTTP request to validate that this workflow belongs to tenant
   const requestOptions = {
@@ -38,18 +36,21 @@ const getLogBefore: BeforeFun = (
     },
   };
   console.info(`Requesting ${JSON.stringify(requestOptions)}`);
-  request(requestOptions, function(error, response, body) {
+  request(requestOptions, function (error, response, body) {
     console.info(`Got status code: ${response.statusCode}, body: '${body}'`);
     if (response.statusCode === 200) {
       const task = JSON.parse(body);
       // make sure name starts with prefix
       const tenantWithInfixSeparator = withInfixSeparator(identity.tenantId);
-      if (!("workflowType" in task) || task.workflowType?.indexOf(tenantWithInfixSeparator) === 0) {
+      if (
+        !('workflowType' in task) ||
+        task.workflowType?.indexOf(tenantWithInfixSeparator) === 0
+      ) {
         proxyCallback();
       } else {
         console.error(
           `Error trying to get task of different tenant: ${identity.tenantId},`,
-          {task},
+          { task },
         );
         res.status(427);
         res.send('Unauthorized');
@@ -105,12 +106,7 @@ const getQueueAllAfter: AfterFun = (identity, req, respObj, res) => {
   }
 };
 
-const getTasksBatchBefore: BeforeFun = (
-  identity,
-  req,
-  res,
-  proxyCallback,
-) => {
+const getTasksBatchBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   if (!adminAccess(identity)) {
     res.status(427);
     res.send('Unauthorized to retrieve tasks');
@@ -123,7 +119,7 @@ const getTasksBatchBefore: BeforeFun = (
 
   const originalQueryString = req._parsedUrl.query;
   const parsedQuery = qs.parse(originalQueryString);
-  let newQuery = "";
+  let newQuery = '';
 
   const workerid = parsedQuery['workerid'];
   if (workerid) {
@@ -150,12 +146,7 @@ const getTasksBatchBefore: BeforeFun = (
   proxyCallback();
 };
 
-const getTaskBefore: BeforeFun = (
-  identity,
-  req,
-  res,
-  proxyCallback,
-) => {
+const getTaskBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   if (!adminAccess(identity)) {
     res.status(427);
     res.send('Unauthorized to retrieve tasks');
@@ -173,7 +164,7 @@ const getTaskBefore: BeforeFun = (
   } else {
     parsedQuery = {};
   }
-  let newQuery = "";
+  let newQuery = '';
 
   const workerid = parsedQuery['workerid'];
   if (workerid) {
@@ -193,33 +184,36 @@ const getTaskBefore: BeforeFun = (
 };
 
 const taskJsonPathsToRemovePrefixFrom = {
-  'taskType': false,
-  'taskDefName': false,
+  taskType: false,
+  taskDefName: false,
   'workflowTask.name': false,
   'workflowTask.taskDefinition.name': false,
-  'workflowType': false
+  workflowType: false,
 };
 
 const getTasksBatchAfter: AfterFun = (identity, req, respObj) => {
   if (respObj) {
     for (const task of respObj) {
-      removeTenantPrefixes(identity.tenantId, task, taskJsonPathsToRemovePrefixFrom);
+      removeTenantPrefixes(
+        identity.tenantId,
+        task,
+        taskJsonPathsToRemovePrefixFrom,
+      );
     }
   }
 };
 
 const getTaskAfter: AfterFun = (identity, req, respObj) => {
   if (respObj) {
-    removeTenantPrefixes(identity.tenantId, respObj, taskJsonPathsToRemovePrefixFrom);
+    removeTenantPrefixes(
+      identity.tenantId,
+      respObj,
+      taskJsonPathsToRemovePrefixFrom,
+    );
   }
 };
 
-const postTaskBefore: BeforeFun = (
-  identity,
-  req,
-  res,
-  proxyCallback,
-) => {
+const postTaskBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   if (!adminAccess(identity)) {
     res.status(427);
     res.send('Unauthorized to update tasks');
@@ -239,21 +233,19 @@ const postTaskBefore: BeforeFun = (
   // This is the only way of adding prefix to dynamic tasks without having to modify the worker / workflow side of things.
 
   let taskOutput = req.body;
-  if ("outputData" in taskOutput) {
-    if ("dynamic_tasks" in taskOutput.outputData) {
-      sanitizeWorkflowdefTasksBefore(taskOutput.outputData.dynamic_tasks, identity.tenantId);
+  if ('outputData' in taskOutput) {
+    if ('dynamic_tasks' in taskOutput.outputData) {
+      sanitizeWorkflowdefTasksBefore(
+        taskOutput.outputData.dynamic_tasks,
+        identity.tenantId,
+      );
     }
   }
 
-  proxyCallback({buffer: createProxyOptionsBuffer(req.body, req)});
+  proxyCallback({ buffer: createProxyOptionsBuffer(req.body, req) });
 };
 
-const ackTaskBefore: BeforeFun = (
-  identity,
-  req,
-  res,
-  proxyCallback,
-) => {
+const ackTaskBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   if (!adminAccess(identity)) {
     res.status(427);
     res.send('Unauthorized to ack tasks');
@@ -263,7 +255,7 @@ const ackTaskBefore: BeforeFun = (
   proxyCallback();
 };
 
-const registration: TransformerRegistrationFun = function(ctx) {
+const registration: TransformerRegistrationFun = function (ctx) {
   proxyTarget = ctx.proxyTarget;
   return [
     {
@@ -301,7 +293,7 @@ const registration: TransformerRegistrationFun = function(ctx) {
     {
       method: 'get',
       url: '/api/tasks/externalstoragelocation',
-    }
+    },
   ];
 };
 

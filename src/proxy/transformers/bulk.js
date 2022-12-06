@@ -15,7 +15,7 @@ import {
   removeTenantPrefix,
 } from '../utils';
 
-import type {BeforeFun, TransformerRegistrationFun} from '../../types';
+import type { BeforeFun, TransformerRegistrationFun } from '../../types';
 
 // All bulk operations expect json array of workflow Ids in request.
 // Each workflow Id must belong to current tenant. Search api is
@@ -38,15 +38,10 @@ curl  -H "x-tenant-id: fb-test" \
     -d '["7d40eb5f-6a0d-438d-a35c-3b2111e2744b"]'
 
 */
-const bulkOperationBefore: BeforeFun = (
-  identity,
-  req,
-  res,
-  proxyCallback,
-) => {
+const bulkOperationBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   const requestWorkflowIds = req.body; // expect JS array
   if (!Array.isArray(requestWorkflowIds) || requestWorkflowIds.length === 0) {
-    console.error('Expected non empty array', {requestWorkflowIds});
+    console.error('Expected non empty array', { requestWorkflowIds });
     res.status(400);
     res.send('Expected array of workflows');
     return;
@@ -65,7 +60,7 @@ const bulkOperationBefore: BeforeFun = (
     if (typeof workflowId === 'string' && /^[a-z0-9-]+$/i.test(workflowId)) {
       query += workflowId + ',';
     } else {
-      console.error('Unexpected workflowId format', {workflowId});
+      console.error('Unexpected workflowId format', { workflowId });
       res.status(400);
       res.send('Unexpected workflowId format');
       return;
@@ -79,7 +74,7 @@ const bulkOperationBefore: BeforeFun = (
     method: 'GET',
   };
   console.info(`Requesting ${JSON.stringify(requestOptions)}`);
-  request(requestOptions, function(error, response, body) {
+  request(requestOptions, function (error, response, body) {
     console.info(`Got status code: ${response.statusCode}, body: ${body}`);
     const searchResult = JSON.parse(body);
     // only keep found workflows
@@ -104,19 +99,21 @@ const bulkOperationBefore: BeforeFun = (
         console.warn(
           `ElasticSearch returned workflow that was not requested:` +
             ` ${foundWorkflowId.workflowId}`,
-          {requestWorkflowIds},
+          {
+            requestWorkflowIds,
+          },
         );
         foundWorkflowIds.splice(idx, 1);
       }
     }
     console.info(`Sending bulk operation: ${foundWorkflowIds}`);
-    proxyCallback({buffer: createProxyOptionsBuffer(foundWorkflowIds, req)});
+    proxyCallback({ buffer: createProxyOptionsBuffer(foundWorkflowIds, req) });
   });
 };
 
 let proxyTarget: string;
 
-const registration: TransformerRegistrationFun = ctx => {
+const registration: TransformerRegistrationFun = (ctx) => {
   proxyTarget = ctx.proxyTarget;
   return [
     {

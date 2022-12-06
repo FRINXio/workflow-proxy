@@ -9,15 +9,14 @@
  */
 
 import streamify from 'stream-array';
-import {JSONPath} from 'jsonpath-plus';
+import { JSONPath } from 'jsonpath-plus';
 
-import type {ExpressRequest} from 'express';
+import type { ExpressRequest } from 'express';
 import type {
-  GroupLoadingStrategy,
-  RoleLoadingStrategy,
   ProxyRequest,
   Task,
-  Workflow, AuthorizationCheck,
+  Workflow,
+  AuthorizationCheck,
 } from '../types';
 
 // Global prefix for taskdefs which can be used by all tenants.
@@ -50,16 +49,16 @@ const SYSTEM_TASK_TYPES: Array<string> = [
   // TODO remove for cloud multitenant env
   'HTTP',
   'LAMBDA',
-  'JSON_JQ_TRANSFORM'
+  'JSON_JQ_TRANSFORM',
 ];
 
 export function isLabeledWithGroup(
   workflowdef: Workflow,
   groups: string[],
 ): boolean {
-  const lowercaseGroups = groups.map(g => g.toLowerCase().replace(/\s/g, ""));
+  const lowercaseGroups = groups.map((g) => g.toLowerCase().replace(/\s/g, ''));
   return getWorkflowLabels(workflowdef).some(
-    l => lowercaseGroups.indexOf(l.toLowerCase()) >= 0,
+    (l) => lowercaseGroups.indexOf(l.toLowerCase()) >= 0,
   );
 }
 
@@ -67,9 +66,9 @@ export function isLabeledWithRole(
   workflowdef: Workflow,
   roles: string[],
 ): boolean {
-  const lowercaseRoles = roles.map(g => g.toLowerCase().replace(/\s/g, ""));
+  const lowercaseRoles = roles.map((g) => g.toLowerCase().replace(/\s/g, ''));
   return getWorkflowLabels(workflowdef).some(
-    l => lowercaseRoles.indexOf(l.toLowerCase()) >= 0,
+    (l) => lowercaseRoles.indexOf(l.toLowerCase()) >= 0,
   );
 }
 
@@ -137,7 +136,7 @@ export function assertAllowedSystemTask(task: Task): void {
       assertAllowedSystemTask(task);
     }
 
-    const decisionCaseIdToTasks: {[string]: Array<Task>} = task.decisionCases
+    const decisionCaseIdToTasks: { [string]: Array<Task> } = task.decisionCases
       ? task.decisionCases
       : {};
     const values: Array<Array<Task>> = objectToValues(decisionCaseIdToTasks);
@@ -158,7 +157,7 @@ export function assertAllowedSystemTask(task: Task): void {
 }
 
 // TODO: necessary because of https://github.com/facebook/flow/issues/2221
-export function objectToValues<A, B>(obj: {[key: A]: B}): Array<B> {
+export function objectToValues<A, B>(obj: { [key: A]: B }): Array<B> {
   // eslint-disable-next-line flowtype/no-weak-types
   return ((Object.values(obj): Array<any>): Array<B>);
 }
@@ -169,7 +168,7 @@ export function withInfixSeparator(s: string): string {
 
 export function addTenantIdPrefix(
   tenantId: string,
-  objectWithName: {name: string},
+  objectWithName: { name: string },
   allowGlobal: boolean = false,
 ): void {
   if (
@@ -216,7 +215,9 @@ export function extractTenantId(workflowName) {
     throw new Error('Value must contain INFIX_SEPARATOR');
   }
   if (workflowName.substr(idx + 1).indexOf(INFIX_SEPARATOR) > -1) {
-    console.error(`Value '${workflowName}' must contain '${INFIX_SEPARATOR}' exactly once`);
+    console.error(
+      `Value '${workflowName}' must contain '${INFIX_SEPARATOR}' exactly once`,
+    );
     throw new Error('Value must contain INFIX_SEPARATOR exactly once');
   }
   return workflowName.substr(0, idx);
@@ -231,9 +232,7 @@ export function getUserEmail(req: ExpressRequest): string {
   return userEmail;
 }
 
-export function getUserRoles(
-  req: ExpressRequest,
-): Promise<string[]> {
+export function getUserRoles(req: ExpressRequest): Promise<string[]> {
   const userRole: ?string = req.headers['x-auth-user-roles'];
   if (userRole == null) {
     return [];
@@ -241,9 +240,7 @@ export function getUserRoles(
   return userRole.split(',');
 }
 
-export function getUserGroups(
-  req: ExpressRequest,
-): Promise<string[]> {
+export function getUserGroups(req: ExpressRequest): Promise<string[]> {
   const userGroup: ?string = req.headers['x-auth-user-groups'];
   if (userGroup == null) {
     return [];
@@ -268,7 +265,7 @@ export function createProxyOptionsBuffer(
     // create an array
     modifiedBody = [modifiedBody];
   } else {
-    console.error('Unknown type', {modifiedBody});
+    console.error('Unknown type', { modifiedBody });
     throw 'Unknown type';
   }
   return streamify(modifiedBody);
@@ -309,7 +306,7 @@ export function removeTenantPrefix(
         `Name must start with tenantId prefix ` +
           `tenantId:'${tenantId}',jsonPath:'${jsonPath}'` +
           `,item:'${item}'`,
-        {json},
+        { json },
       );
       throw 'Name must start with tenantId prefix'; // TODO create Exception class
     }
@@ -324,7 +321,7 @@ export function removeTenantPrefix(
 export function removeTenantPrefixes(
   tenantId: string,
   json: mixed,
-  jsonPathToAllowGlobal: {[string]: boolean},
+  jsonPathToAllowGlobal: { [string]: boolean },
 ): void {
   for (const key in jsonPathToAllowGlobal) {
     removeTenantPrefix(tenantId, json, key, jsonPathToAllowGlobal[key]);
@@ -336,7 +333,7 @@ export function findValuesByJsonPath(
   path: string,
   resultType: string = 'all',
 ) {
-  const result = JSONPath({json, path, resultType});
+  const result = JSONPath({ json, path, resultType });
   console.info(`For path '${path}' found ${result.length} items`);
   return result;
 }
@@ -351,11 +348,20 @@ export function anythingTo<T>(anything: any): T {
   }
 }
 
-const OWNER_ROLE = (process.env.ADMIN_ACCESS_ROLE || 'OWNER').trim().split(',').filter(elm => elm);
-const NETWORK_ADMIN_GROUP = (process.env.ADMIN_ACCESS_ROLE || 'network-admin').trim().split(',').filter(elm => elm);
-const NETWORK_OWNER=OWNER_ROLE.concat(NETWORK_ADMIN_GROUP);
+const OWNER_ROLE = (process.env.ADMIN_ACCESS_ROLE || 'OWNER')
+  .trim()
+  .split(',')
+  .filter((elm) => elm);
+const NETWORK_ADMIN_GROUP = (process.env.ADMIN_ACCESS_ROLE || 'network-admin')
+  .trim()
+  .split(',')
+  .filter((elm) => elm);
+const NETWORK_OWNER = OWNER_ROLE.concat(NETWORK_ADMIN_GROUP);
 
-export const adminAccess : AuthorizationCheck = (identity) => {
-  return identity.roles.filter(value => NETWORK_OWNER.includes(value)).length > 0 ||
-    identity.groups.filter(value => NETWORK_OWNER.includes(value)).length > 0;
+export const adminAccess: AuthorizationCheck = (identity) => {
+  return (
+    identity.roles.filter((value) => NETWORK_OWNER.includes(value)).length >
+      0 ||
+    identity.groups.filter((value) => NETWORK_OWNER.includes(value)).length > 0
+  );
 };

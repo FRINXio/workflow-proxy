@@ -8,7 +8,7 @@
  * @format
  */
 
-import type {ExpressRequest, ExpressResponse} from 'express';
+import type { ExpressRequest, ExpressResponse } from 'express';
 
 export type Task = {
   name: string,
@@ -16,17 +16,17 @@ export type Task = {
   defaultCase?: Array<Task>,
   decisionCases?: Map<string, Array<Task>>,
   forkTasks?: Array<Task>,
-  subWorkflowParam?: {name: string},
+  subWorkflowParam?: { name: string },
 };
 
 export type ProxyRequest = ExpressRequest & {
-  _parsedUrl: {pathname: string, query: string},
+  _parsedUrl: { pathname: string, query: string },
 };
 
 export type ProxyResponse = ExpressResponse & {
   write: mixed,
 };
-export type ProxyNext = mixed => void;
+export type ProxyNext = (mixed) => void;
 
 export type ProxyCallback = (proxyOptions?: mixed) => void;
 
@@ -34,7 +34,7 @@ export type IdentityHeaders = {
   tenantId: string,
   roles: string[],
   groups: string[],
-}
+};
 
 export type BeforeFun = (
   identity: IdentityHeaders,
@@ -63,7 +63,7 @@ type ExpressCallback = (
   next: ProxyNext,
 ) => mixed;
 type ExpressMethodFun = (string, ExpressCallback) => void;
-export type ExpressRouter = {[HttpMethod]: ExpressMethodFun};
+export type ExpressRouter = { [HttpMethod]: ExpressMethodFun };
 
 export type TransformerEntry = {
   method: HttpMethod,

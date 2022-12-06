@@ -11,9 +11,14 @@
 import qs from 'qs';
 import request from 'request';
 import {
-  addTenantIdPrefix, adminAccess,
+  addTenantIdPrefix,
+  adminAccess,
   anythingTo,
-  createProxyOptionsBuffer, getTenantId, getUserEmail, getUserGroups, getUserRoles,
+  createProxyOptionsBuffer,
+  getTenantId,
+  getUserEmail,
+  getUserGroups,
+  getUserRoles,
   removeTenantPrefix,
   removeTenantPrefixes,
   withInfixSeparator,
@@ -23,7 +28,8 @@ import type {
   AfterFun,
   BeforeFun,
   StartWorkflowRequest,
-  TransformerRegistrationFun, WorkflowExecution,
+  TransformerRegistrationFun,
+  WorkflowExecution,
 } from '../../types';
 
 // Search for workflows based on payload and other parameters
@@ -50,7 +56,10 @@ export const getSearchBefore: BeforeFun = (
   }
 
   /* If search by freeText workflowType, add tenant___ to search query */
-  newQueryString=newQueryString.replace('workflowType:*',`workflowType:${identity.tenantId}___`);
+  newQueryString = newQueryString.replace(
+    'workflowType:*',
+    `workflowType:${identity.tenantId}___`,
+  );
 
   /* Tenant limitations */
   // prefix query with workflowType STARTS_WITH tenantId_
@@ -62,7 +71,12 @@ export const getSearchBefore: BeforeFun = (
 };
 
 export const getSearchAfter: AfterFun = (identity, req, respObj) => {
-  removeTenantPrefix(identity.tenantId, respObj, 'results[*].workflowType', false);
+  removeTenantPrefix(
+    identity.tenantId,
+    respObj,
+    'results[*].workflowType',
+    false,
+  );
 };
 
 export function updateQuery(
@@ -110,10 +124,15 @@ export const postWorkflowBefore: BeforeFun = (
   if (adminAccess(identity)) {
     postWorkflowBeforeTenant(identity, req, res, proxyCallback);
   } else {
-    postWorkflowBeforeRbac(identity, req, res, proxyCallback,
+    postWorkflowBeforeRbac(
+      identity,
+      req,
+      res,
+      proxyCallback,
       (requestOptions, onWorkflowDefCheck) => {
         request(requestOptions, onWorkflowDefCheck);
-      });
+      },
+    );
   }
 };
 
@@ -148,10 +167,16 @@ const postWorkflowBeforeTenant: BeforeFun = (
   reqObj.correlationId = getUserEmail(req);
   reqObj.taskToDomain['*'] = identity.tenantId;
   console.info(`Transformed request to ${JSON.stringify(reqObj)}`);
-  proxyCallback({buffer: createProxyOptionsBuffer(reqObj, req)});
+  proxyCallback({ buffer: createProxyOptionsBuffer(reqObj, req) });
 };
 
-export function postWorkflowBeforeRbac(identity, req, res, proxyCallback, checkAndExecute) {
+export function postWorkflowBeforeRbac(
+  identity,
+  req,
+  res,
+  proxyCallback,
+  checkAndExecute,
+) {
   const workflow: WorkflowExecution = anythingTo<WorkflowExecution>(req.body);
   let url = tenantProxyUrl + 'api/metadata/workflow/' + workflow.name;
   if (workflow.version) {
@@ -163,7 +188,7 @@ export function postWorkflowBeforeRbac(identity, req, res, proxyCallback, checkA
     url,
     method: 'GET',
     headers: {
-      'from': getUserEmail(req),
+      from: getUserEmail(req),
       'x-tenant-id': getTenantId(req),
       'x-auth-user-roles': getUserRoles(req),
       'x-auth-user-groups': getUserGroups(req),
@@ -204,7 +229,6 @@ export const getExecutionStatusAfter: AfterFun = (
   respObj,
   res,
 ) => {
-
   if (!adminAccess(identity)) {
     correlationIdCheck(respObj, req, res);
   }
@@ -232,7 +256,7 @@ export const getExecutionStatusAfter: AfterFun = (
 export function correlationIdCheck(respObj, req, res) {
   if (respObj.correlationId !== getUserEmail(req)) {
     res.status(427);
-    res.send("Unauthorized");
+    res.send('Unauthorized');
   }
 }
 
@@ -242,19 +266,19 @@ curl  -H "x-tenant-id: fb-test" \
     "localhost/proxy/api/workflow/2dbb6e3e-c45d-464b-a9c9-2bbb16b7ca71/remove" \
     -X DELETE
 */
-const removeWorkflowBefore: BeforeFun = (
-  identity,
-  req,
-  res,
-  proxyCallback,
-) => {
+const removeWorkflowBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   if (adminAccess(identity)) {
     removeWorkflowBeforeTenant(identity, req, res, proxyCallback);
   } else {
-    removeWorkflowBeforeRbac(identity, req, res, proxyCallback,
+    removeWorkflowBeforeRbac(
+      identity,
+      req,
+      res,
+      proxyCallback,
       (requestOptions, onWorkflowDefCheck) => {
         request(requestOptions, onWorkflowDefCheck);
-      });
+      },
+    );
   }
 };
 
@@ -274,7 +298,7 @@ const removeWorkflowBeforeTenant: BeforeFun = (
     },
   };
   console.info(`Requesting ${JSON.stringify(requestOptions)}`);
-  request(requestOptions, function(error, response, body) {
+  request(requestOptions, function (error, response, body) {
     console.info(`Got status code: ${response.statusCode}, body: '${body}'`);
     if (response.statusCode === 200) {
       const workflow = JSON.parse(body);
@@ -297,14 +321,20 @@ const removeWorkflowBeforeTenant: BeforeFun = (
   });
 };
 
-function removeWorkflowBeforeRbac(req, identity, res, proxyCallback, checkAndExecute) {
+function removeWorkflowBeforeRbac(
+  req,
+  identity,
+  res,
+  proxyCallback,
+  checkAndExecute,
+) {
   let url = tenantProxyUrl + 'api/workflow/' + req.params.workflowId;
   const requestOptions = {
     url,
     method: 'GET',
     headers: {
-      'from': getUserEmail(req),
-      'x-tenant-id': getTenantId(req)
+      from: getUserEmail(req),
+      'x-tenant-id': getTenantId(req),
     },
   };
 
@@ -334,7 +364,7 @@ function removeWorkflowBeforeRbac(req, identity, res, proxyCallback, checkAndExe
 let proxyTarget: string;
 let tenantProxyUrl: string;
 
-const registration: TransformerRegistrationFun = function(ctx) {
+const registration: TransformerRegistrationFun = function (ctx) {
   proxyTarget = ctx.proxyTarget;
   tenantProxyUrl = ctx.tenantProxyUrl;
 

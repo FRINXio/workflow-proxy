@@ -10,7 +10,7 @@
 
 import request from 'request';
 
-import type {FrontendResponse, ExpressRequest} from './types';
+import type { FrontendResponse, ExpressRequest } from './types';
 
 function makeOptions(
   method: string,
@@ -23,7 +23,7 @@ function makeOptions(
     url,
     headers: {
       'x-tenant-id': parentRequest.headers['x-tenant-id'],
-      'from': parentRequest.headers['from'],
+      from: parentRequest.headers['from'],
       'x-auth-user-roles': parentRequest.headers['x-auth-user-roles'],
       'x-auth-user-groups': parentRequest.headers['x-auth-user-groups'],
       cookie: parentRequest.headers['cookie'],
@@ -61,11 +61,15 @@ function resolveSuccess(res, resolve) {
 
 function doHttpRequestWithOptions(options): Promise<FrontendResponse> {
   return new Promise<FrontendResponse>((resolve, reject) => {
-    request(options, function(err, res) {
+    request(options, function (err, res) {
       if (res != null && isSuccess(res)) {
         resolveSuccess(res, resolve);
       } else if (res != null) {
-        reject({message: 'Wrong status code', body: res.body, statusCode: res.statusCode});
+        reject({
+          message: 'Wrong status code',
+          body: res.body,
+          statusCode: res.statusCode,
+        });
       } else {
         reject(err);
       }
@@ -89,17 +93,27 @@ const HttpClient = {
   get: <T>(path: string, parentRequest: ExpressRequest): Promise<T> =>
     new Promise<T>((resolve, reject) => {
       const options = makeOptions('GET', path, parentRequest);
-      request(options, function(err, res) {
+      request(options, function (err, res) {
         if (res != null && isSuccess(res)) {
           try {
             // all GET methods should return json except when there is a failure
             resolve(JSON.parse(res.body));
           } catch (err) {
-            console.warn(`Unexpected response body (invalid json): '${res.body}'`)
-            reject({message: 'Unexpected response body (invalid json)', body: res.body, statusCode: res.statusCode});
+            console.warn(
+              `Unexpected response body (invalid json): '${res.body}'`,
+            );
+            reject({
+              message: 'Unexpected response body (invalid json)',
+              body: res.body,
+              statusCode: res.statusCode,
+            });
           }
         } else if (res != null) {
-          reject({message: 'Wrong status code', body: res.body, statusCode: res.statusCode});
+          reject({
+            message: 'Wrong status code',
+            body: res.body,
+            statusCode: res.statusCode,
+          });
         } else {
           reject(err);
         }

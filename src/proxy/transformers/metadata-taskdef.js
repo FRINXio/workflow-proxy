@@ -18,10 +18,11 @@ import {
   createProxyOptionsBuffer,
   getUserEmail,
   removeTenantPrefix,
-  withInfixSeparator, adminAccess,
+  withInfixSeparator,
+  adminAccess,
 } from '../utils.js';
 
-import type {ExpressRequest} from 'express';
+import type { ExpressRequest } from 'express';
 
 import type {
   AfterFun,
@@ -61,7 +62,11 @@ const getAllTaskdefsAfter: AfterFun = (identity, req, respObj, res) => {
 };
 
 // Used in POST and PUT
-function sanitizeTaskdefBefore(tenantId: string, taskdef: Task, req: ExpressRequest): void {
+function sanitizeTaskdefBefore(
+  tenantId: string,
+  taskdef: Task,
+  req: ExpressRequest,
+): void {
   // only whitelisted system tasks are allowed
   assertAllowedSystemTask(taskdef);
   // prepend tenantId
@@ -90,12 +95,7 @@ curl -X POST -H "x-tenant-id: fb-test"  \
 '
 */
 // TODO: should this be disabled?
-const postTaskdefsBefore: BeforeFun = (
-  identity,
-  req,
-  res,
-  proxyCallback,
-) => {
+const postTaskdefsBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   if (!adminAccess(identity)) {
     res.status(427);
     res.send('Unauthorized to register tasks');
@@ -109,7 +109,7 @@ const postTaskdefsBefore: BeforeFun = (
       const taskdef = anythingTo<Task>(reqObj[idx]);
       sanitizeTaskdefBefore(identity.tenantId, taskdef, req);
     }
-    proxyCallback({buffer: createProxyOptionsBuffer(reqObj, req)});
+    proxyCallback({ buffer: createProxyOptionsBuffer(reqObj, req) });
   } else {
     console.error('Expected req.body to be array in postTaskdefsBefore');
     throw 'Expected req.body to be array in postTaskdefsBefore';
@@ -135,12 +135,7 @@ curl -X PUT -H "x-tenant-id: fb-test" \
 '
 */
 // TODO: should this be disabled?
-const putTaskdefBefore: BeforeFun = (
-  identity,
-  req,
-  res,
-  proxyCallback,
-) => {
+const putTaskdefBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   if (!adminAccess(identity)) {
     res.status(427);
     res.send('Unauthorized to register tasks');
@@ -151,7 +146,7 @@ const putTaskdefBefore: BeforeFun = (
   if (reqObj != null && typeof reqObj === 'object') {
     const taskdef = anythingTo<Task>(reqObj);
     sanitizeTaskdefBefore(identity.tenantId, taskdef, req);
-    proxyCallback({buffer: createProxyOptionsBuffer(reqObj, req)});
+    proxyCallback({ buffer: createProxyOptionsBuffer(reqObj, req) });
   } else {
     console.error('Expected req.body to be object in putTaskdefBefore');
     throw 'Expected req.body to be object in putTaskdefBefore';
@@ -184,12 +179,7 @@ const getTaskdefByNameBefore: BeforeFun = (
   proxyCallback();
 };
 
-const getTaskdefByNameAfter: AfterFun = (
-  identity,
-  req,
-  respObj,
-  res,
-) => {
+const getTaskdefByNameAfter: AfterFun = (identity, req, respObj, res) => {
   const task = anythingTo<Task>(respObj);
   const globalPrefix = withInfixSeparator(GLOBAL_PREFIX);
   const tenantWithInfixSeparator = withInfixSeparator(identity.tenantId);
