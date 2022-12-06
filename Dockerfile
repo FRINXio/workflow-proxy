@@ -1,4 +1,4 @@
-FROM node:12 as build
+FROM node:19 as build
 
 # Create app directory
 COPY . /app/workflow-proxy
@@ -10,7 +10,7 @@ RUN yarn test
 RUN yarn run transpile
 
 
-FROM node:12-alpine3.15
+FROM node:19-alpine
 
 RUN apk update && apk upgrade && rm -rf /var/cache/apt/*
 WORKDIR /app/workflow-proxy
