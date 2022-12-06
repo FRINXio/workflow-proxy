@@ -1,0 +1,40 @@
+name: PR check
+
+on:
+  pull_request:
+    branches:
+      - master
+
+env:
+  IMAGE_NAME: frinx/workflow-proxy
+
+jobs:
+  pr-check:
+    runs-on: ubuntu-latest
+    container: node:19-alpine
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Clean cache
+        run: yarn cache clean
+      - name: Run PR format check
+        run: yarn formatter:check
+      - name: Run PR test check
+        run: yarn test
+      - name: Run audit check
+        run: yarn audit
+
+  security-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Build image
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+      - uses: Azure/container-scan@v0
+        with:
+          image-name: ${{ env.IMAGE_NAME }}:latest
+          # severity-threshold: CRITICAL

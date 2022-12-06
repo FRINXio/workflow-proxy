@@ -1,0 +1,8 @@
+./node_modules
+./openapi
+./workflow-proxy
+./github
+**/build
+**/dist
+**/__generated__
+**/flow-typed
