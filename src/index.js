@@ -62,8 +62,8 @@ app.use(helmet.referrerPolicy());
 app.use(helmet.xssFilter());
 
 const swaggerUi = require('swagger-ui-express');
-const workflowManagerSwaggerDocument = require('/app/workflow-proxy/openapi/workflow-manager.json');
-const uniconfigSwaggerDocument = require('/app/workflow-proxy/openapi/uniconfig.json');
+const workflowManagerSwaggerDocument = require('./openapi/workflow-manager.json');
+const uniconfigSwaggerDocument = require('./openapi/uniconfig.json');
 
 const userFacingPort = process.env.USER_FACING_PORT ?? 8088;
 const proxyTarget = process.env.PROXY_TARGET || 'http://conductor-server:8080';
@@ -141,7 +141,6 @@ async function init() {
               oauth2_wp: ['openid'],
             },
           ];
-
           workflowManagerSwaggerDocument.security = oauth_security;
           workflowManagerSwaggerDocument.components.securitySchemes =
             oauth_config;
@@ -200,7 +199,6 @@ async function init() {
               oauth2_uc: ['openid'],
             },
           ];
-
           uniconfigSwaggerDocument.security = oauth_security;
           uniconfigSwaggerDocument.components.securitySchemes = oauth_config;
         }
