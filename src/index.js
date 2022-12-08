@@ -30,6 +30,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+require('log-timestamp');
+
 var helmet = require('helmet');
 const app = ExpressApplication();
 app.use(
