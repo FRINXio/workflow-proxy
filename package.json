@@ -24,6 +24,7 @@
     "helmet": "^5.0.2",
     "http-proxy": "^1.18.1",
     "jsonpath-plus": "^6.0.1",
+    "log-timestamp": "^0.3.0",
     "moment": "^2.29.3",
     "qs": "^6.10.3",
     "stream-array": "^1.1.2",
