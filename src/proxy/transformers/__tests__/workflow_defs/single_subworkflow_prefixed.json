@@ -1,6 +1,6 @@
 {
   "name": "FACEBOOK___workflow1",
-  "description": "description - ADMIN,OWNER,TEST",
+  "description": "{\"description\": \"description\", \"labels\": [\"LABEL\"], \"rbac\": [\"ADMIN\",\"OWNER\"]}",
   "ownerEmail": "testmail",
   "tasks": [
     {

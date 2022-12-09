@@ -1,6 +1,6 @@
 {
   "name": "workflow1",
-  "description": "description - ADMIN,OWNER,TEST",
+  "description": "{\"description\": \"description\", \"labels\": [\"LABEL\"], \"rbac\": [\"ADMIN\",\"OWNER\"]}",
   "tasks": [
     {
       "name": "Post_to_Slack",

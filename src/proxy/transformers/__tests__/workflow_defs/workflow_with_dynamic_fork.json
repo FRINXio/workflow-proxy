@@ -1,6 +1,6 @@
 {
   "name": "Mount_all_from_inventory",
-  "description": "{\"description\": \"mount and check all labeled devices from inventory\", \"labels\": [\"BASICS\",\"CLI\",\"NETCONF\",\"INVENTORY\",\"MAIN\"]}",
+  "description": "{\"description\": \"mount and check all labeled devices from inventory\", \"labels\": [\"BASICS\",\"CLI\",\"NETCONF\",\"INVENTORY\",\"MAIN\"], \"rbac\": [\"ADMIN-ROLE\",\"ADMIN-GROUP\"]}",
   "version": 1,
   "tasks": [
     {
