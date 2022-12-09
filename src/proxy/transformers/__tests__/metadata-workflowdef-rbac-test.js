@@ -53,7 +53,8 @@ describe('Workflow def RBAC transformers', () => {
     );
     expect(input).toEqual({
       name: 'workflow1',
-      description: 'description - ADMIN,OWNER,TEST',
+      description:
+        '{"description": "description", "labels": ["LABEL"], "rbac": ["ADMIN","OWNER"]}',
       tasks: [
         {
           name: 'task_1',
@@ -79,7 +80,8 @@ describe('Workflow def RBAC transformers', () => {
     expect(input).toEqual([
       {
         name: 'workflow1',
-        description: 'description - ADMIN,OWNER,TEST',
+        description:
+          '{"description": "description", "labels": ["LABEL"], "rbac": ["ADMIN","OWNER"]}',
         tasks: [
           {
             name: 'task_1',
@@ -90,7 +92,8 @@ describe('Workflow def RBAC transformers', () => {
       },
       {
         name: 'workflow3',
-        description: 'description - ADMIN',
+        description:
+          '{"description": "description", "labels": ["LABEL"], "rbac": ["ADMIN"]}',
         tasks: [
           {
             name: 'task_1',

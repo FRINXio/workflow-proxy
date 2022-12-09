@@ -77,8 +77,8 @@ export function getWorkflowLabels(workflowdef: Workflow): string[] {
   try {
     // Extract labels from description as JSON
     let parsedDescription = JSON.parse(descr);
-    if (parsedDescription?.labels) {
-      return parsedDescription.labels;
+    if (parsedDescription?.rbac) {
+      return parsedDescription.rbac;
     }
   } catch (e) {
     // Fallback solution, deprecated format of storing labels

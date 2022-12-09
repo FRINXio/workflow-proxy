@@ -1,7 +1,7 @@
 [
   {
     "name": "FACEBOOK___workflow1",
-    "description": "description - ADMIN,OWNER,TEST",
+    "description": "{\"description\": \"description\", \"labels\": [\"LABEL\"], \"rbac\": [\"ADMIN\",\"OWNER\"]}",
     "tasks": [
       {
         "name": "FACEBOOK___task_1",
@@ -12,7 +12,7 @@
   },
   {
     "name": "FACEBOOK___workflow2",
-    "description": "description - OWNER",
+    "description": "{\"description\": \"description\", \"labels\": [\"LABEL\"], \"rbac\": [\"OWNER\"]}",
     "tasks": [
       {
         "name": "FACEBOOK___task_1",
@@ -23,7 +23,7 @@
   },
   {
     "name": "FACEBOOK___workflow3",
-    "description": "description - ADMIN",
+    "description": "{\"description\": \"description\", \"labels\": [\"LABEL\"], \"rbac\": [\"ADMIN\"]}",
     "tasks": [
       {
         "name": "FACEBOOK___task_1",
