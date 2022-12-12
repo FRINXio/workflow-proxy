@@ -28,7 +28,6 @@ import type {
   TransformerRegistrationFun,
 } from '../../types';
 
-const versionSeparator = ':';
 let schellarTarget: string;
 
 // Used in POST and PUT
@@ -37,13 +36,7 @@ function sanitizeScheduleBefore(
   schedule: ScheduleRequest,
   req: ExpressRequest,
 ): void {
-  const expectedName =
-    schedule.workflowName + versionSeparator + schedule.workflowVersion;
-  if (schedule.name !== expectedName) {
-    console.error('Unexpected schedule name', { schedule, expectedName });
-    throw 'Unexpected schedule name';
-  }
-  if (expectedName.indexOf('/') > -1) {
+  if (schedule.name.indexOf('/') > -1) {
     // guard against https://github.com/flaviostutz/schellar/issues/4
     console.error('Cannot create schedule with name containing "/" character');
     throw 'Cannot create schedule with name containing "/" character';

@@ -53,12 +53,16 @@ const WORKFLOW_STATUS_TYPES: Array<string> = [
 const http = HttpClient;
 
 const findSchedule = (schedules, name) => {
+  const scheduleName = [];
   for (const schedule of schedules) {
-    if (schedule.name === name) {
-      return schedule;
+    if (schedule.workflowName + ':' + schedule.workflowVersion === name) {
+      scheduleName.push(schedule.name);
     }
   }
-  return null;
+  if (scheduleName.length === 0) {
+    return null;
+  }
+  return scheduleName;
 };
 
 /* This function validate query parameters (workflowId, workflowType, order, status) used for 
@@ -218,6 +222,7 @@ export default async function (
         const found = findSchedule(schedules, expectedScheduleName);
         workflowDef.hasSchedule = found != null;
         workflowDef.expectedScheduleName = expectedScheduleName;
+        workflowDef.existingScheduleNames = found;
       }
 
       res.status(200).send({ result });
@@ -724,6 +729,11 @@ export default async function (
         res.status(result.statusCode).send(result.text);
       } catch (putError) {
         console.warn('Failed to POST,PUT', { postError, putError });
+        if (putError.statusCode === 400) {
+          res.status(putError.statusCode).send(putError.body);
+        } else if (postError.statusCode === 400) {
+          res.status(postError.statusCode).send(postError.body);
+        }
         next(putError);
       }
     }

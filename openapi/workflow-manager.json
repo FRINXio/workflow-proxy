@@ -1529,6 +1529,18 @@
             "additionalProperties": {
               "type": "object"
             }
+          },
+          "hasSchedule": {
+            "type": "string"
+          },
+          "expectedScheduleName": {
+            "type": "string"
+          },
+          "existingScheduleNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
