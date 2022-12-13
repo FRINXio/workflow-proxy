@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - master
+  workflow_dispatch:
 
 env:
   IMAGE_NAME: frinx/workflow-proxy
@@ -38,3 +39,128 @@ jobs:
         with:
           image-name: ${{ env.IMAGE_NAME }}:latest
           # severity-threshold: CRITICAL
+
+  test:
+    runs-on: ubuntu-latest
+    needs:
+      - pr-check
+      - security-test
+
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      conductor:
+        image: frinx/conductor-server:2.0.0
+        ports:
+          - 8080:8080
+        env:
+          spring_datasource_url: jdbc:postgresql://postgres:5432/postgres?charset=utf8&parseTime=true&interpolateParams=true
+          spring_searchdatasource_url: jdbc:postgresql://postgres:5432/postgres?charset=utf8&parseTime=true&interpolateParams=true
+          conductor_externalPayloadStorage_postgres_url: jdbc:postgresql://postgres:5432/postgres?charset=utf8&parseTime=true&interpolateParams=true
+        options: >-
+          --health-cmd "curl -X 'GET' 'http://localhost:8080/health'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Transpile
+        run: yarn && yarn transpile
+
+      - name: Start proxy
+        run: PROXY_TARGET=http://localhost:8080 yarn start > proxy_logs.txt &
+
+      - name: Wait for proxy
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 2
+          max_attempts: 10
+          retry_on: error
+          command: |
+            curl -f 'http://localhost:8088/probe/readiness'
+
+      - name: Create WF
+        run: |
+          curl -X 'PUT' \
+            'http://localhost:8088/proxy/api/metadata/workflow' \
+            -H 'accept: */*' \
+            -H 'from: github' \
+            -H 'x-auth-user-groups: network-admin' \
+            -H 'Content-Type: application/json' \
+            -d '[{
+                  "name": "test",
+                  "description": "test workflow",
+                  "version": 1,
+                  "tasks": [
+                    {
+                      "name": "health",
+                      "taskReferenceName": "health",
+                      "inputParameters": {
+                        "http_request": {
+                          "uri": "http://localhost:8080/health",
+                          "method": "GET"
+                        }
+                      },
+                      "type": "HTTP"
+                    }                    
+                  ],
+                  "schemaVersion": 2
+                }]'
+
+      - name: Execute WF
+        run: |
+          curl -X 'POST' \
+            'http://localhost:8088/proxy/api/workflow' \
+          -H 'accept: */*' \
+          -H 'from: github' \
+          -H 'x-auth-user-groups: network-admin' \
+          -H 'Content-Type: application/json' \
+            -d '{
+            "name": "test"
+            }'
+
+      - uses: nick-fields/retry@v2
+        name: Assert WF
+        with:
+          timeout_seconds: 2
+          max_attempts: 10
+          retry_on: error
+          command: |
+            curl -X 'GET' \
+            'http://localhost:8088/proxy/api/workflow/search?start=0&size=100&freeText=%2A' \
+            -H 'accept: */*' \
+            -H 'from: github' \
+            -H 'x-auth-user-groups: network-admin' \
+            | grep workflowId
+
+      - name: Search WFs
+        if: always()
+        run: |
+          curl -X 'GET' \
+          'http://localhost:8088/proxy/api/workflow/search?start=0&size=100&freeText=%2A' \
+          -H 'accept: */*' \
+          -H 'from: github' \
+          -H 'x-auth-user-groups: network-admin' \
+          | jq
+
+      - name: Print Proxy logs
+        if: always()
+        run: cat proxy_logs.txt
+
+      - name: Print Conductor logs
+        if: always()
+        run: docker logs `docker ps -a | grep conductor | cut -d' ' -f 1`
