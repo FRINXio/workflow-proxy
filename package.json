@@ -1,6 +1,6 @@
 {
   "name": "workflows-proxy",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "main": "index.js",
   "license": "BSD-3-Clause",
   "author": "Ken Garber <kengarber@fb.com>",
