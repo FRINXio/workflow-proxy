@@ -9,20 +9,15 @@
  */
 
 import {
-  addTenantIdPrefix,
+  adminAccess,
   anythingTo,
   createProxyOptionsBuffer,
-  findValuesByJsonPath,
-  removeTenantPrefix,
-  withInfixSeparator,
   getUserEmail,
-  adminAccess,
 } from '../utils.js';
 import { getAllWorkflowsAfter as getAllWorkflowsAfterDelegate } from './metadata-workflowdef.js';
 
 import type { ExpressRequest } from 'express';
 import type {
-  AfterFun,
   BeforeFun,
   ScheduleRequest,
   TransformerRegistrationFun,
@@ -33,7 +28,6 @@ let schellarTarget: string;
 
 // Used in POST and PUT
 function sanitizeScheduleBefore(
-  tenantId: string,
   schedule: ScheduleRequest,
   req: ExpressRequest,
 ): void {
@@ -49,21 +43,12 @@ function sanitizeScheduleBefore(
     throw 'Cannot create schedule with name containing "/" character';
   }
 
-  // add tenantId to name - name is in form workflowName:version
-  addTenantIdPrefix(tenantId, schedule);
-  // add tenantId to workflowName
-  schedule.workflowName = withInfixSeparator(tenantId) + schedule.workflowName;
   // Whoever creates/updates the schedule will be presented to workers as the owner of the execution.
   schedule.correlationId = getUserEmail(req); // TODO: include roles and groups
-  // Add taskToDomain so that schellar executes the workflow tasks in the per-tenant queue.
-  // See readme for more details.
-  schedule.taskToDomain = { '*': tenantId };
-  console.debug('sanitizeScheduleBefore', schedule);
 }
 
 /*
 curl http://localhost/proxy/schedule \
-  -H "x-tenant-id: fb-test" \
   -H 'Content-Type: application/json'
 */
 const getAllBefore: BeforeFun = (identity, req, res, proxyCallback) => {
@@ -77,47 +62,8 @@ const getAllBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   proxyCallback({ target: schellarTarget });
 };
 
-function removeWrongPrefixesFromArray(
-  tenantId,
-  array: Array<mixed>,
-  jsonPath: string,
-) {
-  const tenantWithInfixSeparator = withInfixSeparator(tenantId);
-  for (let idx = array.length - 1; idx >= 0; idx--) {
-    const item = array[idx];
-    const leafValues = findValuesByJsonPath(item, jsonPath, 'value');
-    let prefixFound = true;
-    for (const leaf of leafValues) {
-      if (!leaf || leaf.indexOf(tenantWithInfixSeparator) !== 0) {
-        prefixFound = false;
-        break;
-      }
-    }
-
-    if (!prefixFound) {
-      array.splice(idx, 1);
-    }
-  }
-}
-
-const getAllAfter: AfterFun = (identity, req, respObj) => {
-  if (respObj != null && Array.isArray(respObj)) {
-    removeWrongPrefixesFromArray(
-      identity.tenantId,
-      anythingTo(respObj),
-      '$.name',
-    );
-    removeTenantPrefix(identity.tenantId, respObj, '$[*].workflowName', false);
-    removeTenantPrefix(identity.tenantId, respObj, '$[*].name', false);
-  } else {
-    console.error('Unexpected response', { respObj });
-    throw 'Unexpected response';
-  }
-};
-
 /*
 curl http://localhost/proxy/schedule/workflow1 \
-  -H "x-tenant-id: fb-test" \
   -H 'Content-Type: application/json'
 */
 const getBefore: BeforeFun = (identity, req, res, proxyCallback) => {
@@ -127,18 +73,11 @@ const getBefore: BeforeFun = (identity, req, res, proxyCallback) => {
     return;
   }
 
-  const reqName = req.params.name;
-  req.url = '/schedule/' + withInfixSeparator(identity.tenantId) + reqName;
   proxyCallback({ target: schellarTarget });
-};
-const getAfter: AfterFun = (identity, req, respObj) => {
-  removeTenantPrefix(identity.tenantId, respObj, '$.workflowName', false);
-  removeTenantPrefix(identity.tenantId, respObj, '$.name', false);
 };
 
 /*
 curl -X POST http://localhost/proxy/schedule \
-  -H "x-tenant-id: fb-test" \
   -H 'Content-Type: application/json' \
   -d '
   {
@@ -166,14 +105,13 @@ const postBefore: BeforeFun = (identity, req, res, proxyCallback) => {
 
   req.url = '/schedule';
   const schedule = anythingTo<ScheduleRequest>(req.body);
-  sanitizeScheduleBefore(identity.tenantId, schedule, req);
+  sanitizeScheduleBefore(schedule, req);
   const buffer = createProxyOptionsBuffer(schedule, req);
   proxyCallback({ target: schellarTarget, buffer });
 };
 
 /*
 curl -X PUT http://localhost/proxy/schedule/workflow1 \
-  -H "x-tenant-id: fb-test" \
   -H 'Content-Type: application/json' \
   -d '
   {
@@ -210,7 +148,7 @@ const putBefore: BeforeFun = (identity, req, res, proxyCallback) => {
     // TODO create Exception class
     throw 'Schedule name must be equal to name supplied in url';
   }
-  sanitizeScheduleBefore(identity.tenantId, schedule, req);
+  sanitizeScheduleBefore(schedule, req);
   reqName = schedule.name;
   req.url = '/schedule/' + reqName;
   const buffer = createProxyOptionsBuffer(schedule, req);
@@ -219,7 +157,6 @@ const putBefore: BeforeFun = (identity, req, res, proxyCallback) => {
 
 /*
 curl -X DELETE \
-  -H "x-tenant-id: fb-test" \
   -H 'Content-Type: application/json' \
   http://localhost/proxy/schedule/workflow1
 */
@@ -230,8 +167,6 @@ const deleteBefore: BeforeFun = (identity, req, res, proxyCallback) => {
     return;
   }
 
-  const reqName = req.params.name;
-  req.url = '/schedule/' + withInfixSeparator(identity.tenantId) + reqName;
   proxyCallback({ target: schellarTarget });
 };
 
@@ -242,13 +177,11 @@ const registration: TransformerRegistrationFun = function (ctx) {
       method: 'get',
       url: '/schedule/?',
       before: getAllBefore,
-      after: getAllAfter,
     },
     {
       method: 'get',
       url: '/schedule/:name',
       before: getBefore,
-      after: getAfter,
     },
     {
       method: 'post',

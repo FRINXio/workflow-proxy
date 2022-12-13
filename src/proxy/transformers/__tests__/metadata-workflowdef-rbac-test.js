@@ -30,8 +30,8 @@ const unfilteredWorkflowsPrefixed = () =>
 let blueprint = require('./workflow_defs/multpile_workflows_labeled.json');
 const unfilteredWorkflows = () => JSON.parse(JSON.stringify(blueprint));
 
-export function mockIdentity(tenantId = 'FACEBOOK', groups = [], roles = []) {
-  return { tenantId: tenantId, roles: roles, groups: groups };
+export function mockIdentity(groups = [], roles = []) {
+  return { roles: roles, groups: groups };
 }
 
 describe('Workflow def RBAC transformers', () => {
@@ -45,12 +45,7 @@ describe('Workflow def RBAC transformers', () => {
 
   test('should return single workflow matching group', () => {
     let input = unfilteredWorkflowsPrefixed()[0];
-    singleWorkflowMetaTransformer(
-      mockIdentity('FACEBOOK', ['ADMIN']),
-      null,
-      input,
-      null,
-    );
+    singleWorkflowMetaTransformer(mockIdentity(['ADMIN']), null, input, null);
     expect(input).toEqual({
       name: 'workflow1',
       description: 'description - ADMIN,OWNER,TEST',
@@ -70,12 +65,7 @@ describe('Workflow def RBAC transformers', () => {
     expect(input).toEqual([]);
 
     input = unfilteredWorkflowsPrefixed();
-    workflowMetaTransformer(
-      mockIdentity('FACEBOOK', ['ADMIN']),
-      null,
-      input,
-      null,
-    );
+    workflowMetaTransformer(mockIdentity(['ADMIN']), null, input, null);
     expect(input).toEqual([
       {
         name: 'workflow1',
@@ -103,7 +93,7 @@ describe('Workflow def RBAC transformers', () => {
 
     input = unfilteredWorkflowsPrefixed();
     workflowMetaTransformer(
-      mockIdentity('FACEBOOK', ['ADMIN', 'OWNER']),
+      mockIdentity(['ADMIN', 'OWNER']),
       null,
       input,
       null,

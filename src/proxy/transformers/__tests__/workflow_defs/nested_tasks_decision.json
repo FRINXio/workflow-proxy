@@ -13,8 +13,7 @@
           "contentType": "application/json",
           "accept": "application/json",
           "headers": {
-            "From": "fbuser@fb.com",
-            "x-tenant-id": "fb-test"
+            "From": "fbuser@fb.com"
           },
           "connectionTimeOut": "3600",
           "readTimeOut": "3600",

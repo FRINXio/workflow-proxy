@@ -1,7 +1,7 @@
 # Workflow Proxy
 
 Workflow proxy is an API proxy component for [conductor workflow engine](https://github.com/Netflix/conductor) that adds following features:
-* Multitenancy
+* Multitenancy - has been removed !
 * RBAC support
 * Workflow scheduling
 * Additional features required by [frinx-workflow-ui](https://github.com/FRINXio/frinx-workflow-ui)
@@ -22,7 +22,7 @@ Workflow proxy is an API proxy component for [conductor workflow engine](https:/
 |                            | HTTP                                                          |
 |                /proxy      |                                  /                            |
 |                 +----------v-----------+                       +----------------------+    |
-|                 | Tenant proxy         |                       | Task proxy           |    |
+|                 | RBAC proxy           |                       | Task proxy           |    |
 |                 |  proxy.js            <                       |  task+proxy.js       |    |
 |                 |  transformers/*.js   |                       |                      |    |
 |                 +----+------+----------+                       +-----------+----------+    |
@@ -44,15 +44,12 @@ Workflow proxy is an API proxy component for [conductor workflow engine](https:/
 The main components are:
 * Conductor proxy
   * Additional features (REST api endpoints) required by [frinx-workflow-ui](https://github.com/FRINXio/frinx-workflow-ui)
-* Tenant proxy
-  * Multitenancy support
+* RBAC proxy
   * RBAC support
-* Task proxy
-  * Tenant aware task distribution to workers 
 
 ## User facing proxy
 
-The tenant & RBAC proxy + conductor proxy form a single logical component: **User facing proxy** and are proxying following conductor REST endpoints:
+The RBAC proxy + conductor proxy form a single logical component: **User facing proxy** and are proxying following conductor REST endpoints:
 * Workflow metadata (workflow definitions)
 * Task metadata (task definitions)
 * Task execution (polling / ACK / updates)
@@ -63,14 +60,13 @@ The tenant & RBAC proxy + conductor proxy form a single logical component: **Use
 
 This is the main proxy that is used whenever the user's browser interacts with
 Conductor APIs. It expects following authentication headers:
-* x-tenant-id
 * from
 * x-auth-user-roles
 * x-auth-user-groups
 
 The execution path from when a request hits User facing proxy is as follows:
 1. Conductor proxy
-2. Tenant & RBAC proxy
+2. RBAC proxy
 3. Conductor
 
 ### Conductor proxy
@@ -83,62 +79,22 @@ Features implemented by this component are required by the workflow-ui.
 
 ### Tenant proxy
 
-Conductor server does not support mutlitenancy on its own and all the data reside in a single database 
-and conductor's REST API allows full access. 
-**The main job of tenant proxy is to isolate tenants** (their requests and data) from one another.
-It is achieved by adding tenant information to requests/data flowing towards conductor and removing them from requests/data coming from conductor.
-Tenant proxy expects client's tenant ID to be set in every request's HTTP header.
+Tenant proxy has been removed and only following functionality has been left:
 
 List of transformations performed in tenant proxy per endpoint:
 * Workflow metadata (workflow definitions)
-  * Add/remove tenant id to workflow name in workflow definition as `TENANT___workflowName`
-  * Filter workflow definitions based on tenant ID prefix when reading workflow definitions
-  * Add/remove tenant id to task names (which are part of the workflow definition and are not globally allowed tasks)
   * Add user id into workflow's `ownerEmail` field
-  * Add/remove tenant id to workflowDef.tasks[name=DYNAMIC_FORK&type=SUBWORKFLOW].inputParameters.expectedName
-    * This is a special (conventional) inputParameter required by the UI and DYNAMIC_FORK to enforce all the dynamic tasks going into DYNAMIC_FORK are of the same name and type
-    * Ensuring tasks executed by DYNAMIC_FORK are tenant isolated or GLOBAL or allowed SYSTEM tasks
-    * This parameter has to always be named "expectedName" !!!
-* Task metadata (task definitions)
-  * Add/remove tenant id to task defition name as prefix in form of `TENANT___taskType`
-  * Filter task definitions based on tenant ID prefix
-* Task executions
-  * Add/remove tenant id to task name
-  * Add/remove tenant id to task.output.dynamic_tasks[*].name
-    * This is a special (conventional) inputParameter required by DYNAMIC_FORK carrying tasks to be dynamically executed
-    * This parameter has to always be named "dynamic_tasks" !!!
 * Workflow executions
-  * Add tenant id to workflow name in the workflow execution request
-  * Add `taskToDomain` mapping to workflow execution request
-    * TaskToDomain is set to `*:TENANT` to make sure all tasks will be marked with domain == tenant
-    * This enables tasks to be polled based on their assigned domain (tenant id)
   * Add user id into `correlationId` field of workflow execution
     * To preserve the information about workflow executor
-  * Remove tenant id prefix from workflow execution data when retrieving workflow execution
-  * Filter workflow executions based on tenant ID prefix when retrieving workflow executions
-* Bulk operations for workflow executions
-  * Filter workflow executions based on tenant ID prefix when manipulating workflow executions in bulk
-* Workflow schedules
-  * Add/remove tenant id to workflow name in schedule definition
-* Events
-  * Add/remove tenant id to event name
-
-**Tenant proxy also ensures that only allowed system tasks are permitted** in new workflow definitions.
-
-The main reason for disabling some system task such as HTTP is that non-trivial tasks should always be executed outside of the conductor server (in dedicated workers).
-Conductor server should remain just a coordination component and not also an executor. 
-Having both responsibilities could cause server to overload with task execution and prevent it from coordinating workflow execution and other workers.
-
-Having dedicated workers for non-trivial task also enables more suitable deployment considering scalability, security and other aspects. 
 
 #### Scheduling
 
 Workflow scheduling is handled by an external component [schellar](https://github.com/FRINXio/schellar).
-Proxy also provides tenant aware REST API proxies for schellar.
 
 #### RBAC
 
-RBAC proxy adds 2 features on top of tenant proxy:
+RBAC proxy adds 2 features on top of residual tenant proxy:
 * Ensures user authorization to access certain endpoints
 * Filters workflow definitions and workflow executions based on user's roles, groups and userID
 
@@ -157,23 +113,6 @@ An admin has full access to workflow API while ordinary user can only:
 Admin user is identified by having the role `OWNER` or belonging to group `netowork-admin`.
 These are sent to the proxy via HTTP header entries.
 These are configurable.
-
-## Task proxy
-
-This proxy should be used by each GLOBAL worker instead of connecting directly to Conductor.
-There is a task proxy in the user facing proxy too. Both allow polling / ACK / update of executed tasks.
-The difference is that user facing proxy only allows tenant isolated execution of tasks where Task proxy allows for GLOBAL workers.
-
-Main responsibility:
-* Prevent single tenant from exhausting a worker by placing too many tasks on the queue
-
-Workers should use the polling API to specify how many tasks they want to work on.
-Task proxy augments this API: It loops over tenants and requests the tasks from each
-tenant's queue, then sends combined result back to the worker.
-Contrary to the User facing proxy, the response body is not cleaned from tenant prefixes,
-so workers are able to figure out tenant Id based on the prefix of the workflow name.
-
-To determine all the tenant ids in the system, this proxy queries keycloak over HTTP.
 
 ## User guide
 
@@ -244,7 +183,6 @@ Some useful pointers for developers:
 * src/proxy/transformer-registry - transformer function collector
 * src/proxy/proxy - user facing proxy router
 * src/task-proxy - task proxy router
-* src/tenant-registry - keycloak client capable of providing all tenant IDs
 * src/routes.js - conductor proxy
 
 There is a Dockerfile to build a container image.

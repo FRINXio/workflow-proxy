@@ -8,101 +8,20 @@
  * @format
  */
 
-import request from 'request';
-import {
-  adminAccess,
-  createProxyOptionsBuffer,
-  removeTenantPrefixes,
-  withInfixSeparator,
-} from '../utils.js';
+import { adminAccess } from '../utils.js';
 import type {
   AfterFun,
   BeforeFun,
   TransformerRegistrationFun,
 } from '../../types';
-import qs from 'qs';
-import { sanitizeWorkflowdefTasksBefore } from './metadata-workflowdef';
 
 let proxyTarget;
 
-const getLogBefore: BeforeFun = (identity, req, res, proxyCallback) => {
-  const url = proxyTarget + '/api/tasks/' + req.params.taskId;
-  // first make a HTTP request to validate that this workflow belongs to tenant
-  const requestOptions = {
-    url,
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/javascript',
-    },
-  };
-  console.info(`Requesting ${JSON.stringify(requestOptions)}`);
-  request(requestOptions, function (error, response, body) {
-    console.info(`Got status code: ${response.statusCode}, body: '${body}'`);
-    if (response.statusCode === 200) {
-      const task = JSON.parse(body);
-      // make sure name starts with prefix
-      const tenantWithInfixSeparator = withInfixSeparator(identity.tenantId);
-      if (
-        !('workflowType' in task) ||
-        task.workflowType?.indexOf(tenantWithInfixSeparator) === 0
-      ) {
-        proxyCallback();
-      } else {
-        console.error(
-          `Error trying to get task of different tenant: ${identity.tenantId},`,
-          { task },
-        );
-        res.status(427);
-        res.send('Unauthorized');
-      }
-    } else {
-      res.status(response.statusCode);
-      res.send(body);
-    }
-  });
-};
-
-/*
-Result contains task queues of all tenants, keep only belonging to the
-tenant's queues.
-Sample input:
- {
-   "GLOBAL___GRAPHQL_task_go": 0,
-   "GLOBAL___RM_claim_task": 0,
-   "GLOBAL___RM_free_task": 0,
-   "GLOBAL___RM_graphql_task": 0,
-   "HTTP": 0,
-   "KAFKA_PUBLISH": 0,
-   "_deciderQueue": 0,
-   "fb-test:GLOBAL___HTTP_task": 0,
-   "fb-test:GLOBAL___SAMPLE_task": 0,
-   "fb-test:GLOBAL___js": 1,
-   "fb-test:GLOBAL___py": 0,
-   "secondt:GLOBAL___HTTP_task": 0
- }
-*/
 const getQueueAllAfter: AfterFun = (identity, req, respObj, res) => {
   if (!adminAccess(identity)) {
     res.status(427);
     res.send('Unauthorized to retrieve queue information');
     return;
-  }
-
-  const allowedDomainPrefix = identity.tenantId + ':';
-  for (const key in respObj) {
-    let newKey = key;
-    if (newKey.indexOf(allowedDomainPrefix) === 0) {
-      newKey = newKey.substr(allowedDomainPrefix.length);
-    }
-
-    if (newKey.indexOf(withInfixSeparator(identity.tenantId)) === 0) {
-      newKey = newKey.substr(withInfixSeparator(identity.tenantId).length);
-    }
-
-    if (newKey !== key) {
-      respObj[newKey] = respObj[key];
-      delete respObj[key];
-    }
   }
 };
 
@@ -113,36 +32,6 @@ const getTasksBatchBefore: BeforeFun = (identity, req, res, proxyCallback) => {
     return;
   }
 
-  const tenantWithInfixSeparator = withInfixSeparator(identity.tenantId);
-  const taskType = tenantWithInfixSeparator + req.params.taskType;
-  let newUrl = `/api/tasks/poll/batch/${taskType}`;
-
-  const originalQueryString = req._parsedUrl.query;
-  const parsedQuery = qs.parse(originalQueryString);
-  let newQuery = '';
-
-  const workerid = parsedQuery['workerid'];
-  if (workerid) {
-    newQuery += 'workerid=' + workerid;
-  }
-  const count = parsedQuery['count'];
-  if (count) {
-    newQuery += '&count=' + count;
-  }
-  const timeout = parsedQuery['timeout'];
-  if (timeout) {
-    newQuery += '&timeout=' + timeout;
-  }
-
-  if (newQuery) {
-    newQuery += '&domain=' + identity.tenantId;
-  } else {
-    newQuery += 'domain=' + identity.tenantId;
-  }
-  newUrl += '?' + newQuery;
-
-  console.info(`Transformed url from '${req.url}' to '${newUrl}'`);
-  req.url = newUrl;
   proxyCallback();
 };
 
@@ -153,64 +42,7 @@ const getTaskBefore: BeforeFun = (identity, req, res, proxyCallback) => {
     return;
   }
 
-  const tenantWithInfixSeparator = withInfixSeparator(identity.tenantId);
-  const taskType = tenantWithInfixSeparator + req.params.taskType;
-  let newUrl = `/api/tasks/poll/${taskType}`;
-
-  let parsedQuery;
-  if (req._parsedUrl && req._parsedUrl.query) {
-    const originalQueryString = req._parsedUrl.query;
-    parsedQuery = qs.parse(originalQueryString);
-  } else {
-    parsedQuery = {};
-  }
-  let newQuery = '';
-
-  const workerid = parsedQuery['workerid'];
-  if (workerid) {
-    newQuery += 'workerid=' + workerid;
-  }
-
-  if (newQuery) {
-    newQuery += '&domain=' + identity.tenantId;
-  } else {
-    newQuery += 'domain=' + identity.tenantId;
-  }
-  newUrl += '?' + newQuery;
-
-  console.info(`Transformed url from '${req.url}' to '${newUrl}'`);
-  req.url = newUrl;
   proxyCallback();
-};
-
-const taskJsonPathsToRemovePrefixFrom = {
-  taskType: false,
-  taskDefName: false,
-  'workflowTask.name': false,
-  'workflowTask.taskDefinition.name': false,
-  workflowType: false,
-};
-
-const getTasksBatchAfter: AfterFun = (identity, req, respObj) => {
-  if (respObj) {
-    for (const task of respObj) {
-      removeTenantPrefixes(
-        identity.tenantId,
-        task,
-        taskJsonPathsToRemovePrefixFrom,
-      );
-    }
-  }
-};
-
-const getTaskAfter: AfterFun = (identity, req, respObj) => {
-  if (respObj) {
-    removeTenantPrefixes(
-      identity.tenantId,
-      respObj,
-      taskJsonPathsToRemovePrefixFrom,
-    );
-  }
 };
 
 const postTaskBefore: BeforeFun = (identity, req, res, proxyCallback) => {
@@ -220,29 +52,7 @@ const postTaskBefore: BeforeFun = (identity, req, res, proxyCallback) => {
     return;
   }
 
-  // Prefix dynamic tasks to be executed
-  // Dynamic_fork task type is often utilized by FRINX workflows.
-  // There usually is a task_A that produces output containing a list of tasks.
-  // This list is then processed and executed by a dynamic_fork task.
-  // The data containing list of tasks to be executed passes via proxy only in this endpoint, where task_A completes
-  // and submits its output to conductor. So this is the only place where we can prefix the names of tasks / subworkflows
-  // to be dynamically executed by dynamic_fork.
-
-  // We rely on the convention of storing "tasks to be dynamically executed" under name "dynamic_tasks".
-
-  // This is the only way of adding prefix to dynamic tasks without having to modify the worker / workflow side of things.
-
-  let taskOutput = req.body;
-  if ('outputData' in taskOutput) {
-    if ('dynamic_tasks' in taskOutput.outputData) {
-      sanitizeWorkflowdefTasksBefore(
-        taskOutput.outputData.dynamic_tasks,
-        identity.tenantId,
-      );
-    }
-  }
-
-  proxyCallback({ buffer: createProxyOptionsBuffer(req.body, req) });
+  proxyCallback();
 };
 
 const ackTaskBefore: BeforeFun = (identity, req, res, proxyCallback) => {
@@ -261,7 +71,6 @@ const registration: TransformerRegistrationFun = function (ctx) {
     {
       method: 'get',
       url: '/api/tasks/:taskId/log',
-      before: getLogBefore,
     },
     {
       method: 'get',
@@ -272,13 +81,11 @@ const registration: TransformerRegistrationFun = function (ctx) {
       method: 'get',
       url: '/api/tasks/poll/batch/:taskType',
       before: getTasksBatchBefore,
-      after: getTasksBatchAfter,
     },
     {
       method: 'get',
       url: '/api/tasks/poll/:taskType',
       before: getTaskBefore,
-      after: getTaskAfter,
     },
     {
       method: 'post',
