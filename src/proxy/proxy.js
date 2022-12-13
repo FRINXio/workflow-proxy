@@ -12,7 +12,7 @@ import bodyParser from 'body-parser';
 import httpProxy from 'http-proxy';
 
 import transformerRegistry from './transformer-registry';
-import { getTenantId, getUserGroups, getUserRoles } from './utils.js';
+import { getUserGroups, getUserRoles } from './utils.js';
 import type {
   ExpressRouter,
   ProxyCallback,
@@ -53,14 +53,11 @@ export default async function (
     });
 
     proxy.on('proxyRes', async function (proxyRes, req, res) {
-      const tenantId = getTenantId(req);
       const roles = getUserRoles(req);
       const groups = getUserGroups(req);
-      const identity: IdentityHeaders = { tenantId, roles, groups };
+      const identity: IdentityHeaders = { roles, groups };
 
-      console.info(
-        `RES ${proxyRes.statusCode} ${req.method} ${req.url} tenantId ${tenantId}`,
-      );
+      console.info(`RES ${proxyRes.statusCode} ${req.method} ${req.url}`);
       const body = [];
       proxyRes.on('data', function (chunk) {
         body.push(chunk);
@@ -105,27 +102,21 @@ export default async function (
     (router: ExpressRouter)[entry.method](
       entry.url,
       async (req: ProxyRequest, res: ProxyResponse, next: ProxyNext) => {
-        let tenantId: string;
         let roles: string;
         let groups: string[];
         let identity: IdentityHeaders;
         try {
-          tenantId = getTenantId(req);
           roles = getUserRoles(req);
           groups = getUserGroups(req);
-          identity = { tenantId, roles, groups };
+          identity = { roles, groups };
         } catch (err) {
-          console.error(
-            'Cannot get tenantId',
-            { tenantId, roles, groups },
-            err,
-          );
+          console.error('Cannot get identity', { roles, groups }, err);
           res.status(400);
-          res.send('Cannot get tenantId:' + err);
+          res.send('Cannot get identity:' + err);
           return;
         }
         // start with 'before'
-        console.info(`REQ ${req.method} ${req.url} tenantId ${tenantId}`);
+        console.info(`REQ ${req.method} ${req.url}`);
         const proxyCallback: ProxyCallback = function (proxyOptions) {
           proxy.web(req, res, proxyOptions, function (e) {
             console.error('Inline error handler', e);

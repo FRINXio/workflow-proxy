@@ -1,16 +1,14 @@
 {
-  "name": "FACEBOOK___event_handler",
-  "event":"conductor:FACEBOOK___invoke_wf:handle_wf",
+  "name": "event_handler",
+  "event":"conductor:invoke_wf:handle_wf",
   "actions": [
     {
       "action": "start_workflow",
       "start_workflow": {
-        "name": "FACEBOOK___WF_handler",
+        "name": "WF_handler",
         "input": {
           "sourceWorkflowId": "workflow"
-        },
-        "taskToDomain":{"*":"FACEBOOK"},
-        "correlationId":"a@fb.com"
+        }
       }
     }
   ],

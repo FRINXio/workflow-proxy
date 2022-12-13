@@ -31,7 +31,6 @@ export type ProxyNext = (mixed) => void;
 export type ProxyCallback = (proxyOptions?: mixed) => void;
 
 export type IdentityHeaders = {
-  tenantId: string,
   roles: string[],
   groups: string[],
 };

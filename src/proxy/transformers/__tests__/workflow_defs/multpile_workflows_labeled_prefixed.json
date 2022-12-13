@@ -1,32 +1,32 @@
 [
   {
-    "name": "FACEBOOK___workflow1",
+    "name": "workflow1",
     "description": "description - ADMIN,OWNER,TEST",
     "tasks": [
       {
-        "name": "FACEBOOK___task_1",
+        "name": "task_1",
         "taskReferenceName": "task_1",
         "type": "SIMPLE"
       }
     ]
   },
   {
-    "name": "FACEBOOK___workflow2",
+    "name": "workflow2",
     "description": "description - OWNER",
     "tasks": [
       {
-        "name": "FACEBOOK___task_1",
+        "name": "task_1",
         "taskReferenceName": "task_1",
         "type": "SIMPLE"
       }
     ]
   },
   {
-    "name": "FACEBOOK___workflow3",
+    "name": "workflow3",
     "description": "description - ADMIN",
     "tasks": [
       {
-        "name": "FACEBOOK___task_1",
+        "name": "task_1",
         "taskReferenceName": "task_1",
         "type": "SIMPLE"
       }

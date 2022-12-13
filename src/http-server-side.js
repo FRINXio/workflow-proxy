@@ -22,7 +22,6 @@ function makeOptions(
     method,
     url,
     headers: {
-      'x-tenant-id': parentRequest.headers['x-tenant-id'],
       from: parentRequest.headers['from'],
       'x-auth-user-roles': parentRequest.headers['x-auth-user-roles'],
       'x-auth-user-groups': parentRequest.headers['x-auth-user-groups'],

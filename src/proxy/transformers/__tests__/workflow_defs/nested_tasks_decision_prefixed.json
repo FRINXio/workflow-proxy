@@ -1,11 +1,11 @@
 {
-  "name": "FACEBOOK___EquipmentTypes",
+  "name": "EquipmentTypes",
   "description": "",
   "version": 1,
   "ownerEmail": "testmail",
   "tasks": [
     {
-      "name": "FACEBOOK___HTTP_REQUEST_TASK",
+      "name": "HTTP_REQUEST_TASK",
       "taskReferenceName": "httpInventory",
       "inputParameters": {
         "http_request": {
@@ -14,8 +14,7 @@
           "contentType": "application/json",
           "accept": "application/json",
           "headers": {
-            "From": "fbuser@fb.com",
-            "x-tenant-id": "fb-test"
+            "From": "fbuser@fb.com"
           },
           "connectionTimeOut": "3600",
           "readTimeOut": "3600",
@@ -29,7 +28,7 @@
       "optional": false
     },
     {
-      "name": "FACEBOOK___decisionTask",
+      "name": "decisionTask",
       "taskReferenceName": "decisionTaskRef_AHDP",
       "inputParameters": {
         "param": "${httpInventory.output.response.statusCode}"
@@ -39,7 +38,7 @@
       "decisionCases": {
         "200": [
           {
-            "name": "FACEBOOK___LAMBDA_TASK",
+            "name": "LAMBDA_TASK",
             "taskReferenceName": "lambdaTaskRef_4C88",
             "type": "SIMPLE",
             "inputParameters": {
@@ -53,7 +52,7 @@
       },
       "defaultCase": [
         {
-          "name": "FACEBOOK___TERMINATE_TASK",
+          "name": "TERMINATE_TASK",
           "taskReferenceName": "terminateTaskRef_ZILU",
           "inputParameters": {
             "terminationStatus": "FAILED",
@@ -68,19 +67,19 @@
       "startDelay": 0
     },
     {
-      "name": "FACEBOOK___sub",
+      "name": "sub",
       "taskReferenceName": "sub_ref_T452",
       "type": "SUB_WORKFLOW",
       "startDelay": 0,
       "subWorkflowParam": {
-        "name": "FACEBOOK___sub",
+        "name": "sub",
         "version": 1
       },
       "optional": false,
       "asyncComplete": false
     },
     {
-      "name": "FACEBOOK___whileTask",
+      "name": "whileTask",
       "taskReferenceName": "whileTaskRef_MVOG",
       "inputParameters": {
         "iterations": 10
@@ -92,7 +91,7 @@
       "loopCondition": "$.whileTaskRef_MVOG['iteration'] < $.iterations",
       "loopOver": [
         {
-          "name": "FACEBOOK___forkTask",
+          "name": "forkTask",
           "taskReferenceName": "forkTaskRef_A6DL",
           "inputParameters": {},
           "type": "FORK_JOIN",
@@ -101,12 +100,12 @@
           "forkTasks": [
             [
               {
-                "name": "FACEBOOK___sub",
+                "name": "sub",
                 "taskReferenceName": "sub_ref_T452",
                 "type": "SUB_WORKFLOW",
                 "startDelay": 0,
                 "subWorkflowParam": {
-                  "name": "FACEBOOK___sub",
+                  "name": "sub",
                   "version": 1
                 },
                 "optional": false,
@@ -142,7 +141,7 @@
           "loopOver": []
         },
         {
-          "name": "FACEBOOK___joinTask",
+          "name": "joinTask",
           "taskReferenceName": "joinTaskRef_DB9Q",
           "inputParameters": {},
           "type": "JOIN",

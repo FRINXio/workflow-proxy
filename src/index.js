@@ -24,7 +24,6 @@ import task from './proxy/transformers/task';
 import workflow from './proxy/transformers/workflow';
 import postgresExternalStorage from './proxy/transformers/postgres-external-storage';
 
-import balancingTaskProxy from './balancing-task-proxy';
 import { adminAccess } from './proxy/utils';
 
 import dotenv from 'dotenv';
@@ -65,7 +64,6 @@ const workflowManagerSwaggerDocument = require('/app/workflow-proxy/openapi/work
 const uniconfigSwaggerDocument = require('/app/workflow-proxy/openapi/uniconfig.json');
 
 const userFacingPort = process.env.USER_FACING_PORT ?? 8088;
-const taskProxyPort = process.env.TASK_PROXY_PORT ?? 8089;
 const proxyTarget = process.env.PROXY_TARGET || 'http://conductor-server:8080';
 const schellarTarget = process.env.SCHELLAR_TARGET || 'http://schellar:3000';
 const tenantProxyUrl = 'http://localhost:8088/proxy/';
@@ -215,21 +213,12 @@ async function init() {
   );
 
   app.get('/probe/liveness', (req, res) => {
-    if (balancingTaskProxy.live()) {
-      res.sendStatus(200);
-    } else {
-      res.sendStatus(500);
-    }
+    res.sendStatus(200);
   });
   app.get('/probe/readiness', (req, res) => {
-    if (balancingTaskProxy.ready()) {
-      res.sendStatus(200);
-    } else {
-      res.sendStatus(500);
-    }
+    res.sendStatus(200);
   });
   app.listen(userFacingPort);
-  balancingTaskProxy.init(proxyTarget, taskProxyPort);
 }
 
 init();

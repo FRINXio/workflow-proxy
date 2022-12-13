@@ -10,7 +10,8 @@
 
 import workflows, {
   correlationIdCheck,
-  postWorkflowBeforeRbac,
+  postWorkflowBefore,
+  postWorkflowBeforeInternal,
 } from '../workflow';
 import {
   findTransformerFx,
@@ -24,13 +25,9 @@ let blueprint = require('./workflow_defs/multpile_workflows_labeled.json');
 const singleLabeledWorkflow = () => JSON.parse(JSON.stringify(blueprint))[0];
 
 const transformers = workflows({ proxyTarget: 'PROXY_TARGET' });
-const postWorkflowBeforeHandler = postWorkflowBeforeRbac;
+const postWorkflowBeforeHandler = postWorkflowBeforeInternal;
 const mockExecReq = () =>
-  mockRequest(
-    { name: 'wf1', version: '1.1' },
-    {},
-    { 'x-tenant-id': 'FACEBOOK', from: 'a@fb.com' },
-  );
+  mockRequest({ name: 'wf1', version: '1.1' }, {}, { from: 'a@fb.com' });
 
 describe('Workflow transformers', () => {
   test('Post workflow execution before Auth ok', () => {
@@ -38,12 +35,12 @@ describe('Workflow transformers', () => {
       let streamToStringCallback = function (input) {
         streamToString(input.buffer).then((workflow) => resolve(workflow));
       };
-      let identity = mockIdentity('FACEBOOK', ['admin', 'bbb']);
+      let identity = mockIdentity(['admin', 'bbb']);
       postWorkflowBeforeHandler(
         identity,
+        streamToStringCallback,
         mockExecReq(),
         null,
-        streamToStringCallback,
         (workflowDefRequest, onWorkflowDefCheck) => {
           onWorkflowDefCheck(
             null,
@@ -54,9 +51,8 @@ describe('Workflow transformers', () => {
       );
     }).then((wfExec) => {
       expect(JSON.parse(wfExec)).toStrictEqual({
-        name: 'FACEBOOK___wf1',
+        name: 'wf1',
         version: '1.1',
-        taskToDomain: { '*': 'FACEBOOK' },
         correlationId: 'a@fb.com',
       });
     });
@@ -65,12 +61,12 @@ describe('Workflow transformers', () => {
   test('Post workflow execution before Auth not matching', () => {
     let response = mockResponse();
     return new Promise((resolve) => {
-      let identity = mockIdentity('FACEBOOK', ['groups not ok']);
+      let identity = mockIdentity(['groups not ok']);
       postWorkflowBeforeHandler(
         identity,
+        null,
         mockExecReq(),
         response,
-        null,
         (workflowDefRequest, onWorkflowDefCheck) => {
           onWorkflowDefCheck(null, { statusCode: 427 }, 'Unauthorized');
           resolve();
@@ -85,12 +81,12 @@ describe('Workflow transformers', () => {
   test('Post workflow execution before Auth fail', () => {
     let response = mockResponse();
     return new Promise((resolve) => {
-      let identity = mockIdentity('FACEBOOK', ['groups not ok']);
+      let identity = mockIdentity(['groups not ok']);
       postWorkflowBeforeHandler(
         identity,
+        null,
         mockExecReq(),
         response,
-        null,
         (workflowDefRequest, onWorkflowDefCheck) => {
           onWorkflowDefCheck(
             null,
@@ -131,8 +127,7 @@ describe('Workflow transformers', () => {
         '/api/workflow/search?' +
           escape('status IN (FAILED)') +
           '=&query=' +
-          escape("((correlationId = 'fb.com') AND ") +
-          escape("(workflowType STARTS_WITH 'FACEBOOK_'))"),
+          escape("(correlationId = 'fb.com')"),
       );
     });
   });
