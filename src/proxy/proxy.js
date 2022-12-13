@@ -83,10 +83,14 @@ export default async function (
           }
           try {
             entry.after(identity, req, respObj, res);
-            res.end(JSON.stringify(respObj));
+            if (res.writableEnded === false) {
+              res.end(JSON.stringify(respObj));
+            }
           } catch (e) {
             console.error('Error while modifying response', { error: e });
-            res.end('Internal server error');
+            if (res.writableEnded === false) {
+              res.end('Internal server error');
+            }
             throw e;
           }
         } else {

@@ -271,7 +271,7 @@ export default async function (
         res.status(200).send({ result });
       } catch (err) {
         if (err.body) {
-          res.status(500).send(err.body);
+          res.status(err.statusCode).send(err.body);
         }
         next(err);
       }
