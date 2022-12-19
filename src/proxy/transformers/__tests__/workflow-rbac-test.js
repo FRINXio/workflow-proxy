@@ -124,10 +124,10 @@ describe('Workflow transformers', () => {
       transformer(mockIdentity(), mockReq, null, callback);
     }).then(() => {
       expect(mockReq.url).toStrictEqual(
-        '/api/workflow/search?' +
+        '/api/workflow/search-v2?' +
           escape('status IN (FAILED)') +
           '=&query=' +
-          escape("(correlationId = 'fb.com')"),
+          escape("correlationId='fb.com'"),
       );
     });
   });
