@@ -45,11 +45,11 @@ export const getSearchBefore: BeforeFun = (
     // Prefix query with correlationId == userEmail
     // This limits the search to workflows started by current user
     const userEmail = getUserEmail(req);
-    const limitToUser = `correlationId = '${userEmail}'`;
+    const limitToUser = `correlationId='${userEmail}'`;
     newQueryString = updateQuery(newQueryString, limitToUser);
   }
 
-  req.url = req._parsedUrl.pathname + '?' + newQueryString;
+  req.url = req._parsedUrl.pathname + '-v2?' + newQueryString;
   proxyCallback();
 };
 
@@ -61,9 +61,9 @@ export function updateQuery(
   let q = parsedQuery['query'];
   if (q) {
     // TODO: validate conductor query to prevent security issues
-    q = `(${q} AND (${queryExpanded}))`;
+    q = `${q} AND ${queryExpanded}`;
   } else {
-    q = `(${queryExpanded})`;
+    q = `${queryExpanded}`;
   }
   parsedQuery['query'] = q;
   const newQueryString = qs.stringify(parsedQuery);

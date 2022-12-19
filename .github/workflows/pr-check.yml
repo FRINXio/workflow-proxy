@@ -103,7 +103,7 @@ jobs:
             -H 'Content-Type: application/json' \
             -d '[{
                   "name": "test",
-                  "description": "test workflow",
+                  "description": "{\"description\": \"Test WF\", \"labels\": [\"GROUP1\"]}",
                   "version": 1,
                   "tasks": [
                     {
@@ -129,12 +129,20 @@ jobs:
           -H 'from: github' \
           -H 'x-auth-user-groups: network-admin' \
           -H 'Content-Type: application/json' \
-            -d '{
-            "name": "test"
-            }'
+          -d '{ "name": "test" }'
+
+      - name: Execute WF as non admin
+        run: |
+          curl -X 'POST' \
+            'http://localhost:8088/proxy/api/workflow' \
+          -H 'accept: */*' \
+          -H 'from: nonadminuser' \
+          -H 'x-auth-user-groups: GROUP1' \
+          -H 'Content-Type: application/json' \
+          -d '{ "name": "test" }'
 
       - uses: nick-fields/retry@v2
-        name: Assert WF
+        name: Assert WF as non admin
         with:
           timeout_seconds: 2
           max_attempts: 10
@@ -143,18 +151,19 @@ jobs:
             curl -X 'GET' \
             'http://localhost:8088/proxy/api/workflow/search?start=0&size=100&freeText=%2A' \
             -H 'accept: */*' \
-            -H 'from: github' \
-            -H 'x-auth-user-groups: network-admin' \
+            -H 'from: nonadminuser' \
+            -H 'x-auth-user-groups: GROUP1' \
             | grep workflowId
+#           TODO make sure only a single workflow is returned
 
-      - name: Search WFs
+      - name: Search WFs as non admin
         if: always()
         run: |
           curl -X 'GET' \
           'http://localhost:8088/proxy/api/workflow/search?start=0&size=100&freeText=%2A' \
           -H 'accept: */*' \
-          -H 'from: github' \
-          -H 'x-auth-user-groups: network-admin' \
+          -H 'from: nonadminuser' \
+          -H 'x-auth-user-groups: GROUP1' \
           | jq
 
       - name: Print Proxy logs
