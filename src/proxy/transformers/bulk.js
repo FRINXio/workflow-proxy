@@ -17,10 +17,6 @@ const registration: TransformerRegistrationFun = (ctx) => {
       url: '/api/workflow/bulk/terminate',
     },
     {
-      method: 'delete',
-      url: '/api/workflow/bulk/terminate',
-    },
-    {
       method: 'put',
       url: '/api/workflow/bulk/pause',
     },

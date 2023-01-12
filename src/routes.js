@@ -64,31 +64,28 @@ const findSchedule = (schedules, name) => {
 /* This function validate query parameters (workflowId, workflowType, order, status) used for 
 searching executed workflows by freeText search query.
 If input parameters are not valid, function return exception with an array object with status and error message. */
-export function freeText_query(req, condition) {
-  const freeText = [];
+export function format_query(req) {
+  const query = [];
 
-  if (condition.length > 0) freeText.push(condition);
+  console.log(req.query);
 
   if (
     typeof req.query.workflowId !== 'undefined' &&
     req.query.workflowId !== ''
   ) {
     if (req.query.workflowId.match(uuid_regex) !== null) {
-      freeText.push('(workflowId:' + req.query.workflowId + ')');
+      query.push("workflowId='" + req.query.workflowId + "'");
     } else if (
       typeof req.query.workflowId !== 'undefined' &&
       req.query.workflowId.match(uuid_regex) === null
     ) {
-      // freeText.push('(*)');
-      freeText.push('(workflowType:**' + req.query.workflowId + '*)');
+      query.push("workflowType='" + req.query.workflowId + "'");
     }
-  } else {
-    freeText.push('(*)');
   }
 
   if (typeof req.query.status !== 'undefined' && req.query.status !== '') {
     if (WORKFLOW_STATUS_TYPES.includes(req.query.status)) {
-      freeText.push('(status:' + req.query.status + ')');
+      query.push("status='" + req.query.status + "'");
     } else {
       throw [
         false,
@@ -99,26 +96,27 @@ export function freeText_query(req, condition) {
     }
   }
 
-  const orderQuery = [];
+  // TODO fix sort in conductor archive
+  // const orderQuery = [];
 
-  if (typeof req.query.order !== 'undefined' && req.query.order !== '') {
-    req.query.order.split(',').forEach((element) => {
-      if (WORKFLOW_SORT_TYPES.includes(element)) {
-        orderQuery.push('sort=' + element);
-      } else {
-        throw [
-          false,
-          'Query input order=' + element + ' for sorting is not valid',
-        ];
-      }
-    });
-  } else {
-    orderQuery.push('sort=startTime:DESC');
-  }
+  // if (typeof req.query.order !== 'undefined' && req.query.order !== '') {
+  //   req.query.order.split(',').forEach((element) => {
+  //     if (WORKFLOW_SORT_TYPES.includes(element)) {
+  //       orderQuery.push('sort=' + element);
+  //     } else {
+  //       throw [
+  //         false,
+  //         'Query input order=' + element + ' for sorting is not valid',
+  //       ];
+  //     }
+  //   });
+  // } else {
+  //   orderQuery.push('sort=startTime:DESC');
+  // }
 
-  var freeText_query =
-    '&' + orderQuery.join('&') + '&freeText=' + freeText.join('AND');
-  return freeText_query;
+  var ret_query = query.join(' AND ');
+
+  return ret_query;
 }
 
 //TODO merge with proxy
@@ -327,6 +325,7 @@ export default async function (
   router.post('/workflow', async (req: ExpressRequest, res, next) => {
     try {
       const result = await http.post(baseURLWorkflow, req.body, req);
+
       res.status(200).send(result);
     } catch (err) {
       if (err.body && err.statusCode) {
@@ -340,17 +339,9 @@ export default async function (
 
   router.get('/executions', async (req: ExpressRequest, res, next) => {
     try {
-      const freeText_search = freeText_query(req, '');
-      let freeText;
-      let h: string = '-1';
-      if (req.query.h !== 'undefined' && req.query.h !== '') {
-        /* FIXME req.query is user-controlled input, properties and values
-         in this object are untrusted and should be validated before trusting */
-        h = req.query.h;
-      }
-      if (h !== '-1') {
-        freeText.push('startTime:[now-' + h + 'h TO now]');
-      }
+      const freeText_search = '*';
+
+      const query = format_query(req);
 
       let start: number = 0;
       if (typeof req.query.start !== 'undefined' && !isNaN(req.query.start)) {
@@ -362,19 +353,16 @@ export default async function (
         size = req.query.size;
       }
 
-      const query = req.query.q;
-
       const url =
         baseURLWorkflow +
         'search?size=' +
         size +
+        '&freeText=' +
         freeText_search +
         '&start=' +
         start +
         '&query=' +
-        /* FIXME: req.query is user-controlled input and could
-         be an array. Needs to be checked */
-        encodeURIComponent(query);
+        query;
 
       const result = await http.get(url, req);
       const hits = result.results;
@@ -397,27 +385,6 @@ export default async function (
   });
 
   router.post(
-    '/workflow/bulk/terminate',
-    async (req: ExpressRequest, res, next) => {
-      try {
-        const result = await http.post(
-          baseURLWorkflow + 'bulk/terminate',
-          req.body,
-          req,
-        );
-        res.status(200).send(result);
-      } catch (err) {
-        if (err.body && err.statusCode) {
-          res.status(err.statusCode).send(err.body);
-        } else if (err.body) {
-          res.status(500).send(err.body);
-        }
-        next(err);
-      }
-    },
-  );
-
-  router.delete(
     '/workflow/bulk/terminate',
     async (req: ExpressRequest, res, next) => {
       try {
@@ -640,7 +607,8 @@ export default async function (
 
   router.get('/hierarchical', async (req: ExpressRequest, res, next) => {
     try {
-      const freeText_search = freeText_query(req, 'NOT(parentWorkflowId:*)');
+      const freeText_search = 'root_wf';
+      const query = format_query(req);
 
       let size: number = 5000;
       if (typeof req.query.size !== 'undefined' && !isNaN(req.query.size)) {
@@ -656,10 +624,12 @@ export default async function (
         baseURLWorkflow +
         'search?size=' +
         size +
+        '&freeText=' +
         freeText_search +
         '&start=' +
         start +
-        '&query=';
+        '&query=' +
+        query;
 
       const result = await http.get(url, req);
       const hits = result.results;
