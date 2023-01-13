@@ -8,7 +8,7 @@
  * @format
  */
 
-import { adminAccess } from '../utils.js';
+import {adminAccess, createProxyOptionsBuffer} from '../utils.js';
 import type {
   AfterFun,
   BeforeFun,
@@ -52,7 +52,7 @@ const postTaskBefore: BeforeFun = (identity, req, res, proxyCallback) => {
     return;
   }
 
-  proxyCallback();
+  proxyCallback({ buffer: createProxyOptionsBuffer(req.body, req) });
 };
 
 const ackTaskBefore: BeforeFun = (identity, req, res, proxyCallback) => {
