@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - master
+      - stable-1.0.X
 
 env:
   IMAGE_NAME: frinx/workflow-proxy
