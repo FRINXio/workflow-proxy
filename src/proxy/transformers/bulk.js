@@ -8,12 +8,12 @@
  * @format
  */
 
-import type {TransformerRegistrationFun} from '../../types';
-import {createProxyOptionsBuffer} from "../utils";
+import type { TransformerRegistrationFun } from '../../types';
+import { createProxyOptionsBuffer } from '../utils';
 
 function genericBefore() {
   return function (identity, req, res, proxyCallback) {
-    proxyCallback({buffer: createProxyOptionsBuffer(req.body, req)});
+    proxyCallback({ buffer: createProxyOptionsBuffer(req.body, req) });
   };
 }
 
@@ -22,27 +22,27 @@ const registration: TransformerRegistrationFun = (ctx) => {
     {
       method: 'post',
       url: '/api/workflow/bulk/terminate',
-      before: genericBefore
+      before: genericBefore,
     },
     {
       method: 'put',
       url: '/api/workflow/bulk/pause',
-      before: genericBefore
+      before: genericBefore,
     },
     {
       method: 'put',
       url: '/api/workflow/bulk/resume',
-      before: genericBefore
+      before: genericBefore,
     },
     {
       method: 'post',
       url: '/api/workflow/bulk/retry',
-      before: genericBefore
+      before: genericBefore,
     },
     {
       method: 'post',
       url: '/api/workflow/bulk/restart',
-      before: genericBefore
+      before: genericBefore,
     },
   ];
 };
