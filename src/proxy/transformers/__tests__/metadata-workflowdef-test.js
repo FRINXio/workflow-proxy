@@ -193,7 +193,7 @@ describe('Workflow def transformers', () => {
         callback,
       );
     }).toThrowError(
-      new Error('Attribute taskToDomain in subWorkflowParam is not allowed'),
+      'Attribute taskToDomain in subWorkflowParam is not allowed',
     );
   });
 });
