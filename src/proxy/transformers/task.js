@@ -8,7 +8,7 @@
  * @format
  */
 
-import {adminAccess, createProxyOptionsBuffer} from '../utils.js';
+import { adminAccess, createProxyOptionsBuffer } from '../utils.js';
 import type {
   AfterFun,
   BeforeFun,
