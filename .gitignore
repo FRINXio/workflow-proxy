@@ -3,3 +3,4 @@ lib/
 coverage
 node_modules
 workflow-proxy
+.idea
