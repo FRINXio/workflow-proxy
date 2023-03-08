@@ -49,7 +49,7 @@ export const getSearchBefore: BeforeFun = (
     newQueryString = updateQuery(newQueryString, limitToUser);
   }
 
-  req.url = req._parsedUrl.pathname + '-v2?' + newQueryString;
+  req.url = `${req._parsedUrl.pathname}?${newQueryString}`;
   proxyCallback();
 };
 
