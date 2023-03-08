@@ -8,43 +8,40 @@
  * @format
  */
 
-import type { TransformerRegistrationFun } from '../../types';
-import { createProxyOptionsBuffer } from '../utils';
+import type { BeforeFun, TransformerRegistrationFun } from '../../types';
+import { createProxyOptionsBuffer } from '../utils.js';
 
-function genericBefore() {
-  return function (identity, req, res, proxyCallback) {
-    proxyCallback({ buffer: createProxyOptionsBuffer(req.body, req) });
-  };
-}
-
-const registration: TransformerRegistrationFun = (ctx) => {
-  return [
-    {
-      method: 'post',
-      url: '/api/workflow/bulk/terminate',
-      before: genericBefore,
-    },
-    {
-      method: 'put',
-      url: '/api/workflow/bulk/pause',
-      before: genericBefore,
-    },
-    {
-      method: 'put',
-      url: '/api/workflow/bulk/resume',
-      before: genericBefore,
-    },
-    {
-      method: 'post',
-      url: '/api/workflow/bulk/retry',
-      before: genericBefore,
-    },
-    {
-      method: 'post',
-      url: '/api/workflow/bulk/restart',
-      before: genericBefore,
-    },
-  ];
+const genericBefore: BeforeFun = (identity, req, res, proxyCallback) => {
+  let reqObj = req.body;
+  proxyCallback({ buffer: createProxyOptionsBuffer(reqObj, req) });
 };
+
+const registration: TransformerRegistrationFun = () => [
+  {
+    method: 'post',
+    url: '/api/workflow/bulk/terminate',
+    before: genericBefore,
+  },
+  {
+    method: 'put',
+    url: '/api/workflow/bulk/pause',
+    before: genericBefore,
+  },
+  {
+    method: 'put',
+    url: '/api/workflow/bulk/resume',
+    before: genericBefore,
+  },
+  {
+    method: 'post',
+    url: '/api/workflow/bulk/retry',
+    before: genericBefore,
+  },
+  {
+    method: 'post',
+    url: '/api/workflow/bulk/restart',
+    before: genericBefore,
+  },
+];
 
 export default registration;
