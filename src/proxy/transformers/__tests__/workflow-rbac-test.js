@@ -124,7 +124,7 @@ describe('Workflow transformers', () => {
       transformer(mockIdentity(), mockReq, null, callback);
     }).then(() => {
       expect(mockReq.url).toStrictEqual(
-        '/api/workflow/search-v2?' +
+        '/api/workflow/search?' +
           escape('status IN (FAILED)') +
           '=&query=' +
           escape("correlationId='fb.com'"),

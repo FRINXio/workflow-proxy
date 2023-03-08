@@ -65,25 +65,26 @@ const findSchedule = (schedules, name) => {
 searching executed workflows by freeText search query.
 If input parameters are not valid, function return exception with an array object with status and error message. */
 export function format_query(req) {
+  const UNDEFINED = 'undefined';
   const query = [];
 
   console.log(req.query);
 
   if (
-    typeof req.query.workflowId !== 'undefined' &&
+    typeof req.query.workflowId !== UNDEFINED &&
     req.query.workflowId !== ''
   ) {
     if (req.query.workflowId.match(uuid_regex) !== null) {
-      query.push("workflowId='" + req.query.workflowId + "'");
+      query.push(`workflowId='${req.query.workflowId}'`);
     } else if (
-      typeof req.query.workflowId !== 'undefined' &&
+      typeof req.query.workflowId !== UNDEFINED &&
       req.query.workflowId.match(uuid_regex) === null
     ) {
-      query.push("workflowType='" + req.query.workflowId + "'");
+      query.push(`workflowType='${req.query.workflowId}'`);
     }
   }
 
-  if (typeof req.query.status !== 'undefined' && req.query.status !== '') {
+  if (typeof req.query.status !== UNDEFINED && req.query.status !== '') {
     if (WORKFLOW_STATUS_TYPES.includes(req.query.status)) {
       query.push("status='" + req.query.status + "'");
     } else {
