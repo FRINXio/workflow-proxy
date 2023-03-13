@@ -367,9 +367,12 @@ export default async function (
 
       const result = await http.get(url, req);
       const hits = result.results;
-      res
-        .status(200)
-        .send({ result: { hits: hits, totalHits: result.totalHits } });
+      res.status(200).send({
+        result: {
+          hits: hits,
+          totalHits: Number(start) + Number(hits.length) + 1,
+        },
+      });
     } catch (err) {
       if (err.body && err.statusCode) {
         res.status(err.statusCode).send(err.body);
@@ -634,9 +637,12 @@ export default async function (
 
       const result = await http.get(url, req);
       const hits = result.results;
-      res
-        .status(200)
-        .send({ result: { hits: hits, totalHits: result.totalHits } });
+      res.status(200).send({
+        result: {
+          hits: hits,
+          totalHits: Number(start) + Number(hits.length) + 1,
+        },
+      });
     } catch (err) {
       console.warn('Unable to construct hierarchical view', { error: err });
       if (err.body && err.statusCode) {
