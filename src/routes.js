@@ -61,7 +61,7 @@ const findSchedule = (schedules, name) => {
   return null;
 };
 
-/* This function validate query parameters (workflowId, workflowType, order, status) used for 
+/* This function validate query parameters (workflowId, workflowType, order, status) used for
 searching executed workflows by freeText search query.
 If input parameters are not valid, function return exception with an array object with status and error message. */
 export function format_query(req) {
@@ -379,7 +379,7 @@ export default async function (
       } else if (err.body) {
         res.status(500).send(err.body);
       } else if (!err[0]) {
-        /* Handling exception from freeText_query method. 
+        /* Handling exception from freeText_query method.
            This method return array with status (err[0]) and
            error message (err[1]) */
         res.status(500).send(JSON.stringify(err[1]));
@@ -650,7 +650,7 @@ export default async function (
       } else if (err.body) {
         res.status(500).send(err.body);
       } else if (!err[0]) {
-        /* Handling exception from freeText_query method. 
+        /* Handling exception from freeText_query method.
            This method return array with status (err[0]) and
            error message (err[1]) */
         res.status(500).send(JSON.stringify(err[1]));
@@ -723,6 +723,26 @@ export default async function (
       next(err);
     }
   });
+
+  router.get(
+    '/workflow/running/:name',
+    async (req: ExpressRequest, res, next) => {
+      try {
+        const result = await http.get(
+          baseURLWorkflow + 'running/' + req.params.name,
+          req,
+        );
+        res.status(200).send(result);
+      } catch (err) {
+        if (err.body && err.statusCode) {
+          res.status(err.statusCode).send(err.body);
+        } else if (err.body) {
+          res.status(500).send(err.body);
+        }
+        next(err);
+      }
+    },
+  );
 
   router.get('/event', async (req: ExpressRequest, res, next) => {
     try {
