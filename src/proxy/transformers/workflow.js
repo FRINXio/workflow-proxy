@@ -27,6 +27,16 @@ import type {
   WorkflowExecution,
 } from '../../types';
 
+export const getRunningBefore: BeforeFun = (
+  identity,
+  req,
+  res,
+  proxyCallback,
+) => {
+  // No RBAC required, this is just list of IDs, no need to filter them
+  proxyCallback();
+};
+
 // Search for workflows based on payload and other parameters
 /*
  curl \
@@ -238,6 +248,11 @@ const registration: TransformerRegistrationFun = function (ctx) {
       method: 'get',
       url: '/api/workflow/search',
       before: getSearchBefore,
+    },
+    {
+      method: 'get',
+      url: '/api/workflow/running/:workflowType',
+      before: getRunningBefore,
     },
     {
       method: 'post',
