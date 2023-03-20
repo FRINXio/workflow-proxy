@@ -85,6 +85,33 @@ describe('Workflow transformers', () => {
     });
   });
 
+  test('Search running workflow before', () => {
+    const transformer = findTransformerFx(
+      transformers,
+      '/api/workflow/running/:workflowType',
+      'get',
+      'before',
+    );
+
+    let mockReq = mockRequest(
+      '',
+      { workflowType: 'mockWorkflow' },
+      {},
+      { pathname: '/api/workflow/running', query: 'started=1999-10-10' },
+    );
+
+    return new Promise((resolve) => {
+      let callback = function () {
+        resolve();
+      };
+      transformer(adminIdentity, mockReq, null, callback);
+    }).then(() => {
+      expect(mockReq.url).toStrictEqual(
+        '/api/workflow/running/FACEBOOK___mockWorkflow?started=1999-10-10',
+      );
+    });
+  });
+
   test('Search workflow execution after', () => {
     let workflowExecutionPrefixedText = require('./execs/workflow_execution_prefixed.json');
     const workflowExecutionPrefixed = () =>

@@ -32,6 +32,21 @@ import type {
   WorkflowExecution,
 } from '../../types';
 
+export const getRunningBefore: BeforeFun = (
+  identity,
+  req,
+  res,
+  proxyCallback,
+) => {
+  // No RBAC required, this is just list of IDs, no need to filter them
+  const tenantWithInfixSeparator = withInfixSeparator(identity.tenantId);
+  const taskType = tenantWithInfixSeparator + req.params.workflowType;
+  let newUrl = `/api/workflow/running/${taskType}` + '?' + req._parsedUrl.query;
+  req.url = newUrl;
+  console.info(`Transformed url from '${req.url}' to '${newUrl}'`);
+  proxyCallback();
+};
+
 // Search for workflows based on payload and other parameters
 /*
  curl -H "x-tenant-id: fb-test" \
@@ -374,6 +389,11 @@ const registration: TransformerRegistrationFun = function (ctx) {
       url: '/api/workflow/search',
       before: getSearchBefore,
       after: getSearchAfter,
+    },
+    {
+      method: 'get',
+      url: '/api/workflow/running/:workflowType',
+      before: getRunningBefore,
     },
     {
       method: 'post',
