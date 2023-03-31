@@ -80,7 +80,14 @@ export function format_query(req) {
       typeof req.query.workflowId !== UNDEFINED &&
       req.query.workflowId.match(uuid_regex) === null
     ) {
-      query.push(`workflowType='${req.query.workflowId}'`);
+      const search_wildcard = encodeURIComponent('%');
+      let workflow_names = req.query.workflowId.replace(' ', '').split(',');
+      for (let i in workflow_names) {
+        workflow_names[
+          i
+        ] = `${search_wildcard}${workflow_names[i]}${search_wildcard}`;
+      }
+      query.push(`workflowType IN '${workflow_names.join(',')}'`);
     }
   }
 

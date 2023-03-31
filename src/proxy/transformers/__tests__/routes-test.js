@@ -28,14 +28,14 @@ describe('Workflow transformers', () => {
     const { format_query } = require('../../../routes');
     var req = {};
     req['query'] = {
-      workflowId: 'Post_to_slack',
+      workflowId: 'Post_to_slack, Install_all,Unmount_device',
       order: 'startTime:ASC',
       status: 'FAILED',
     };
     var test = format_query(req, 'NOT(parentWorkflowId:*)');
 
     expect(test).toStrictEqual(
-      "workflowType='Post_to_slack' AND status='FAILED'",
+      "workflowType IN '%25Post_to_slack%25,%25Install_all%25,%25Unmount_device%25' AND status='FAILED'",
     );
   });
 
