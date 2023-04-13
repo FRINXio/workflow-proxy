@@ -37,6 +37,31 @@ export const getRunningBefore: BeforeFun = (
   proxyCallback();
 };
 
+export const getPathBefore: BeforeFun = (
+  identity,
+  req,
+  res,
+  proxyCallback,
+) => {
+  // No RBAC required, this is just list of IDs, no need to filter them
+  proxyCallback();
+};
+
+export const getFamilyBefore: BeforeFun = (
+  identity,
+  req,
+  res,
+  proxyCallback,
+) => {
+  if (!adminAccess(identity)) {
+    // TODO implement RBAC ? does it make sense for non admins to call this ?
+    res.status(427);
+    res.send('Unauthorized');
+  }
+
+  proxyCallback();
+};
+
 // Search for workflows based on payload and other parameters
 /*
  curl \
@@ -253,6 +278,16 @@ const registration: TransformerRegistrationFun = function (ctx) {
       method: 'get',
       url: '/api/workflow/running/:workflowType',
       before: getRunningBefore,
+    },
+    {
+      method: 'get',
+      url: '/api/workflow/path/:workflowId',
+      before: getPathBefore,
+    },
+    {
+      method: 'get',
+      url: '/api/workflow/family/:workflowId',
+      before: getFamilyBefore,
     },
     {
       method: 'post',
