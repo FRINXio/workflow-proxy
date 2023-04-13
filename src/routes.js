@@ -751,6 +751,46 @@ export default async function (
     },
   );
 
+  router.get(
+    '/workflow/path/:name',
+    async (req: ExpressRequest, res, next) => {
+      try {
+        const result = await http.get(
+          baseURLWorkflow + 'path/' + req.params.name,
+          req,
+        );
+        res.status(200).send(result);
+      } catch (err) {
+        if (err.body && err.statusCode) {
+          res.status(err.statusCode).send(err.body);
+        } else if (err.body) {
+          res.status(500).send(err.body);
+        }
+        next(err);
+      }
+    },
+  );
+
+  router.get(
+    '/workflow/family/:name',
+    async (req: ExpressRequest, res, next) => {
+      try {
+        const result = await http.get(
+          baseURLWorkflow + 'family/' + req.params.name,
+          req,
+        );
+        res.status(200).send(result);
+      } catch (err) {
+        if (err.body && err.statusCode) {
+          res.status(err.statusCode).send(err.body);
+        } else if (err.body) {
+          res.status(500).send(err.body);
+        }
+        next(err);
+      }
+    },
+  );
+
   router.get('/event', async (req: ExpressRequest, res, next) => {
     try {
       const result = await http.get(baseApiURL + 'event/', req);
