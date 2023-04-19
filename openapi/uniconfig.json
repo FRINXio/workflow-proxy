@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "uniconfig",
-    "version": "5.0.15"
+    "version": "5.1.5"
   },
   "servers": [
     {
@@ -134,11 +134,72 @@
         }
       }
     },
+    "/operations/config-coverage": {
+      "post": {
+        "tags": [
+          "RPCs and Actions"
+        ],
+        "summary": "Calculates coverage of the device configuration by translation units.",
+        "operationId": "rpc_config-coverage",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/cli.unit.generic.configcoverage.Input"
+                  }
+                }
+              },
+              "encoding": {
+                "application/json": {
+                  "contentType": "application/json"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Correct response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "output": {
+                      "$ref": "#/components/schemas/cli.unit.generic.configcoverage.Output"
+                    }
+                  }
+                },
+                "encoding": {
+                  "application/json": {
+                    "contentType": "application/json"
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "No response"
+          },
+          "400": {
+            "description": "Internal error"
+          },
+          "401": {
+            "description": "No response"
+          }
+        }
+      }
+    },
     "/operations/execute": {
       "post": {
         "tags": [
-          "cli-unit-generic"
+          "RPCs and Actions"
         ],
+        "summary": "Simple execution of single or multiple commands on remote terminal. Multiple commands must be\nseparated by newline in the input. After all commands are executed, the last output is not checked\nagainst expected output. Also, the outputs from commands are not collected - output of this RPC\ncontains only status message.",
         "operationId": "rpc_execute",
         "parameters": [],
         "requestBody": {
@@ -196,8 +257,9 @@
     "/operations/execute-and-expect": {
       "post": {
         "tags": [
-          "cli-unit-generic"
+          "RPCs and Actions"
         ],
+        "summary": "Form of the 'execute-and-read' RPC that can contain 'expect(..)' patterns used for waiting\nfor specific outputs/prompts. It can be used for execution of interactive commands that require\nmultiple subsequent inputs with different preceding prompts. The 'expect(..)' pattern can contain\nrandom Java-based regular expression typed between the brackets. Every pattern must be specified\non the separated line and the next line cannot contain another 'expect(..)' pattern. Output of this\nRPC reflects the whole dialogue between ODL client and remote terminal except the initial\ncommand-prompt.",
         "operationId": "rpc_execute-and-expect",
         "parameters": [],
         "requestBody": {
@@ -255,8 +317,9 @@
     "/operations/execute-and-read": {
       "post": {
         "tags": [
-          "cli-unit-generic"
+          "RPCs and Actions"
         ],
+        "summary": "Execution of the sequence of commands specified in the input. These commands must be separated\nby the new line - then, each of the command is executed separately. After all commands are executed,\nit is assumed, that the original command prompt (prompt that was set before execution of this RPC)\nappears on the remote terminal. If the input contains only single command, output of this RPC will\ncontain only output of this command. If input contains multiple commands separated by newline, output\nof this RPC will be built from command prompts (except the prompt of the first command), input commands\nand outputs returned from remote terminal.",
         "operationId": "rpc_execute-and-read",
         "parameters": [],
         "requestBody": {
@@ -314,8 +377,9 @@
     "/operations/execute-and-read-until": {
       "post": {
         "tags": [
-          "cli-unit-generic"
+          "RPCs and Actions"
         ],
+        "summary": "",
         "operationId": "rpc_execute-and-read-until",
         "parameters": [],
         "requestBody": {
@@ -373,8 +437,9 @@
     "/operations/uninstall-node": {
       "post": {
         "tags": [
-          "connection-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Uninstallation of node with specific ID and connection-type from Uniconfig database.\nThis RPC completes when:\na. node is successfully removed from Uniconfig database,\nb. unistallation of node fails,\nc. node has already been uninstalled (failure).\nWarning: uninstallation process doesn't unmount node from Uniconfig instance and is not affected\nby current state of associated mountpoints.",
         "operationId": "rpc_uninstall-node",
         "parameters": [],
         "requestBody": {
@@ -432,8 +497,9 @@
     "/operations/uninstall-multiple-nodes": {
       "post": {
         "tags": [
-          "connection-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Uninstallation of multiple nodes with specific ID and connection-type from Uniconfig database.\nThis RPC completes when:\na. node is successfully removed from Uniconfig database,\nb. unistallation of node fails,\nc. node has already been uninstalled (failure).\nWarning: uninstallation process doesn't unmount node from Uniconfig instance and is not affected\nby current state of associated mountpoints.",
         "operationId": "rpc_uninstall-multiple-nodes",
         "parameters": [],
         "requestBody": {
@@ -491,8 +557,9 @@
     "/operations/get-installed-nodes": {
       "post": {
         "tags": [
-          "connection-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Returns list of all installed nodes or for the given mount-type.",
         "operationId": "rpc_get-installed-nodes",
         "parameters": [],
         "requestBody": {
@@ -550,8 +617,9 @@
     "/operations/install-node": {
       "post": {
         "tags": [
-          "connection-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Installation of node into Uniconfig database using input settings. This RPC completes when:\na. node is successfully installed into Uniconfig database,\nb. installation of node fails because node cannot be mounted or configuration cannot be synced\n   from device into database,\nc. node has already been installed (failure).",
         "operationId": "rpc_install-node",
         "parameters": [],
         "requestBody": {
@@ -609,8 +677,9 @@
     "/operations/change-admin-state": {
       "post": {
         "tags": [
-          "connection-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Change the admin-state of a specific node.",
         "operationId": "rpc_change-admin-state",
         "parameters": [],
         "requestBody": {
@@ -668,8 +737,9 @@
     "/operations/unmount-node": {
       "post": {
         "tags": [
-          "connection-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Unmounting node from CLI/NETCONF/Unified layer. This RPC completes when:\na. mountpoint from the correspoding layer is successfully removed,\nb. some failure occurs during unmounting process,\nc. node has already been unmounted.",
         "operationId": "rpc_unmount-node",
         "parameters": [],
         "requestBody": {
@@ -727,8 +797,9 @@
     "/operations/mount-node": {
       "post": {
         "tags": [
-          "connection-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Mounting node into CLI/NETCONF/Unified layer depending on the input 'connection-type'.\nThis RPC completes when:\na. mountpoint on the corresponding layer is successfully created,\nb. some failure occurs during mounting process,\nc. mountpoint has already been created.",
         "operationId": "rpc_mount-node",
         "parameters": [],
         "requestBody": {
@@ -786,8 +857,9 @@
     "/operations/install-multiple-nodes": {
       "post": {
         "tags": [
-          "connection-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Installation of multiple nodes into Uniconfig database using input settings.\nThis RPC completes when:\na. node is successfully installed into Uniconfig database,\nb. installation of node fails because node cannot be mounted or configuration cannot be synced\n   from device into database,\nc. node has already been installed (failure).",
         "operationId": "rpc_install-multiple-nodes",
         "parameters": [],
         "requestBody": {
@@ -845,8 +917,9 @@
     "/operations/check-installed-nodes": {
       "post": {
         "tags": [
-          "connection-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Returns a list of all installed nodes from the node list in input.",
         "operationId": "rpc_check-installed-nodes",
         "parameters": [],
         "requestBody": {
@@ -904,8 +977,9 @@
     "/operations/show-subscription-data": {
       "post": {
         "tags": [
-          "data-change-events"
+          "RPCs and Actions"
         ],
+        "summary": "",
         "operationId": "rpc_show-subscription-data",
         "parameters": [],
         "requestBody": {
@@ -963,8 +1037,9 @@
     "/operations/delete-data-change-subscription": {
       "post": {
         "tags": [
-          "data-change-events"
+          "RPCs and Actions"
         ],
+        "summary": "Unregistration from data-tree change events using provided subscription-id.",
         "operationId": "rpc_delete-data-change-subscription",
         "parameters": [],
         "requestBody": {
@@ -1003,8 +1078,9 @@
     "/operations/create-data-change-subscription": {
       "post": {
         "tags": [
-          "data-change-events"
+          "RPCs and Actions"
         ],
+        "summary": "Registration to data-tree change events under specific node and path.",
         "operationId": "rpc_create-data-change-subscription",
         "parameters": [],
         "requestBody": {
@@ -1062,8 +1138,9 @@
     "/operations/discover": {
       "post": {
         "tags": [
-          "device-discovery"
+          "RPCs and Actions"
         ],
+        "summary": "RPC used for verification of reachability of network devices.\nThe user can check a single IP address, in both IPv4 and IPv6\nformats, a network or a range of addresses. The ICMP protocol\nis used to check the availability of the device. The user can\nalso specify a specific port (TCP or UDP) or a range of ports\nwhich are checked if they are open.",
         "operationId": "rpc_discover",
         "parameters": [],
         "requestBody": {
@@ -1121,8 +1198,9 @@
     "/operations/dryrun-commit": {
       "post": {
         "tags": [
-          "dryrun-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Simulates configuration of network elements based on\ndiff between actual configuration and intended configuration.\nCli commands are written into dryrun-journal instead of actual\ndevice. Return value represent cli commands for all nodes\nthat have configuration pending.",
         "operationId": "rpc_dryrun-commit",
         "parameters": [],
         "requestBody": {
@@ -1180,8 +1258,9 @@
     "/operations/read-journal": {
       "post": {
         "tags": [
-          "journal"
+          "RPCs and Actions"
         ],
+        "summary": "",
         "operationId": "rpc_read-journal",
         "parameters": [],
         "requestBody": {
@@ -1229,8 +1308,9 @@
     "/operations/clear-journal": {
       "post": {
         "tags": [
-          "journal"
+          "RPCs and Actions"
         ],
+        "summary": "",
         "operationId": "rpc_clear-journal",
         "parameters": [],
         "requestBody": {
@@ -1278,8 +1358,9 @@
     "/operations/enable-default-device-logging": {
       "post": {
         "tags": [
-          "logging"
+          "RPCs and Actions"
         ],
+        "summary": "Enable logging for all devices by default.",
         "operationId": "rpc_enable-default-device-logging",
         "parameters": [],
         "requestBody": {
@@ -1337,8 +1418,9 @@
     "/operations/disable-logging": {
       "post": {
         "tags": [
-          "logging"
+          "RPCs and Actions"
         ],
+        "summary": "Disable logging in specified logging broker.",
         "operationId": "rpc_disable-logging",
         "parameters": [],
         "requestBody": {
@@ -1396,8 +1478,9 @@
     "/operations/set-global-hidden-types": {
       "post": {
         "tags": [
-          "logging"
+          "RPCs and Actions"
         ],
+        "summary": "Set types which will be masked in output using asterisk.",
         "operationId": "rpc_set-global-hidden-types",
         "parameters": [],
         "requestBody": {
@@ -1455,8 +1538,9 @@
     "/operations/disable-device-logging": {
       "post": {
         "tags": [
-          "logging"
+          "RPCs and Actions"
         ],
+        "summary": "Disable logging for specific device.",
         "operationId": "rpc_disable-device-logging",
         "parameters": [],
         "requestBody": {
@@ -1514,8 +1598,9 @@
     "/operations/disable-default-device-logging": {
       "post": {
         "tags": [
-          "logging"
+          "RPCs and Actions"
         ],
+        "summary": "Disable logging for all devices by default.",
         "operationId": "rpc_disable-default-device-logging",
         "parameters": [],
         "requestBody": {
@@ -1573,8 +1658,9 @@
     "/operations/enable-device-logging": {
       "post": {
         "tags": [
-          "logging"
+          "RPCs and Actions"
         ],
+        "summary": "Enable logging for specific device.",
         "operationId": "rpc_enable-device-logging",
         "parameters": [],
         "requestBody": {
@@ -1632,8 +1718,9 @@
     "/operations/enable-logging": {
       "post": {
         "tags": [
-          "logging"
+          "RPCs and Actions"
         ],
+        "summary": "Enable logging in specified logging broker.",
         "operationId": "rpc_enable-logging",
         "parameters": [],
         "requestBody": {
@@ -1691,8 +1778,9 @@
     "/operations/add-trusted-certificate": {
       "post": {
         "tags": [
-          "netconf-keystore"
+          "RPCs and Actions"
         ],
+        "summary": "Add a list of trusted certificates into the keystore.",
         "operationId": "rpc_add-trusted-certificate",
         "parameters": [],
         "requestBody": {
@@ -1731,8 +1819,9 @@
     "/operations/remove-keystore-entry": {
       "post": {
         "tags": [
-          "netconf-keystore"
+          "RPCs and Actions"
         ],
+        "summary": "Use this rpc to remove a single or multiple keys from the datastore.",
         "operationId": "rpc_remove-keystore-entry",
         "parameters": [],
         "requestBody": {
@@ -1771,8 +1860,9 @@
     "/operations/add-keystore-entry": {
       "post": {
         "tags": [
-          "netconf-keystore"
+          "RPCs and Actions"
         ],
+        "summary": "Use this rpc to add a single or multiple new keys into the keystore. The private key\nand passphrase will both be encrypted before they are written into the datastore.",
         "operationId": "rpc_add-keystore-entry",
         "parameters": [],
         "requestBody": {
@@ -1811,8 +1901,9 @@
     "/operations/remove-trusted-certificate": {
       "post": {
         "tags": [
-          "netconf-keystore"
+          "RPCs and Actions"
         ],
+        "summary": "Remove a list of trusted certificates from the datastore.",
         "operationId": "rpc_remove-trusted-certificate",
         "parameters": [],
         "requestBody": {
@@ -1851,8 +1942,9 @@
     "/operations/add-private-key": {
       "post": {
         "tags": [
-          "netconf-keystore"
+          "RPCs and Actions"
         ],
+        "summary": "Add a list of private keys into the keystore.",
         "operationId": "rpc_add-private-key",
         "parameters": [],
         "requestBody": {
@@ -1891,8 +1983,9 @@
     "/operations/remove-private-key": {
       "post": {
         "tags": [
-          "netconf-keystore"
+          "RPCs and Actions"
         ],
+        "summary": "Remove a list of private keys from the datastore.",
         "operationId": "rpc_remove-private-key",
         "parameters": [],
         "requestBody": {
@@ -1931,8 +2024,9 @@
     "/operations/create-subscription": {
       "post": {
         "tags": [
-          "notifications"
+          "RPCs and Actions"
         ],
+        "summary": "The command to create a notification subscription. It\ntakes as argument the name of the notification stream\nand filter. Both of those options limit the content of\nthe subscription. In addition, there are two time-related\nparameters, startTime and stopTime, which can be used to\nselect the time interval of interest to the notification\nreplay feature.",
         "operationId": "rpc_create-subscription",
         "parameters": [],
         "requestBody": {
@@ -1971,8 +2065,9 @@
     "/operations/set-hidden-http-headers": {
       "post": {
         "tags": [
-          "restconf-logging"
+          "RPCs and Actions"
         ],
+        "summary": "Set hidden HTTP headers which content is hidden in the RESTCONF audit logs.",
         "operationId": "rpc_set-hidden-http-headers",
         "parameters": [],
         "requestBody": {
@@ -2030,8 +2125,9 @@
     "/operations/set-hidden-http-methods": {
       "post": {
         "tags": [
-          "restconf-logging"
+          "RPCs and Actions"
         ],
+        "summary": "Set hidden HTTP methods that are not logged into RESTCONF audit logs.",
         "operationId": "rpc_set-hidden-http-methods",
         "parameters": [],
         "requestBody": {
@@ -2089,8 +2185,9 @@
     "/operations/register-repository": {
       "post": {
         "tags": [
-          "schema-resources"
+          "RPCs and Actions"
         ],
+        "summary": "",
         "operationId": "rpc_register-repository",
         "parameters": [],
         "requestBody": {
@@ -2254,6 +2351,129 @@
           "snapshot-manager"
         ],
         "description": "removes snapshot.manager.SnapshotsMetadata",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Object deleted"
+          },
+          "400": {
+            "description": "Internal error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/data/snapshots-metadata/snapshot": {
+      "get": {
+        "tags": [
+          "snapshot-manager"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "snapshot.manager.snapshotsmetadata.Snapshot to be added or updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/snapshot.manager.snapshotsmetadata.Snapshot"
+                },
+                "encoding": {
+                  "application/json": {
+                    "contentType": "application/json"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Internal error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "snapshot-manager"
+        ],
+        "description": "creates or updates snapshot.manager.snapshotsmetadata.Snapshot",
+        "parameters": [],
+        "requestBody": {
+          "description": "snapshot.manager.snapshotsmetadata.Snapshot to be added to list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/snapshot.manager.snapshotsmetadata.Snapshot"
+              },
+              "encoding": {
+                "application/json": {
+                  "contentType": "application/json"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Object created"
+          },
+          "204": {
+            "description": "Object modified"
+          },
+          "400": {
+            "description": "Internal error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "snapshot-manager"
+        ],
+        "description": "creates snapshot.manager.snapshotsmetadata.Snapshot",
+        "parameters": [],
+        "requestBody": {
+          "description": "snapshot.manager.snapshotsmetadata.Snapshot to be added to list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/snapshot.manager.snapshotsmetadata.Snapshot"
+              },
+              "encoding": {
+                "application/json": {
+                  "contentType": "application/json"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Object created"
+          },
+          "400": {
+            "description": "Internal error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "409": {
+            "description": "Object already exists"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "snapshot-manager"
+        ],
+        "description": "removes snapshot.manager.snapshotsmetadata.Snapshot",
         "parameters": [],
         "responses": {
           "204": {
@@ -2451,50 +2671,12 @@
         }
       }
     },
-    "/data/snapshots-metadata/snapshot": {
-      "post": {
-        "tags": [
-          "snapshot-manager"
-        ],
-        "description": "creates snapshot.manager.snapshotsmetadata.Snapshot",
-        "parameters": [],
-        "requestBody": {
-          "description": "snapshot.manager.snapshotsmetadata.Snapshot to be added to list",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/snapshot.manager.snapshotsmetadata.Snapshot"
-              },
-              "encoding": {
-                "application/json": {
-                  "contentType": "application/json"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Object created"
-          },
-          "400": {
-            "description": "Internal error"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "409": {
-            "description": "Object already exists"
-          }
-        }
-      }
-    },
     "/operations/delete-snapshot": {
       "post": {
         "tags": [
-          "snapshot-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Deletes existing network-topology with the given name\nas a snapshot.",
         "operationId": "rpc_delete-snapshot",
         "parameters": [],
         "requestBody": {
@@ -2552,8 +2734,9 @@
     "/operations/create-snapshot": {
       "post": {
         "tags": [
-          "snapshot-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Creates new network-topology with the given name\nas a snapshot of actual uniconfig topology.",
         "operationId": "rpc_create-snapshot",
         "parameters": [],
         "requestBody": {
@@ -2611,8 +2794,9 @@
     "/operations/replace-config-with-snapshot": {
       "post": {
         "tags": [
-          "snapshot-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Replaces intended uniconfig topology with a snapshot.",
         "operationId": "rpc_replace-config-with-snapshot",
         "parameters": [],
         "requestBody": {
@@ -2670,8 +2854,9 @@
     "/operations/copy-one-to-one": {
       "post": {
         "tags": [
-          "subtree-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Merge or replace config between subtrees.",
         "operationId": "rpc_copy-one-to-one",
         "parameters": [],
         "requestBody": {
@@ -2729,8 +2914,9 @@
     "/operations/copy-one-to-many": {
       "post": {
         "tags": [
-          "subtree-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Merge or replace config between subtrees.",
         "operationId": "rpc_copy-one-to-many",
         "parameters": [],
         "requestBody": {
@@ -2788,8 +2974,9 @@
     "/operations/calculate-subtree-diff": {
       "post": {
         "tags": [
-          "subtree-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Calculate diff between two YIID paths.",
         "operationId": "rpc_calculate-subtree-diff",
         "parameters": [],
         "requestBody": {
@@ -2847,8 +3034,9 @@
     "/operations/copy-many-to-one": {
       "post": {
         "tags": [
-          "subtree-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Merge or replace config between subtrees.",
         "operationId": "rpc_copy-many-to-one",
         "parameters": [],
         "requestBody": {
@@ -2906,8 +3094,9 @@
     "/operations/calculate-subtree-git-like-diff": {
       "post": {
         "tags": [
-          "subtree-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Calculate diff between two YIID paths in a git like style.",
         "operationId": "rpc_calculate-subtree-git-like-diff",
         "parameters": [],
         "requestBody": {
@@ -2965,8 +3154,9 @@
     "/operations/bulk-edit": {
       "post": {
         "tags": [
-          "subtree-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Application of multiple modifications to multiple nodes. Modifications are applied in parallel\nand same modifications are applied to all listed nodes.",
         "operationId": "rpc_bulk-edit",
         "parameters": [],
         "requestBody": {
@@ -3024,8 +3214,9 @@
     "/operations/apply-template": {
       "post": {
         "tags": [
-          "template-manager"
+          "RPCs and Actions"
         ],
+        "summary": "RPC used for application of single template into one or multiple Uniconfig nodes.",
         "operationId": "rpc_apply-template",
         "parameters": [],
         "requestBody": {
@@ -3083,8 +3274,9 @@
     "/operations/upgrade-template": {
       "post": {
         "tags": [
-          "template-manager"
+          "RPCs and Actions"
         ],
+        "summary": "RPC used for upgrading/migrating template to another version of YANG repository.",
         "operationId": "rpc_upgrade-template",
         "parameters": [],
         "requestBody": {
@@ -3123,8 +3315,9 @@
     "/operations/get-template-info": {
       "post": {
         "tags": [
-          "template-manager"
+          "RPCs and Actions"
         ],
+        "summary": "RPC used for retrieval of information about an existing template including list of variables",
         "operationId": "rpc_get-template-info",
         "parameters": [],
         "requestBody": {
@@ -3179,11 +3372,62 @@
         }
       }
     },
+    "/operations/get-template-nodes": {
+      "post": {
+        "tags": [
+          "RPCs and Actions"
+        ],
+        "summary": "Returns a list of all templates.",
+        "operationId": "rpc_get-template-nodes",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Correct response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "output": {
+                      "$ref": "#/components/schemas/template.manager.gettemplatenodes.Output"
+                    }
+                  }
+                },
+                "encoding": {
+                  "application/json": {
+                    "contentType": "application/json"
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "No response"
+          },
+          "400": {
+            "description": "Internal error"
+          },
+          "401": {
+            "description": "No response"
+          }
+        }
+      }
+    },
     "/operations/create-multiple-templates": {
       "post": {
         "tags": [
-          "template-manager"
+          "RPCs and Actions"
         ],
+        "summary": "RPC used for creation of multiple templates. Existing templates with same names are replaced.",
         "operationId": "rpc_create-multiple-templates",
         "parameters": [],
         "requestBody": {
@@ -3241,8 +3485,9 @@
     "/operations/revert-changes": {
       "post": {
         "tags": [
-          "transaction-log"
+          "RPCs and Actions"
         ],
+        "summary": "Revert changes by their uuid.",
         "operationId": "rpc_revert-changes",
         "parameters": [],
         "requestBody": {
@@ -3300,8 +3545,9 @@
     "/operations/sync-to-network": {
       "post": {
         "tags": [
-          "uniconfig-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Synchronises configuration from given uniconfig node to network element.",
         "operationId": "rpc_sync-to-network",
         "parameters": [],
         "requestBody": {
@@ -3356,171 +3602,25 @@
         }
       }
     },
-    "/operations/calculate-diff": {
+    "/operations/create-transaction": {
       "post": {
         "tags": [
-          "uniconfig-manager"
+          "RPCs and Actions"
         ],
-        "operationId": "rpc_calculate-diff",
+        "summary": "Creation of new UniConfig transaction. RPC does not define input body. Output contains:\n- text body with generated transaction-id,\n- Set-Cookie header with set transaction-id under 'UNICONFIGTXID' key.\nOptional query parameters:\n- 'timeout': After transaction inactivity for specified time transaction will be automatically cleaned.\n  Value of this parameter is whole number and defines time in seconds.\n- 'dedicatedDeviceSession': UniConfig transaction will create dedicated session to device which is\n  used only by one transaction and closed immediately after committing or closing the transaction.\n  Accepted values: 'true' and 'false'.",
+        "operationId": "rpc_create-transaction",
         "parameters": [],
         "requestBody": {
-          "description": "",
           "content": {
             "application/json": {
               "schema": {
-                "properties": {
-                  "input": {
-                    "$ref": "#/components/schemas/uniconfig.manager.calculatediff.Input"
-                  }
-                }
-              },
-              "encoding": {
-                "application/json": {
-                  "contentType": "application/json"
-                }
+                "type": "object"
               }
             }
           },
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Correct response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "output": {
-                      "$ref": "#/components/schemas/uniconfig.manager.calculatediff.Output"
-                    }
-                  }
-                },
-                "encoding": {
-                  "application/json": {
-                    "contentType": "application/json"
-                  }
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "No response"
-          },
-          "400": {
-            "description": "Internal error"
-          },
-          "401": {
-            "description": "No response"
-          }
-        }
-      }
-    },
-    "/operations/sync-from-network": {
-      "post": {
-        "tags": [
-          "uniconfig-manager"
-        ],
-        "operationId": "rpc_sync-from-network",
-        "parameters": [],
-        "requestBody": {
-          "description": "",
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "input": {
-                    "$ref": "#/components/schemas/uniconfig.manager.syncfromnetwork.Input"
-                  }
-                }
-              },
-              "encoding": {
-                "application/json": {
-                  "contentType": "application/json"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Correct response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "output": {
-                      "$ref": "#/components/schemas/uniconfig.manager.syncfromnetwork.Output"
-                    }
-                  }
-                },
-                "encoding": {
-                  "application/json": {
-                    "contentType": "application/json"
-                  }
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "No response"
-          },
-          "400": {
-            "description": "Internal error"
-          },
-          "401": {
-            "description": "No response"
-          }
-        }
-      }
-    },
-    "/operations/calculate-git-like-diff": {
-      "post": {
-        "tags": [
-          "uniconfig-manager"
-        ],
-        "operationId": "rpc_calculate-git-like-diff",
-        "parameters": [],
-        "requestBody": {
-          "description": "",
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "input": {
-                    "$ref": "#/components/schemas/uniconfig.manager.calculategitlikediff.Input"
-                  }
-                }
-              },
-              "encoding": {
-                "application/json": {
-                  "contentType": "application/json"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Correct response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "output": {
-                      "$ref": "#/components/schemas/uniconfig.manager.calculategitlikediff.Output"
-                    }
-                  }
-                },
-                "encoding": {
-                  "application/json": {
-                    "contentType": "application/json"
-                  }
-                }
-              }
-            }
-          },
           "201": {
             "description": "No response"
           },
@@ -3536,8 +3636,9 @@
     "/operations/health": {
       "post": {
         "tags": [
-          "uniconfig-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Check if uniconfig is running. If DB persistance is enabled, check DB connection too.",
         "operationId": "rpc_health",
         "parameters": [],
         "requestBody": {
@@ -3585,8 +3686,9 @@
     "/operations/replace-config-with-operational": {
       "post": {
         "tags": [
-          "uniconfig-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Replaces intended uniconfig topology with actual uniconfig topology.",
         "operationId": "rpc_replace-config-with-operational",
         "parameters": [],
         "requestBody": {
@@ -3644,8 +3746,9 @@
     "/operations/validate": {
       "post": {
         "tags": [
-          "uniconfig-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Execute validation of configuration of network elements based on\ndiff between actual configuration and intended configuration.\nResult is returned in RFC output.",
         "operationId": "rpc_validate",
         "parameters": [],
         "requestBody": {
@@ -3703,8 +3806,9 @@
     "/operations/commit": {
       "post": {
         "tags": [
-          "uniconfig-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Executes configuration of network elements based on\ndiff between actual configuration and intended configuration.\nIf an error occurs, automatic rollback is executed. Result of execution\nis returned in RPC output.",
         "operationId": "rpc_commit",
         "parameters": [],
         "requestBody": {
@@ -3762,8 +3866,9 @@
     "/operations/checked-commit": {
       "post": {
         "tags": [
-          "uniconfig-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Executes configuration of network elements based on\ndiff between actual configuration and intended configuration.\nBefore execution a fingerprint check is executed. If an error occurs,\nautomatic rollback is executed. Result of execution\nis returned in RPC output.",
         "operationId": "rpc_checked-commit",
         "parameters": [],
         "requestBody": {
@@ -3818,11 +3923,283 @@
         }
       }
     },
+    "/operations/compare-config": {
+      "post": {
+        "tags": [
+          "RPCs and Actions"
+        ],
+        "summary": "Compare configuration between CONFIG datastore and device configuration",
+        "operationId": "rpc_compare-config",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/uniconfig.manager.compareconfig.Input"
+                  }
+                }
+              },
+              "encoding": {
+                "application/json": {
+                  "contentType": "application/json"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Correct response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "output": {
+                      "$ref": "#/components/schemas/uniconfig.manager.compareconfig.Output"
+                    }
+                  }
+                },
+                "encoding": {
+                  "application/json": {
+                    "contentType": "application/json"
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "No response"
+          },
+          "400": {
+            "description": "Internal error"
+          },
+          "401": {
+            "description": "No response"
+          }
+        }
+      }
+    },
+    "/operations/calculate-diff": {
+      "post": {
+        "tags": [
+          "RPCs and Actions"
+        ],
+        "summary": "Calculates differences between intended and actual uniconfig topology.",
+        "operationId": "rpc_calculate-diff",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/uniconfig.manager.calculatediff.Input"
+                  }
+                }
+              },
+              "encoding": {
+                "application/json": {
+                  "contentType": "application/json"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Correct response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "output": {
+                      "$ref": "#/components/schemas/uniconfig.manager.calculatediff.Output"
+                    }
+                  }
+                },
+                "encoding": {
+                  "application/json": {
+                    "contentType": "application/json"
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "No response"
+          },
+          "400": {
+            "description": "Internal error"
+          },
+          "401": {
+            "description": "No response"
+          }
+        }
+      }
+    },
+    "/operations/sync-from-network": {
+      "post": {
+        "tags": [
+          "RPCs and Actions"
+        ],
+        "summary": "Synchronises configuration from network element to given uniconfig node.",
+        "operationId": "rpc_sync-from-network",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/uniconfig.manager.syncfromnetwork.Input"
+                  }
+                }
+              },
+              "encoding": {
+                "application/json": {
+                  "contentType": "application/json"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Correct response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "output": {
+                      "$ref": "#/components/schemas/uniconfig.manager.syncfromnetwork.Output"
+                    }
+                  }
+                },
+                "encoding": {
+                  "application/json": {
+                    "contentType": "application/json"
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "No response"
+          },
+          "400": {
+            "description": "Internal error"
+          },
+          "401": {
+            "description": "No response"
+          }
+        }
+      }
+    },
+    "/operations/calculate-git-like-diff": {
+      "post": {
+        "tags": [
+          "RPCs and Actions"
+        ],
+        "summary": "Calculates differences between intended and actual uniconfig topology and returns\na git like difference between those two.",
+        "operationId": "rpc_calculate-git-like-diff",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/uniconfig.manager.calculategitlikediff.Input"
+                  }
+                }
+              },
+              "encoding": {
+                "application/json": {
+                  "contentType": "application/json"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Correct response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "output": {
+                      "$ref": "#/components/schemas/uniconfig.manager.calculategitlikediff.Output"
+                    }
+                  }
+                },
+                "encoding": {
+                  "application/json": {
+                    "contentType": "application/json"
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "No response"
+          },
+          "400": {
+            "description": "Internal error"
+          },
+          "401": {
+            "description": "No response"
+          }
+        }
+      }
+    },
+    "/operations/close-transaction": {
+      "post": {
+        "tags": [
+          "RPCs and Actions"
+        ],
+        "summary": "Closing UniConfig transaction. Identifier of the transaction must be defined in the Cookie header\nunder 'UNICONFIGTXID' key. RPC does not define input and output body.",
+        "operationId": "rpc_close-transaction",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "No response"
+          },
+          "400": {
+            "description": "Internal error"
+          },
+          "401": {
+            "description": "No response"
+          }
+        }
+      }
+    },
     "/operations/is-in-sync": {
       "post": {
         "tags": [
-          "uniconfig-manager"
+          "RPCs and Actions"
         ],
+        "summary": "Checks whether information in the operational datastore is in-sync with the state on the device.",
         "operationId": "rpc_is-in-sync",
         "parameters": [],
         "requestBody": {
@@ -3880,8 +4257,9 @@
     "/operations/query-config": {
       "post": {
         "tags": [
-          "uniconfig-query"
+          "RPCs and Actions"
         ],
+        "summary": "Reads selected and filtered configuration of node using input JSON-path.",
         "operationId": "rpc_query-config",
         "parameters": [],
         "requestBody": {
@@ -3962,15 +4340,32 @@
         ]
       },
       "cli.translate.registry.AvailableCliDeviceTranslations": {
+        "required": [],
         "properties": {
           "available-cli-device-translation": {
             "type": "array",
             "description": "",
             "items": {
               "title": "cli.translate.registry.availableclidevicetranslations.AvailableCliDeviceTranslation",
+              "required": [],
               "properties": {
+                "default-error-retry-patterns": {
+                  "title": "cli.translate.registry.errorretrypatterns.DefaultErrorRetryPatterns",
+                  "required": [],
+                  "properties": {
+                    "retry-pattern": {
+                      "type": "array",
+                      "description": "Device specific retry error patterns.",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "description": "Device specific list of retry error patterns. This list is the primary source\nof error from device after which resend system is activated. This list can be overriden from the\ncode."
+                },
                 "default-commit-error-patterns": {
                   "title": "cli.translate.registry.errorcommitpatterns.DefaultCommitErrorPatterns",
+                  "required": [],
                   "properties": {
                     "commit-error-pattern": {
                       "type": "array",
@@ -3988,6 +4383,7 @@
                 },
                 "default-error-patterns": {
                   "title": "cli.translate.registry.errorpatterns.DefaultErrorPatterns",
+                  "required": [],
                   "properties": {
                     "error-pattern": {
                       "type": "array",
@@ -4009,7 +4405,55 @@
         },
         "description": ""
       },
+      "cli.unit.generic.configcoverage.Input": {
+        "required": [],
+        "properties": {
+          "with-details": {
+            "type": "boolean",
+            "description": "Flag for determine whether output will be detailed or not."
+          }
+        },
+        "description": ""
+      },
+      "cli.unit.generic.configcoverage.Output": {
+        "required": [],
+        "properties": {
+          "simple-output": {
+            "type": "string",
+            "description": "Simple output contains commands marked with '+' if it is covered or '-' if not.",
+            "x-choice": "result:simple"
+          },
+          "complex-output": {
+            "type": "array",
+            "description": "Simple output contains commands marked with '+' if it is covered or '-' if not.",
+            "items": {
+              "title": "cli.unit.generic.configcoverage.output.result.complex.ComplexOutput",
+              "required": [],
+              "properties": {
+                "non-covered-parts": {
+                  "type": "array",
+                  "description": "",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "command": {
+                  "type": "string",
+                  "description": ""
+                },
+                "covered": {
+                  "type": "boolean",
+                  "description": ""
+                }
+              }
+            },
+            "x-choice": "result:complex"
+          }
+        },
+        "description": ""
+      },
       "cli.unit.generic.execute.Input": {
+        "required": [],
         "properties": {
           "wait-for-output-timer": {
             "maximum": 65535,
@@ -4017,6 +4461,10 @@
             "type": "integer",
             "description": "If no output is received during this time, then execute next command.\nCommands are sent without waiting for their echo.",
             "format": "int32"
+          },
+          "error-check": {
+            "type": "boolean",
+            "description": "Flag for determine whether error handling will be enabled or not"
           },
           "command": {
             "type": "string",
@@ -4026,6 +4474,7 @@
         "description": ""
       },
       "cli.unit.generic.execute.Output": {
+        "required": [],
         "properties": {
           "status": {
             "type": "string",
@@ -4035,6 +4484,7 @@
         "description": ""
       },
       "cli.unit.generic.executeandexpect.Input": {
+        "required": [],
         "properties": {
           "wait-for-output-timer": {
             "maximum": 65535,
@@ -4042,6 +4492,10 @@
             "type": "integer",
             "description": "If no output is received during this time, then execute next command.\nCommands are sent without waiting for their echo.",
             "format": "int32"
+          },
+          "error-check": {
+            "type": "boolean",
+            "description": "Flag for determine whether error handling will be enabled or not"
           },
           "command": {
             "type": "string",
@@ -4051,6 +4505,7 @@
         "description": ""
       },
       "cli.unit.generic.executeandexpect.Output": {
+        "required": [],
         "properties": {
           "output": {
             "type": "string",
@@ -4060,6 +4515,7 @@
         "description": ""
       },
       "cli.unit.generic.executeandread.Input": {
+        "required": [],
         "properties": {
           "wait-for-output-timer": {
             "maximum": 65535,
@@ -4067,6 +4523,10 @@
             "type": "integer",
             "description": "If no output is received during this time, then execute next command.\nCommands are sent without waiting for their echo.",
             "format": "int32"
+          },
+          "error-check": {
+            "type": "boolean",
+            "description": "Flag for determine whether error handling will be enabled or not"
           },
           "command": {
             "type": "string",
@@ -4076,6 +4536,7 @@
         "description": ""
       },
       "cli.unit.generic.executeandread.Output": {
+        "required": [],
         "properties": {
           "output": {
             "type": "string",
@@ -4085,6 +4546,7 @@
         "description": ""
       },
       "cli.unit.generic.executeandreaduntil.Input": {
+        "required": [],
         "properties": {
           "wait-for-output-timer": {
             "maximum": 65535,
@@ -4092,6 +4554,10 @@
             "type": "integer",
             "description": "If no output is received during this time, then execute next command.\nCommands are sent without waiting for their echo.",
             "format": "int32"
+          },
+          "error-check": {
+            "type": "boolean",
+            "description": "Flag for determine whether error handling will be enabled or not"
           },
           "last-output": {
             "type": "string",
@@ -4105,6 +4571,7 @@
         "description": ""
       },
       "cli.unit.generic.executeandreaduntil.Output": {
+        "required": [],
         "properties": {
           "output": {
             "type": "string",
@@ -4140,6 +4607,7 @@
         ]
       },
       "connection.manager.changeadminstate.Input": {
+        "required": [],
         "properties": {
           "node-id": {
             "type": "string",
@@ -4152,6 +4620,7 @@
         "description": ""
       },
       "connection.manager.changeadminstate.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -4164,9 +4633,11 @@
         "description": ""
       },
       "connection.manager.checkinstallednodes.Input": {
+        "required": [],
         "properties": {
           "target-nodes": {
             "title": "uniconfig.manager.targetuniconfignodesfields.TargetNodes",
+            "required": [],
             "properties": {
               "node": {
                 "type": "array",
@@ -4182,6 +4653,7 @@
         "description": ""
       },
       "connection.manager.checkinstallednodes.Output": {
+        "required": [],
         "properties": {
           "nodes": {
             "type": "array",
@@ -4194,6 +4666,7 @@
         "description": ""
       },
       "connection.manager.getinstallednodes.Input": {
+        "required": [],
         "properties": {
           "mount-type": {
             "$ref": "#/components/schemas/connection.manager.MountType"
@@ -4202,6 +4675,7 @@
         "description": ""
       },
       "connection.manager.getinstallednodes.Output": {
+        "required": [],
         "properties": {
           "nodes": {
             "type": "array",
@@ -4214,12 +4688,14 @@
         "description": ""
       },
       "connection.manager.installmultiplenodes.Input": {
+        "required": [],
         "properties": {
           "nodes": {
             "type": "array",
             "description": "",
             "items": {
               "title": "connection.manager.installmultiplenodes.input.Nodes",
+              "required": [],
               "properties": {
                 "node-id": {
                   "type": "string",
@@ -4227,6 +4703,7 @@
                 },
                 "cli": {
                   "title": "connection.manager.installmultiplenodes.input.nodes.Cli",
+                  "required": [],
                   "properties": {
                     "cli-topology:device-type": {
                       "type": "string",
@@ -4235,6 +4712,20 @@
                     "uniconfig-config:confirmed-commit-enabled": {
                       "type": "boolean",
                       "description": "Specifies whether to send confirmed commit RPC between validate RPC and confirming commit."
+                    },
+                    "uniconfig-config:replace-paths": {
+                      "type": "array",
+                      "description": "Replace paths that point to config that should be handled as a one replace request",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "cli-topology:resend-command-delay": {
+                      "maximum": 65535,
+                      "minimum": 0,
+                      "type": "integer",
+                      "description": "Delay between re-send commands.",
+                      "format": "int32"
                     },
                     "secret": {
                       "type": "string",
@@ -4256,6 +4747,10 @@
                       "format": "int32",
                       "x-choice": "keepalive-strategy:keepalive"
                     },
+                    "uniconfig-config:store-failed-installation": {
+                      "type": "boolean",
+                      "description": "In case UniConfig fails to install the device, it will still populate the database."
+                    },
                     "password": {
                       "type": "string",
                       "description": "",
@@ -4271,6 +4766,7 @@
                     },
                     "uniconfig-config:crypto": {
                       "title": "uniconfig.config.uniconfigconfignodefields.Crypto",
+                      "required": [],
                       "properties": {
                         "public-key-path": {
                           "type": "string",
@@ -4281,6 +4777,12 @@
                         }
                       },
                       "description": "Settings related to encryption of arbitrary leaves/leaf-list using public key that\nis read from device on specified path."
+                    },
+                    "cli-topology:max-resend-command-attempt": {
+                      "maximum": 4294967295,
+                      "minimum": 0,
+                      "type": "number",
+                      "description": "Maximum number of re-send commands that are sent to device after first attempt.\nValue 0 disables resending."
                     },
                     "cli-topology:max-reconnection-attempts": {
                       "maximum": 4294967295,
@@ -4323,6 +4825,7 @@
                     },
                     "cli-topology:pass-through": {
                       "title": "cli.topology.clinodeconnectionstatus.PassThrough",
+                      "required": [],
                       "properties": {},
                       "description": "When the underlying node is connected, its cli context\nis available verbatim under this container through the\nmount extension."
                     },
@@ -4332,6 +4835,7 @@
                     },
                     "cli-topology:default-error-patterns": {
                       "title": "cli.translate.registry.errorpatterns.DefaultErrorPatterns",
+                      "required": [],
                       "properties": {
                         "error-pattern": {
                           "type": "array",
@@ -4348,6 +4852,7 @@
                     },
                     "blacklist": {
                       "title": "uniconfig.config.uniconfigconfignodefields.nodes.bl.Blacklist",
+                      "required": [],
                       "properties": {
                         "path": {
                           "type": "array",
@@ -4373,6 +4878,7 @@
                     },
                     "whitelist": {
                       "title": "uniconfig.config.uniconfigconfignodefields.nodes.wl.Whitelist",
+                      "required": [],
                       "properties": {
                         "path": {
                           "type": "array",
@@ -4394,6 +4900,7 @@
                     },
                     "cli-topology:default-commit-error-patterns": {
                       "title": "cli.translate.registry.errorcommitpatterns.DefaultCommitErrorPatterns",
+                      "required": [],
                       "properties": {
                         "commit-error-pattern": {
                           "type": "array",
@@ -4459,6 +4966,7 @@
                 },
                 "netconf": {
                   "title": "connection.manager.installmultiplenodes.input.nodes.Netconf",
+                  "required": [],
                   "properties": {
                     "concurrent-rpc-limit": {
                       "maximum": 65535,
@@ -4471,6 +4979,13 @@
                     "uniconfig-config:confirmed-commit-enabled": {
                       "type": "boolean",
                       "description": "Specifies whether to send confirmed commit RPC between validate RPC and confirming commit."
+                    },
+                    "uniconfig-config:replace-paths": {
+                      "type": "array",
+                      "description": "Replace paths that point to config that should be handled as a one replace request",
+                      "items": {
+                        "type": "string"
+                      }
                     },
                     "max-reconnection-attempts": {
                       "maximum": 4294967295,
@@ -4490,6 +5005,7 @@
                     },
                     "netconf-node-topology:yang-module-capabilities": {
                       "title": "netconf.node.topology.netconfnodeconnectionparameters.YangModuleCapabilities",
+                      "required": [],
                       "properties": {
                         "capability": {
                           "type": "array",
@@ -4527,6 +5043,7 @@
                     },
                     "flags": {
                       "title": "netconf.node.topology.netconfparametersgroups.Flags",
+                      "required": [],
                       "properties": {
                         "streaming-session": {
                           "type": "boolean",
@@ -4557,6 +5074,7 @@
                     },
                     "netconf-node-topology:yang-library": {
                       "title": "netconf.node.topology.netconfschemastorage.YangLibrary",
+                      "required": [],
                       "properties": {
                         "password": {
                           "type": "string",
@@ -4575,6 +5093,7 @@
                     },
                     "netconf-node-topology:odl-hello-message-capabilities": {
                       "title": "netconf.node.topology.netconfnodeconnectionparameters.OdlHelloMessageCapabilities",
+                      "required": [],
                       "properties": {
                         "capability": {
                           "type": "array",
@@ -4590,6 +5109,10 @@
                       "type": "boolean",
                       "description": "If this parameter is set to 'false', then parser should ignore unknown elements and not throw\nexception during parsing.",
                       "x-choice": "netconf-parameters:netconf-parameters-old-format"
+                    },
+                    "uniconfig-config:store-failed-installation": {
+                      "type": "boolean",
+                      "description": "In case UniConfig fails to install the device, it will still populate the database."
                     },
                     "password": {
                       "type": "string",
@@ -4618,6 +5141,7 @@
                     },
                     "uniconfig-config:crypto": {
                       "title": "uniconfig.config.uniconfigconfignodefields.Crypto",
+                      "required": [],
                       "properties": {
                         "public-key-path": {
                           "type": "string",
@@ -4631,6 +5155,7 @@
                     },
                     "other-parameters": {
                       "title": "netconf.node.topology.netconfparametersgroups.OtherParameters",
+                      "required": [],
                       "properties": {
                         "concurrent-rpc-limit": {
                           "maximum": 65535,
@@ -4675,6 +5200,7 @@
                     },
                     "netconf-node-topology:pass-through": {
                       "title": "netconf.node.topology.netconfnodeconnectionstatus.PassThrough",
+                      "required": [],
                       "properties": {},
                       "description": "When the underlying node is connected, its NETCONF context\nis available verbatim under this container through the\nmount extension."
                     },
@@ -4683,6 +5209,7 @@
                       "description": "List of available streams to which subscription can be created.",
                       "items": {
                         "title": "netconf.subscriptions.streamslist.Stream",
+                        "required": [],
                         "properties": {
                           "stop-time": {
                             "type": "string",
@@ -4701,6 +5228,7 @@
                     },
                     "netconf-node-topology:non-module-capabilities": {
                       "title": "netconf.node.topology.netconfnodeconnectionparameters.NonModuleCapabilities",
+                      "required": [],
                       "properties": {
                         "capability": {
                           "type": "array",
@@ -4728,6 +5256,7 @@
                     },
                     "key-based": {
                       "title": "netconf.node.topology.netconfnodecredentials.credentials.keyauth.KeyBased",
+                      "required": [],
                       "properties": {
                         "key-id": {
                           "type": "string",
@@ -4743,6 +5272,7 @@
                     },
                     "blacklist": {
                       "title": "uniconfig.config.uniconfigconfignodefields.nodes.bl.Blacklist",
+                      "required": [],
                       "properties": {
                         "path": {
                           "type": "array",
@@ -4768,6 +5298,7 @@
                     },
                     "session-timers": {
                       "title": "netconf.node.topology.netconfparametersgroups.SessionTimers",
+                      "required": [],
                       "properties": {
                         "keepalive-delay": {
                           "maximum": 4294967295,
@@ -4825,6 +5356,7 @@
                     },
                     "whitelist": {
                       "title": "uniconfig.config.uniconfigconfignodefields.nodes.wl.Whitelist",
+                      "required": [],
                       "properties": {
                         "path": {
                           "type": "array",
@@ -4875,6 +5407,7 @@
                     },
                     "login-password-unencrypted": {
                       "title": "netconf.node.topology.netconfnodecredentials.credentials.loginpwunencrypted.LoginPasswordUnencrypted",
+                      "required": [],
                       "properties": {
                         "password": {
                           "type": "string",
@@ -4895,6 +5428,7 @@
                     },
                     "login-password": {
                       "title": "netconf.node.topology.netconfnodecredentials.credentials.loginpw.LoginPassword",
+                      "required": [],
                       "properties": {
                         "password": {
                           "type": "string",
@@ -4920,12 +5454,9 @@
                   },
                   "description": "NETCONF node settings."
                 },
-                "sync-node": {
-                  "type": "boolean",
-                  "description": "Flag that can be used to disable device mounting and configuration syncing."
-                },
                 "gnmi": {
                   "title": "connection.manager.installmultiplenodes.input.nodes.Gnmi",
+                  "required": [],
                   "properties": {
                     "uniconfig-config:sequence-read-active": {
                       "type": "boolean",
@@ -4935,11 +5466,23 @@
                       "type": "boolean",
                       "description": "Specifies whether to send confirmed commit RPC between validate RPC and confirming commit."
                     },
+                    "uniconfig-config:replace-paths": {
+                      "type": "array",
+                      "description": "Replace paths that point to config that should be handled as a one replace request",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "uniconfig-config:store-failed-installation": {
+                      "type": "boolean",
+                      "description": "In case UniConfig fails to install the device, it will still populate the database."
+                    },
                     "uniconfig-config:admin-state": {
                       "$ref": "#/components/schemas/uniconfig.config.AdminState"
                     },
                     "uniconfig-config:crypto": {
                       "title": "uniconfig.config.uniconfigconfignodefields.Crypto",
+                      "required": [],
                       "properties": {
                         "public-key-path": {
                           "type": "string",
@@ -4953,6 +5496,7 @@
                     },
                     "blacklist": {
                       "title": "uniconfig.config.uniconfigconfignodefields.nodes.bl.Blacklist",
+                      "required": [],
                       "properties": {
                         "path": {
                           "type": "array",
@@ -4986,6 +5530,7 @@
                     },
                     "whitelist": {
                       "title": "uniconfig.config.uniconfigconfignodefields.nodes.wl.Whitelist",
+                      "required": [],
                       "properties": {
                         "path": {
                           "type": "array",
@@ -5015,12 +5560,18 @@
         "description": ""
       },
       "connection.manager.installmultiplenodes.Output": {
+        "required": [],
         "properties": {
+          "error-message": {
+            "type": "string",
+            "description": "Error message that describe overall problem."
+          },
           "node-results": {
             "type": "array",
             "description": "",
             "items": {
               "title": "connection.manager.multiplenodesoutputfields.NodeResults",
+              "required": [],
               "properties": {
                 "node-id": {
                   "type": "string",
@@ -5035,11 +5586,15 @@
                 }
               }
             }
+          },
+          "overall-status": {
+            "$ref": "#/components/schemas/frinx.types.OperationResultType"
           }
         },
         "description": ""
       },
       "connection.manager.installnode.Input": {
+        "required": [],
         "properties": {
           "node-id": {
             "type": "string",
@@ -5047,6 +5602,7 @@
           },
           "cli": {
             "title": "connection.manager.installnode.input.Cli",
+            "required": [],
             "properties": {
               "cli-topology:device-type": {
                 "type": "string",
@@ -5055,6 +5611,20 @@
               "uniconfig-config:confirmed-commit-enabled": {
                 "type": "boolean",
                 "description": "Specifies whether to send confirmed commit RPC between validate RPC and confirming commit."
+              },
+              "uniconfig-config:replace-paths": {
+                "type": "array",
+                "description": "Replace paths that point to config that should be handled as a one replace request",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "cli-topology:resend-command-delay": {
+                "maximum": 65535,
+                "minimum": 0,
+                "type": "integer",
+                "description": "Delay between re-send commands.",
+                "format": "int32"
               },
               "secret": {
                 "type": "string",
@@ -5076,6 +5646,10 @@
                 "format": "int32",
                 "x-choice": "keepalive-strategy:keepalive"
               },
+              "uniconfig-config:store-failed-installation": {
+                "type": "boolean",
+                "description": "In case UniConfig fails to install the device, it will still populate the database."
+              },
               "password": {
                 "type": "string",
                 "description": "",
@@ -5091,6 +5665,7 @@
               },
               "uniconfig-config:crypto": {
                 "title": "uniconfig.config.uniconfigconfignodefields.Crypto",
+                "required": [],
                 "properties": {
                   "public-key-path": {
                     "type": "string",
@@ -5101,6 +5676,12 @@
                   }
                 },
                 "description": "Settings related to encryption of arbitrary leaves/leaf-list using public key that\nis read from device on specified path."
+              },
+              "cli-topology:max-resend-command-attempt": {
+                "maximum": 4294967295,
+                "minimum": 0,
+                "type": "number",
+                "description": "Maximum number of re-send commands that are sent to device after first attempt.\nValue 0 disables resending."
               },
               "cli-topology:max-reconnection-attempts": {
                 "maximum": 4294967295,
@@ -5143,6 +5724,7 @@
               },
               "cli-topology:pass-through": {
                 "title": "cli.topology.clinodeconnectionstatus.PassThrough",
+                "required": [],
                 "properties": {},
                 "description": "When the underlying node is connected, its cli context\nis available verbatim under this container through the\nmount extension."
               },
@@ -5152,6 +5734,7 @@
               },
               "cli-topology:default-error-patterns": {
                 "title": "cli.translate.registry.errorpatterns.DefaultErrorPatterns",
+                "required": [],
                 "properties": {
                   "error-pattern": {
                     "type": "array",
@@ -5168,6 +5751,7 @@
               },
               "blacklist": {
                 "title": "uniconfig.config.uniconfigconfignodefields.nodes.bl.Blacklist",
+                "required": [],
                 "properties": {
                   "path": {
                     "type": "array",
@@ -5193,6 +5777,7 @@
               },
               "whitelist": {
                 "title": "uniconfig.config.uniconfigconfignodefields.nodes.wl.Whitelist",
+                "required": [],
                 "properties": {
                   "path": {
                     "type": "array",
@@ -5214,6 +5799,7 @@
               },
               "cli-topology:default-commit-error-patterns": {
                 "title": "cli.translate.registry.errorcommitpatterns.DefaultCommitErrorPatterns",
+                "required": [],
                 "properties": {
                   "commit-error-pattern": {
                     "type": "array",
@@ -5279,6 +5865,7 @@
           },
           "netconf": {
             "title": "connection.manager.installnode.input.Netconf",
+            "required": [],
             "properties": {
               "concurrent-rpc-limit": {
                 "maximum": 65535,
@@ -5291,6 +5878,13 @@
               "uniconfig-config:confirmed-commit-enabled": {
                 "type": "boolean",
                 "description": "Specifies whether to send confirmed commit RPC between validate RPC and confirming commit."
+              },
+              "uniconfig-config:replace-paths": {
+                "type": "array",
+                "description": "Replace paths that point to config that should be handled as a one replace request",
+                "items": {
+                  "type": "string"
+                }
               },
               "max-reconnection-attempts": {
                 "maximum": 4294967295,
@@ -5310,6 +5904,7 @@
               },
               "netconf-node-topology:yang-module-capabilities": {
                 "title": "netconf.node.topology.netconfnodeconnectionparameters.YangModuleCapabilities",
+                "required": [],
                 "properties": {
                   "capability": {
                     "type": "array",
@@ -5347,6 +5942,7 @@
               },
               "flags": {
                 "title": "netconf.node.topology.netconfparametersgroups.Flags",
+                "required": [],
                 "properties": {
                   "streaming-session": {
                     "type": "boolean",
@@ -5377,6 +5973,7 @@
               },
               "netconf-node-topology:yang-library": {
                 "title": "netconf.node.topology.netconfschemastorage.YangLibrary",
+                "required": [],
                 "properties": {
                   "password": {
                     "type": "string",
@@ -5395,6 +5992,7 @@
               },
               "netconf-node-topology:odl-hello-message-capabilities": {
                 "title": "netconf.node.topology.netconfnodeconnectionparameters.OdlHelloMessageCapabilities",
+                "required": [],
                 "properties": {
                   "capability": {
                     "type": "array",
@@ -5410,6 +6008,10 @@
                 "type": "boolean",
                 "description": "If this parameter is set to 'false', then parser should ignore unknown elements and not throw\nexception during parsing.",
                 "x-choice": "netconf-parameters:netconf-parameters-old-format"
+              },
+              "uniconfig-config:store-failed-installation": {
+                "type": "boolean",
+                "description": "In case UniConfig fails to install the device, it will still populate the database."
               },
               "password": {
                 "type": "string",
@@ -5438,6 +6040,7 @@
               },
               "uniconfig-config:crypto": {
                 "title": "uniconfig.config.uniconfigconfignodefields.Crypto",
+                "required": [],
                 "properties": {
                   "public-key-path": {
                     "type": "string",
@@ -5451,6 +6054,7 @@
               },
               "other-parameters": {
                 "title": "netconf.node.topology.netconfparametersgroups.OtherParameters",
+                "required": [],
                 "properties": {
                   "concurrent-rpc-limit": {
                     "maximum": 65535,
@@ -5495,6 +6099,7 @@
               },
               "netconf-node-topology:pass-through": {
                 "title": "netconf.node.topology.netconfnodeconnectionstatus.PassThrough",
+                "required": [],
                 "properties": {},
                 "description": "When the underlying node is connected, its NETCONF context\nis available verbatim under this container through the\nmount extension."
               },
@@ -5503,6 +6108,7 @@
                 "description": "List of available streams to which subscription can be created.",
                 "items": {
                   "title": "netconf.subscriptions.streamslist.Stream",
+                  "required": [],
                   "properties": {
                     "stop-time": {
                       "type": "string",
@@ -5521,6 +6127,7 @@
               },
               "netconf-node-topology:non-module-capabilities": {
                 "title": "netconf.node.topology.netconfnodeconnectionparameters.NonModuleCapabilities",
+                "required": [],
                 "properties": {
                   "capability": {
                     "type": "array",
@@ -5548,6 +6155,7 @@
               },
               "key-based": {
                 "title": "netconf.node.topology.netconfnodecredentials.credentials.keyauth.KeyBased",
+                "required": [],
                 "properties": {
                   "key-id": {
                     "type": "string",
@@ -5563,6 +6171,7 @@
               },
               "blacklist": {
                 "title": "uniconfig.config.uniconfigconfignodefields.nodes.bl.Blacklist",
+                "required": [],
                 "properties": {
                   "path": {
                     "type": "array",
@@ -5588,6 +6197,7 @@
               },
               "session-timers": {
                 "title": "netconf.node.topology.netconfparametersgroups.SessionTimers",
+                "required": [],
                 "properties": {
                   "keepalive-delay": {
                     "maximum": 4294967295,
@@ -5645,6 +6255,7 @@
               },
               "whitelist": {
                 "title": "uniconfig.config.uniconfigconfignodefields.nodes.wl.Whitelist",
+                "required": [],
                 "properties": {
                   "path": {
                     "type": "array",
@@ -5695,6 +6306,7 @@
               },
               "login-password-unencrypted": {
                 "title": "netconf.node.topology.netconfnodecredentials.credentials.loginpwunencrypted.LoginPasswordUnencrypted",
+                "required": [],
                 "properties": {
                   "password": {
                     "type": "string",
@@ -5715,6 +6327,7 @@
               },
               "login-password": {
                 "title": "netconf.node.topology.netconfnodecredentials.credentials.loginpw.LoginPassword",
+                "required": [],
                 "properties": {
                   "password": {
                     "type": "string",
@@ -5740,12 +6353,9 @@
             },
             "description": "NETCONF node settings."
           },
-          "sync-node": {
-            "type": "boolean",
-            "description": "Flag that can be used to disable device mounting and configuration syncing."
-          },
           "gnmi": {
             "title": "connection.manager.installnode.input.Gnmi",
+            "required": [],
             "properties": {
               "uniconfig-config:sequence-read-active": {
                 "type": "boolean",
@@ -5755,11 +6365,23 @@
                 "type": "boolean",
                 "description": "Specifies whether to send confirmed commit RPC between validate RPC and confirming commit."
               },
+              "uniconfig-config:replace-paths": {
+                "type": "array",
+                "description": "Replace paths that point to config that should be handled as a one replace request",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "uniconfig-config:store-failed-installation": {
+                "type": "boolean",
+                "description": "In case UniConfig fails to install the device, it will still populate the database."
+              },
               "uniconfig-config:admin-state": {
                 "$ref": "#/components/schemas/uniconfig.config.AdminState"
               },
               "uniconfig-config:crypto": {
                 "title": "uniconfig.config.uniconfigconfignodefields.Crypto",
+                "required": [],
                 "properties": {
                   "public-key-path": {
                     "type": "string",
@@ -5773,6 +6395,7 @@
               },
               "blacklist": {
                 "title": "uniconfig.config.uniconfigconfignodefields.nodes.bl.Blacklist",
+                "required": [],
                 "properties": {
                   "path": {
                     "type": "array",
@@ -5806,6 +6429,7 @@
               },
               "whitelist": {
                 "title": "uniconfig.config.uniconfigconfignodefields.nodes.wl.Whitelist",
+                "required": [],
                 "properties": {
                   "path": {
                     "type": "array",
@@ -5832,6 +6456,7 @@
         "description": ""
       },
       "connection.manager.installnode.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -5844,6 +6469,7 @@
         "description": ""
       },
       "connection.manager.mountnode.Input": {
+        "required": [],
         "properties": {
           "node-id": {
             "type": "string",
@@ -5856,6 +6482,7 @@
         "description": ""
       },
       "connection.manager.mountnode.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -5868,12 +6495,14 @@
         "description": ""
       },
       "connection.manager.uninstallmultiplenodes.Input": {
+        "required": [],
         "properties": {
           "nodes": {
             "type": "array",
             "description": "",
             "items": {
               "title": "connection.manager.uninstallmultiplenodesinputfields.Nodes",
+              "required": [],
               "properties": {
                 "node-id": {
                   "type": "string",
@@ -5889,12 +6518,18 @@
         "description": ""
       },
       "connection.manager.uninstallmultiplenodes.Output": {
+        "required": [],
         "properties": {
+          "error-message": {
+            "type": "string",
+            "description": "Error message that describe overall problem."
+          },
           "node-results": {
             "type": "array",
             "description": "",
             "items": {
               "title": "connection.manager.multiplenodesoutputfields.NodeResults",
+              "required": [],
               "properties": {
                 "node-id": {
                   "type": "string",
@@ -5909,11 +6544,15 @@
                 }
               }
             }
+          },
+          "overall-status": {
+            "$ref": "#/components/schemas/frinx.types.OperationResultType"
           }
         },
         "description": ""
       },
       "connection.manager.uninstallnode.Input": {
+        "required": [],
         "properties": {
           "node-id": {
             "type": "string",
@@ -5926,6 +6565,7 @@
         "description": ""
       },
       "connection.manager.uninstallnode.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -5938,6 +6578,7 @@
         "description": ""
       },
       "connection.manager.unmountnode.Input": {
+        "required": [],
         "properties": {
           "node-id": {
             "type": "string",
@@ -5950,6 +6591,7 @@
         "description": ""
       },
       "connection.manager.unmountnode.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -5970,6 +6612,7 @@
         ]
       },
       "data.change.events.createdatachangesubscription.Input": {
+        "required": [],
         "properties": {
           "subtree-path": {
             "type": "string",
@@ -5990,6 +6633,7 @@
         "description": ""
       },
       "data.change.events.createdatachangesubscription.Output": {
+        "required": [],
         "properties": {
           "subscription-id": {
             "type": "string",
@@ -5999,6 +6643,7 @@
         "description": ""
       },
       "data.change.events.deletedatachangesubscription.Input": {
+        "required": [],
         "properties": {
           "subscription-id": {
             "type": "string",
@@ -6008,6 +6653,7 @@
         "description": ""
       },
       "data.change.events.showsubscriptiondata.Input": {
+        "required": [],
         "properties": {
           "subscription-id": {
             "type": "string",
@@ -6017,6 +6663,7 @@
         "description": ""
       },
       "data.change.events.showsubscriptiondata.Output": {
+        "required": [],
         "properties": {
           "subtree-path": {
             "type": "string",
@@ -6037,49 +6684,18 @@
         "description": ""
       },
       "device.discovery.discover.Input": {
+        "required": [],
         "properties": {
           "verify-host-reachability": {
             "type": "boolean",
             "description": "Check whether the host is reachable or not using ICMP protocol"
-          },
-          "tcp-port": {
-            "type": "array",
-            "description": "",
-            "items": {
-              "title": "device.discovery.inputport.TcpPort",
-              "properties": {
-                "end-port": {
-                  "maximum": 65535,
-                  "minimum": 0,
-                  "type": "integer",
-                  "description": "",
-                  "format": "int32",
-                  "x-choice": "type-of-port:port-range-case"
-                },
-                "port": {
-                  "maximum": 65535,
-                  "minimum": 0,
-                  "type": "integer",
-                  "description": "",
-                  "format": "int32",
-                  "x-choice": "type-of-port:scalar-case"
-                },
-                "start-port": {
-                  "maximum": 65535,
-                  "minimum": 0,
-                  "type": "integer",
-                  "description": "",
-                  "format": "int32",
-                  "x-choice": "type-of-port:port-range-case"
-                }
-              }
-            }
           },
           "address": {
             "type": "array",
             "description": "",
             "items": {
               "title": "device.discovery.inputaddress.Address",
+              "required": [],
               "properties": {
                 "end-ipv6-address": {
                   "type": "string",
@@ -6119,11 +6735,46 @@
               }
             }
           },
+          "tcp-port": {
+            "type": "array",
+            "description": "",
+            "items": {
+              "title": "device.discovery.inputport.TcpPort",
+              "required": [],
+              "properties": {
+                "end-port": {
+                  "maximum": 65535,
+                  "minimum": 0,
+                  "type": "integer",
+                  "description": "",
+                  "format": "int32",
+                  "x-choice": "type-of-port:port-range-case"
+                },
+                "port": {
+                  "maximum": 65535,
+                  "minimum": 0,
+                  "type": "integer",
+                  "description": "",
+                  "format": "int32",
+                  "x-choice": "type-of-port:scalar-case"
+                },
+                "start-port": {
+                  "maximum": 65535,
+                  "minimum": 0,
+                  "type": "integer",
+                  "description": "",
+                  "format": "int32",
+                  "x-choice": "type-of-port:port-range-case"
+                }
+              }
+            }
+          },
           "udp-port": {
             "type": "array",
             "description": "",
             "items": {
               "title": "device.discovery.inputport.UdpPort",
+              "required": [],
               "properties": {
                 "end-port": {
                   "maximum": 65535,
@@ -6156,12 +6807,14 @@
         "description": ""
       },
       "device.discovery.discover.Output": {
+        "required": [],
         "properties": {
           "device": {
             "type": "array",
             "description": "",
             "items": {
               "title": "device.discovery.discoveryoutputfields.Device",
+              "required": [],
               "properties": {
                 "host": {
                   "type": "string",
@@ -6198,6 +6851,7 @@
         "description": ""
       },
       "dryrun.manager.dryruncommit.Input": {
+        "required": [],
         "properties": {
           "do-rollback": {
             "type": "boolean",
@@ -6205,6 +6859,7 @@
           },
           "target-nodes": {
             "title": "uniconfig.manager.targetuniconfignodesfields.TargetNodes",
+            "required": [],
             "properties": {
               "node": {
                 "type": "array",
@@ -6220,6 +6875,7 @@
         "description": ""
       },
       "dryrun.manager.dryruncommit.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -6227,12 +6883,14 @@
           },
           "node-results": {
             "title": "uniconfig.manager.commitoutputfields.NodeResults",
+            "required": [],
             "properties": {
               "node-result": {
                 "type": "array",
                 "description": "Result of configuration and rollback on the given node.\nRollback status is empty if rollback was not executed.",
                 "items": {
                   "title": "uniconfig.manager.nodeconfigresults.NodeResult",
+                  "required": [],
                   "properties": {
                     "configuration-status": {
                       "$ref": "#/components/schemas/frinx.types.OperationResultType"
@@ -6293,6 +6951,7 @@
         ]
       },
       "journal.clearjournal.Output": {
+        "required": [],
         "properties": {
           "journal": {
             "type": "string",
@@ -6302,6 +6961,7 @@
         "description": ""
       },
       "journal.readjournal.Output": {
+        "required": [],
         "properties": {
           "journal": {
             "type": "string",
@@ -6318,6 +6978,7 @@
         ]
       },
       "logging.disabledefaultdevicelogging.Input": {
+        "required": [],
         "properties": {
           "broker-identifier": {
             "type": "string",
@@ -6327,6 +6988,7 @@
         "description": ""
       },
       "logging.disabledefaultdevicelogging.Output": {
+        "required": [],
         "properties": {
           "message": {
             "type": "string",
@@ -6339,6 +7001,7 @@
         "description": ""
       },
       "logging.disabledevicelogging.Input": {
+        "required": [],
         "properties": {
           "device-list": {
             "type": "array",
@@ -6355,6 +7018,7 @@
         "description": ""
       },
       "logging.disabledevicelogging.Output": {
+        "required": [],
         "properties": {
           "message": {
             "type": "string",
@@ -6367,6 +7031,7 @@
         "description": ""
       },
       "logging.disablelogging.Input": {
+        "required": [],
         "properties": {
           "broker-identifier": {
             "type": "string",
@@ -6376,6 +7041,7 @@
         "description": ""
       },
       "logging.disablelogging.Output": {
+        "required": [],
         "properties": {
           "message": {
             "type": "string",
@@ -6388,6 +7054,7 @@
         "description": ""
       },
       "logging.enabledefaultdevicelogging.Input": {
+        "required": [],
         "properties": {
           "broker-identifier": {
             "type": "string",
@@ -6397,6 +7064,7 @@
         "description": ""
       },
       "logging.enabledefaultdevicelogging.Output": {
+        "required": [],
         "properties": {
           "message": {
             "type": "string",
@@ -6409,6 +7077,7 @@
         "description": ""
       },
       "logging.enabledevicelogging.Input": {
+        "required": [],
         "properties": {
           "device-list": {
             "type": "array",
@@ -6425,6 +7094,7 @@
         "description": ""
       },
       "logging.enabledevicelogging.Output": {
+        "required": [],
         "properties": {
           "message": {
             "type": "string",
@@ -6437,6 +7107,7 @@
         "description": ""
       },
       "logging.enablelogging.Input": {
+        "required": [],
         "properties": {
           "broker-identifier": {
             "type": "string",
@@ -6446,6 +7117,7 @@
         "description": ""
       },
       "logging.enablelogging.Output": {
+        "required": [],
         "properties": {
           "message": {
             "type": "string",
@@ -6458,6 +7130,7 @@
         "description": ""
       },
       "logging.setglobalhiddentypes.Input": {
+        "required": [],
         "properties": {
           "hidden-types": {
             "type": "array",
@@ -6470,6 +7143,7 @@
         "description": ""
       },
       "logging.setglobalhiddentypes.Output": {
+        "required": [],
         "properties": {
           "message": {
             "type": "string",
@@ -6482,12 +7156,14 @@
         "description": ""
       },
       "netconf.keystore.addkeystoreentry.Input": {
+        "required": [],
         "properties": {
           "key-credential": {
             "type": "array",
             "description": "",
             "items": {
               "title": "netconf.keystore.keystoreentry.KeyCredential",
+              "required": [],
               "properties": {
                 "passphrase": {
                   "type": "string",
@@ -6508,12 +7184,14 @@
         "description": ""
       },
       "netconf.keystore.addprivatekey.Input": {
+        "required": [],
         "properties": {
           "private-key": {
             "type": "array",
             "description": "A private key.",
             "items": {
               "title": "netconf.keystore.privatekeys.PrivateKey",
+              "required": [],
               "properties": {
                 "name": {
                   "type": "string",
@@ -6537,12 +7215,14 @@
         "description": ""
       },
       "netconf.keystore.addtrustedcertificate.Input": {
+        "required": [],
         "properties": {
           "trusted-certificate": {
             "type": "array",
             "description": "A list of trusted certificate. These cerfitifcates can be used by a server to\nauthenticate clients, or by clients to authenticate servers.",
             "items": {
               "title": "netconf.keystore.trustedcertificates.TrustedCertificate",
+              "required": [],
               "properties": {
                 "certificate": {
                   "type": "string",
@@ -6559,6 +7239,7 @@
         "description": ""
       },
       "netconf.keystore.removekeystoreentry.Input": {
+        "required": [],
         "properties": {
           "key-id": {
             "type": "array",
@@ -6571,6 +7252,7 @@
         "description": ""
       },
       "netconf.keystore.removeprivatekey.Input": {
+        "required": [],
         "properties": {
           "name": {
             "type": "array",
@@ -6583,6 +7265,7 @@
         "description": ""
       },
       "netconf.keystore.removetrustedcertificate.Input": {
+        "required": [],
         "properties": {
           "name": {
             "type": "array",
@@ -6603,6 +7286,7 @@
         ]
       },
       "notifications.createsubscription.Input": {
+        "required": [],
         "properties": {
           "filter": {
             "type": "string",
@@ -6638,6 +7322,7 @@
         ]
       },
       "restconf.logging.sethiddenhttpheaders.Input": {
+        "required": [],
         "properties": {
           "hidden-http-headers": {
             "type": "array",
@@ -6650,6 +7335,7 @@
         "description": ""
       },
       "restconf.logging.sethiddenhttpheaders.Output": {
+        "required": [],
         "properties": {
           "message": {
             "type": "string",
@@ -6662,6 +7348,7 @@
         "description": ""
       },
       "restconf.logging.sethiddenhttpmethods.Input": {
+        "required": [],
         "properties": {
           "hidden-http-methods": {
             "type": "array",
@@ -6674,6 +7361,7 @@
         "description": ""
       },
       "restconf.logging.sethiddenhttpmethods.Output": {
+        "required": [],
         "properties": {
           "message": {
             "type": "string",
@@ -6693,6 +7381,7 @@
         ]
       },
       "schema.resources.registerrepository.Input": {
+        "required": [],
         "properties": {
           "repository-name": {
             "type": "string",
@@ -6702,6 +7391,7 @@
         "description": ""
       },
       "schema.resources.registerrepository.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -6714,6 +7404,7 @@
         "description": ""
       },
       "snapshot.manager.SnapshotsMetadata": {
+        "required": [],
         "properties": {
           "snapshot": {
             "type": "array",
@@ -6726,6 +7417,7 @@
         "description": ""
       },
       "snapshot.manager.createsnapshot.Input": {
+        "required": [],
         "properties": {
           "name": {
             "type": "string",
@@ -6733,6 +7425,7 @@
           },
           "target-nodes": {
             "title": "uniconfig.manager.targetuniconfignodesfields.TargetNodes",
+            "required": [],
             "properties": {
               "node": {
                 "type": "array",
@@ -6748,6 +7441,7 @@
         "description": ""
       },
       "snapshot.manager.createsnapshot.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -6755,12 +7449,14 @@
           },
           "node-results": {
             "title": "snapshot.manager.createsnapshotoutputfields.NodeResults",
+            "required": [],
             "properties": {
               "node-result": {
                 "type": "array",
                 "description": "Result of create-snapshot on actual uniconfig node.",
                 "items": {
                   "title": "snapshot.manager.nodecreatesnapshotresults.NodeResult",
+                  "required": [],
                   "properties": {
                     "node-id": {
                       "type": "string",
@@ -6789,6 +7485,7 @@
         "description": ""
       },
       "snapshot.manager.deletesnapshot.Input": {
+        "required": [],
         "properties": {
           "name": {
             "type": "string",
@@ -6798,6 +7495,7 @@
         "description": ""
       },
       "snapshot.manager.deletesnapshot.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -6810,6 +7508,7 @@
         "description": ""
       },
       "snapshot.manager.replaceconfigwithsnapshot.Input": {
+        "required": [],
         "properties": {
           "name": {
             "type": "string",
@@ -6817,6 +7516,7 @@
           },
           "target-nodes": {
             "title": "uniconfig.manager.targetuniconfignodesfields.TargetNodes",
+            "required": [],
             "properties": {
               "node": {
                 "type": "array",
@@ -6832,6 +7532,7 @@
         "description": ""
       },
       "snapshot.manager.replaceconfigwithsnapshot.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -6839,12 +7540,14 @@
           },
           "node-results": {
             "title": "uniconfig.manager.replaceconfigwithoperationaloutputfields.NodeResults",
+            "required": [],
             "properties": {
               "node-result": {
                 "type": "array",
                 "description": "Result of replace-config-with-operational on actual uniconfig node.",
                 "items": {
                   "title": "uniconfig.manager.nodereplaceconfigwithoperationalresults.NodeResult",
+                  "required": [],
                   "properties": {
                     "node-id": {
                       "type": "string",
@@ -6873,6 +7576,7 @@
         "description": ""
       },
       "snapshot.manager.snapshotsmetadata.Snapshot": {
+        "required": [],
         "properties": {
           "name": {
             "type": "string",
@@ -6921,6 +7625,7 @@
         ]
       },
       "subtree.manager.bulkedit.Input": {
+        "required": [],
         "properties": {
           "node-id": {
             "type": "array",
@@ -6938,6 +7643,7 @@
             "description": "List of intended modifications.",
             "items": {
               "title": "subtree.manager.bulkeditinputfields.Edit",
+              "required": [],
               "properties": {
                 "path": {
                   "type": "string",
@@ -6957,6 +7663,7 @@
         "description": ""
       },
       "subtree.manager.bulkedit.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -6967,6 +7674,7 @@
             "description": "List of target nodes with results.",
             "items": {
               "title": "subtree.manager.bulkeditoutputfields.NodeResult",
+              "required": [],
               "properties": {
                 "node-id": {
                   "type": "string",
@@ -6992,6 +7700,7 @@
         "description": ""
       },
       "subtree.manager.calculatesubtreediff.Input": {
+        "required": [],
         "properties": {
           "source-datastore": {
             "$ref": "#/components/schemas/subtree.manager.SourceDatastore"
@@ -7011,12 +7720,32 @@
         "description": ""
       },
       "subtree.manager.calculatesubtreediff.Output": {
+        "required": [],
         "properties": {
+          "deleted-data": {
+            "type": "array",
+            "description": "Removed intended configuration against actual.",
+            "items": {
+              "title": "subtree.manager.deleteddata.DeletedData",
+              "required": [],
+              "properties": {
+                "data": {
+                  "type": "string",
+                  "description": ""
+                },
+                "path": {
+                  "type": "string",
+                  "description": "Instance-identifier of deleted data node."
+                }
+              }
+            }
+          },
           "created-data": {
             "type": "array",
             "description": "Created intended configuration against actual.",
             "items": {
               "title": "subtree.manager.createddata.CreatedData",
+              "required": [],
               "properties": {
                 "data": {
                   "type": "string",
@@ -7034,6 +7763,7 @@
             "description": "Updated intended configuration against actual.",
             "items": {
               "title": "subtree.manager.updateddata.UpdatedData",
+              "required": [],
               "properties": {
                 "path-actual": {
                   "type": "string",
@@ -7053,46 +7783,12 @@
                 }
               }
             }
-          },
-          "error-message": {
-            "type": "string",
-            "description": "Error message describing cause of error."
-          },
-          "source-path": {
-            "type": "string",
-            "description": "Source path to data which is put/merged under target nodes."
-          },
-          "deleted-data": {
-            "type": "array",
-            "description": "Removed intended configuration against actual.",
-            "items": {
-              "title": "subtree.manager.deleteddata.DeletedData",
-              "properties": {
-                "data": {
-                  "type": "string",
-                  "description": ""
-                },
-                "path": {
-                  "type": "string",
-                  "description": "Instance-identifier of deleted data node."
-                }
-              }
-            }
-          },
-          "error-type": {
-            "$ref": "#/components/schemas/frinx.types.ErrorType"
-          },
-          "target-path": {
-            "type": "string",
-            "description": "Target path under which data from source paths is put/merged."
-          },
-          "status": {
-            "$ref": "#/components/schemas/frinx.types.OperationResultType"
           }
         },
         "description": ""
       },
       "subtree.manager.calculatesubtreegitlikediff.Input": {
+        "required": [],
         "properties": {
           "source-datastore": {
             "$ref": "#/components/schemas/subtree.manager.SourceDatastore"
@@ -7112,45 +7808,20 @@
         "description": ""
       },
       "subtree.manager.calculatesubtreegitlikediff.Output": {
+        "required": [],
         "properties": {
           "changes": {
             "type": "array",
             "description": "Result of diff between source and target YIID paths in a git like style.",
             "items": {
-              "title": "subtree.manager.subtreegitlikediffoutput.Changes",
-              "properties": {
-                "data": {
-                  "type": "string",
-                  "description": "Result of the changes in a git like style."
-                },
-                "target-path": {
-                  "type": "string",
-                  "description": "Instance-identifier of updated data node showing the relative path."
-                },
-                "source-path": {
-                  "type": "string",
-                  "description": "Instance-identifier of updated data node showing the relative path."
-                },
-                "status": {
-                  "$ref": "#/components/schemas/frinx.types.OperationResultType"
-                }
-              }
+              "type": "string"
             }
-          },
-          "error-type": {
-            "$ref": "#/components/schemas/frinx.types.ErrorType"
-          },
-          "error-message": {
-            "type": "string",
-            "description": "Error message describing cause of error."
-          },
-          "status": {
-            "$ref": "#/components/schemas/frinx.types.OperationResultType"
           }
         },
         "description": ""
       },
       "subtree.manager.copymanytoone.Input": {
+        "required": [],
         "properties": {
           "source-paths": {
             "type": "array",
@@ -7176,6 +7847,7 @@
         "description": ""
       },
       "subtree.manager.copymanytoone.Output": {
+        "required": [],
         "properties": {
           "result": {
             "$ref": "#/components/schemas/frinx.types.OperationResultType"
@@ -7188,6 +7860,7 @@
         "description": ""
       },
       "subtree.manager.copyonetomany.Input": {
+        "required": [],
         "properties": {
           "source-datastore": {
             "$ref": "#/components/schemas/subtree.manager.Datastore"
@@ -7213,6 +7886,7 @@
         "description": ""
       },
       "subtree.manager.copyonetomany.Output": {
+        "required": [],
         "properties": {
           "result": {
             "$ref": "#/components/schemas/frinx.types.OperationResultType"
@@ -7225,6 +7899,7 @@
         "description": ""
       },
       "subtree.manager.copyonetoone.Input": {
+        "required": [],
         "properties": {
           "source-datastore": {
             "$ref": "#/components/schemas/subtree.manager.Datastore"
@@ -7247,6 +7922,7 @@
         "description": ""
       },
       "subtree.manager.copyonetoone.Output": {
+        "required": [],
         "properties": {
           "result": {
             "$ref": "#/components/schemas/frinx.types.OperationResultType"
@@ -7258,7 +7934,19 @@
         },
         "description": ""
       },
+      "template.manager.TagIdentityref": {
+        "type": "string",
+        "enum": [
+          "template-tags:delete",
+          "template-tags:create",
+          "template-tags:merge",
+          "template-tags:replace",
+          "template-tags:update",
+          "template-tags:operation"
+        ]
+      },
       "template.manager.applytemplate.Input": {
+        "required": [],
         "properties": {
           "template-node-id": {
             "type": "string",
@@ -7269,6 +7957,7 @@
             "description": "",
             "items": {
               "title": "template.manager.applytemplateinputfields.UniconfigNode",
+              "required": [],
               "properties": {
                 "uniconfig-node-id": {
                   "type": "string",
@@ -7279,6 +7968,7 @@
                   "description": "List of variables with associated values.",
                   "items": {
                     "title": "template.manager.applytemplateinputfields.uniconfignode.Variable",
+                    "required": [],
                     "properties": {
                       "leaf-list-values": {
                         "type": "array",
@@ -7293,6 +7983,7 @@
                         "description": "",
                         "items": {
                           "title": "template.manager.applytemplateinputfields.uniconfignode.variable.type.typedleafvalues.TypedLeafValues",
+                          "required": [],
                           "properties": {
                             "type": {
                               "type": "string",
@@ -7334,6 +8025,7 @@
         "description": ""
       },
       "template.manager.applytemplate.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -7344,6 +8036,7 @@
             "description": "RPC results per target Uniconfig node to which template is applied.",
             "items": {
               "title": "template.manager.applytemplateoutputfields.NodeResult",
+              "required": [],
               "properties": {
                 "node-id": {
                   "type": "string",
@@ -7369,12 +8062,14 @@
         "description": ""
       },
       "template.manager.createmultipletemplates.Input": {
+        "required": [],
         "properties": {
           "templates": {
             "type": "array",
             "description": "",
             "items": {
               "title": "template.manager.createmultipletemplatesinputfields.Templates",
+              "required": [],
               "properties": {
                 "yang-repository": {
                   "type": "string",
@@ -7390,11 +8085,32 @@
                 }
               }
             }
+          },
+          "tags": {
+            "type": "array",
+            "description": "List of template tags that are additionally written into template configuration.",
+            "items": {
+              "title": "template.manager.createmultipletemplatesinputfields.Tags",
+              "required": [],
+              "properties": {
+                "paths": {
+                  "type": "array",
+                  "description": "List of paths on which tag should be applied to. Paths must be specified as relative\npaths to root 'configuration' container and formatted based on RFC-8040 rules.",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "tag": {
+                  "$ref": "#/components/schemas/template.manager.TagIdentityref"
+                }
+              }
+            }
           }
         },
         "description": ""
       },
       "template.manager.createmultipletemplates.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -7405,6 +8121,7 @@
             "description": "RPC results per target template node.",
             "items": {
               "title": "template.manager.createmultipletemplatesoutputfields.NodeResult",
+              "required": [],
               "properties": {
                 "node-id": {
                   "type": "string",
@@ -7430,6 +8147,7 @@
         "description": ""
       },
       "template.manager.gettemplateinfo.Input": {
+        "required": [],
         "properties": {
           "template-node-id": {
             "type": "string",
@@ -7439,24 +8157,29 @@
         "description": ""
       },
       "template.manager.gettemplateinfo.Output": {
+        "required": [],
         "properties": {
           "variables": {
             "title": "template.manager.gettemplateinfooutputfields.Variables",
+            "required": [],
             "properties": {
               "variable": {
                 "type": "array",
                 "description": "",
                 "items": {
                   "title": "template.manager.gettemplateinfooutputfields.variables.Variable",
+                  "required": [],
                   "properties": {
                     "base-types": {
                       "title": "template.manager.gettemplateinfooutputfields.variables.variable.BaseTypes",
+                      "required": [],
                       "properties": {
                         "base-type": {
                           "type": "array",
                           "description": "",
                           "items": {
                             "title": "template.manager.gettemplateinfooutputfields.variables.variable.basetypes.BaseType",
+                            "required": [],
                             "properties": {
                               "type": {
                                 "type": "string",
@@ -7485,12 +8208,14 @@
                     },
                     "paths": {
                       "title": "template.manager.gettemplateinfooutputfields.variables.variable.Paths",
+                      "required": [],
                       "properties": {
                         "path": {
                           "type": "array",
                           "description": "",
                           "items": {
                             "title": "template.manager.gettemplateinfooutputfields.variables.variable.paths.Path",
+                            "required": [],
                             "properties": {
                               "path": {
                                 "type": "string",
@@ -7523,7 +8248,21 @@
         },
         "description": ""
       },
+      "template.manager.gettemplatenodes.Output": {
+        "required": [],
+        "properties": {
+          "nodes": {
+            "type": "array",
+            "description": "List of template names.",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "description": ""
+      },
       "template.manager.upgradetemplate.Input": {
+        "required": [],
         "properties": {
           "yang-repository": {
             "type": "string",
@@ -7541,6 +8280,7 @@
         "description": ""
       },
       "transaction.log.revertchanges.Input": {
+        "required": [],
         "properties": {
           "ignore-non-existing-nodes": {
             "type": "boolean",
@@ -7548,6 +8288,7 @@
           },
           "target-transactions": {
             "title": "transaction.log.targetuuidsfields.TargetTransactions",
+            "required": [],
             "properties": {
               "transaction": {
                 "type": "array",
@@ -7563,6 +8304,7 @@
         "description": ""
       },
       "transaction.log.revertchanges.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -7570,12 +8312,14 @@
           },
           "revert-output": {
             "title": "transaction.log.revertoutputfields.RevertOutput",
+            "required": [],
             "properties": {
               "result": {
                 "type": "array",
                 "description": "Result of reverted changes.",
                 "items": {
                   "title": "transaction.log.revertresults.Result",
+                  "required": [],
                   "properties": {
                     "transaction-id": {
                       "type": "string",
@@ -7620,9 +8364,11 @@
         ]
       },
       "uniconfig.manager.calculatediff.Input": {
+        "required": [],
         "properties": {
           "target-nodes": {
             "title": "uniconfig.manager.targetuniconfigunistorenodesfields.TargetNodes",
+            "required": [],
             "properties": {
               "node": {
                 "type": "array",
@@ -7638,6 +8384,7 @@
         "description": ""
       },
       "uniconfig.manager.calculatediff.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -7645,12 +8392,14 @@
           },
           "node-results": {
             "title": "uniconfig.manager.calculatediffoutputfields.NodeResults",
+            "required": [],
             "properties": {
               "node-result": {
                 "type": "array",
                 "description": "Differences between intended and actual uniconfig node.",
                 "items": {
                   "title": "uniconfig.manager.nodecalculatediffresults.NodeResult",
+                  "required": [],
                   "properties": {
                     "node-id": {
                       "type": "string",
@@ -7661,6 +8410,7 @@
                       "description": "Created intended configuration against actual.",
                       "items": {
                         "title": "uniconfig.manager.nodecalculatediffresults.noderesult.CreatedData",
+                        "required": [],
                         "properties": {
                           "data": {
                             "type": "string",
@@ -7682,6 +8432,7 @@
                       "description": "Updated intended configuration against actual.",
                       "items": {
                         "title": "uniconfig.manager.nodecalculatediffresults.noderesult.UpdatedData",
+                        "required": [],
                         "properties": {
                           "path": {
                             "type": "string",
@@ -7703,6 +8454,7 @@
                       "description": "Removed intended configuration against actual.",
                       "items": {
                         "title": "uniconfig.manager.nodecalculatediffresults.noderesult.DeletedData",
+                        "required": [],
                         "properties": {
                           "data": {
                             "type": "string",
@@ -7726,6 +8478,7 @@
                       "description": "Reordered intended list against actual.",
                       "items": {
                         "title": "uniconfig.manager.nodecalculatediffresults.noderesult.ReorderedLists",
+                        "required": [],
                         "properties": {
                           "path": {
                             "type": "string",
@@ -7755,9 +8508,11 @@
         "description": ""
       },
       "uniconfig.manager.calculategitlikediff.Input": {
+        "required": [],
         "properties": {
           "target-nodes": {
             "title": "uniconfig.manager.targetuniconfigunistorenodesfields.TargetNodes",
+            "required": [],
             "properties": {
               "node": {
                 "type": "array",
@@ -7773,6 +8528,7 @@
         "description": ""
       },
       "uniconfig.manager.calculategitlikediff.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -7780,18 +8536,21 @@
           },
           "node-results": {
             "title": "uniconfig.manager.calculategitlikediffoutputfields.NodeResults",
+            "required": [],
             "properties": {
               "node-result": {
                 "type": "array",
                 "description": "Differences between intended and actual uniconfig node in a git like style.",
                 "items": {
                   "title": "uniconfig.manager.nodecalculategitlikediffresults.NodeResult",
+                  "required": [],
                   "properties": {
                     "changes": {
                       "type": "array",
                       "description": "All changes that happened between intended and actual uniconfig node",
                       "items": {
                         "title": "uniconfig.manager.nodechanges.Changes",
+                        "required": [],
                         "properties": {
                           "data": {
                             "type": "string",
@@ -7831,6 +8590,7 @@
         "description": ""
       },
       "uniconfig.manager.checkedcommit.Input": {
+        "required": [],
         "properties": {
           "do-rollback": {
             "type": "boolean",
@@ -7838,6 +8598,7 @@
           },
           "target-nodes": {
             "title": "uniconfig.manager.targetuniconfigunistorenodesfields.TargetNodes",
+            "required": [],
             "properties": {
               "node": {
                 "type": "array",
@@ -7853,6 +8614,7 @@
         "description": ""
       },
       "uniconfig.manager.checkedcommit.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -7860,12 +8622,14 @@
           },
           "node-results": {
             "title": "uniconfig.manager.commitoutputfields.NodeResults",
+            "required": [],
             "properties": {
               "node-result": {
                 "type": "array",
                 "description": "Result of configuration and rollback on the given node.\nRollback status is empty if rollback was not executed.",
                 "items": {
                   "title": "uniconfig.manager.nodeconfigresults.NodeResult",
+                  "required": [],
                   "properties": {
                     "configuration-status": {
                       "$ref": "#/components/schemas/frinx.types.OperationResultType"
@@ -7901,6 +8665,7 @@
         "description": ""
       },
       "uniconfig.manager.commit.Input": {
+        "required": [],
         "properties": {
           "do-confirmed-commit": {
             "type": "boolean",
@@ -7912,6 +8677,7 @@
           },
           "target-nodes": {
             "title": "uniconfig.manager.targetnodesfields.TargetNodes",
+            "required": [],
             "properties": {
               "node": {
                 "type": "array",
@@ -7923,6 +8689,10 @@
             },
             "description": ""
           },
+          "skip-unreachable-nodes": {
+            "type": "boolean",
+            "description": "Option to skip nodes, that are unreachable at the time of commit. Other nodes will be commited"
+          },
           "do-validate": {
             "type": "boolean",
             "description": "Option to enable/disable validation at commit. Default value is true - validate"
@@ -7931,6 +8701,7 @@
         "description": ""
       },
       "uniconfig.manager.commit.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -7938,12 +8709,14 @@
           },
           "node-results": {
             "title": "uniconfig.manager.commitoutputfields.NodeResults",
+            "required": [],
             "properties": {
               "node-result": {
                 "type": "array",
                 "description": "Result of configuration and rollback on the given node.\nRollback status is empty if rollback was not executed.",
                 "items": {
                   "title": "uniconfig.manager.nodeconfigresults.NodeResult",
+                  "required": [],
                   "properties": {
                     "configuration-status": {
                       "$ref": "#/components/schemas/frinx.types.OperationResultType"
@@ -7978,7 +8751,156 @@
         },
         "description": ""
       },
+      "uniconfig.manager.compareconfig.Input": {
+        "required": [],
+        "properties": {
+          "check-timestamp": {
+            "type": "boolean",
+            "description": "Perform timestamp comparison(last known to Uniconfig vs current timestamp on device)\nbefore loading all configuration from a device."
+          },
+          "target-nodes": {
+            "title": "uniconfig.manager.targetuniconfigunistorenodesfields.TargetNodes",
+            "required": [],
+            "properties": {
+              "node": {
+                "type": "array",
+                "description": "",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "description": ""
+      },
+      "uniconfig.manager.compareconfig.Output": {
+        "required": [],
+        "properties": {
+          "error-message": {
+            "type": "string",
+            "description": "Error message that describe overall problem."
+          },
+          "node-results": {
+            "title": "uniconfig.manager.compareconfigoutputfields.NodeResults",
+            "required": [],
+            "properties": {
+              "node-result": {
+                "type": "array",
+                "description": "Differences between intended and actual uniconfig node.",
+                "items": {
+                  "title": "uniconfig.manager.nodecalculatediffresults.NodeResult",
+                  "required": [],
+                  "properties": {
+                    "node-id": {
+                      "type": "string",
+                      "description": ""
+                    },
+                    "created-data": {
+                      "type": "array",
+                      "description": "Created intended configuration against actual.",
+                      "items": {
+                        "title": "uniconfig.manager.nodecalculatediffresults.noderesult.CreatedData",
+                        "required": [],
+                        "properties": {
+                          "data": {
+                            "type": "string",
+                            "description": ""
+                          },
+                          "path": {
+                            "type": "string",
+                            "description": "Instance-identifier of created data node."
+                          }
+                        }
+                      }
+                    },
+                    "error-message": {
+                      "type": "string",
+                      "description": "Error message describing cause of error."
+                    },
+                    "updated-data": {
+                      "type": "array",
+                      "description": "Updated intended configuration against actual.",
+                      "items": {
+                        "title": "uniconfig.manager.nodecalculatediffresults.noderesult.UpdatedData",
+                        "required": [],
+                        "properties": {
+                          "path": {
+                            "type": "string",
+                            "description": "Instance-identifier of updated data node."
+                          },
+                          "data-intended": {
+                            "type": "string",
+                            "description": ""
+                          },
+                          "data-actual": {
+                            "type": "string",
+                            "description": ""
+                          }
+                        }
+                      }
+                    },
+                    "deleted-data": {
+                      "type": "array",
+                      "description": "Removed intended configuration against actual.",
+                      "items": {
+                        "title": "uniconfig.manager.nodecalculatediffresults.noderesult.DeletedData",
+                        "required": [],
+                        "properties": {
+                          "data": {
+                            "type": "string",
+                            "description": ""
+                          },
+                          "path": {
+                            "type": "string",
+                            "description": "Instance-identifier of deleted data node."
+                          }
+                        }
+                      }
+                    },
+                    "error-type": {
+                      "$ref": "#/components/schemas/frinx.types.ErrorType"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/frinx.types.OperationResultType"
+                    },
+                    "reordered-lists": {
+                      "type": "array",
+                      "description": "Reordered intended list against actual.",
+                      "items": {
+                        "title": "uniconfig.manager.nodecalculatediffresults.noderesult.ReorderedLists",
+                        "required": [],
+                        "properties": {
+                          "path": {
+                            "type": "string",
+                            "description": "Instance-identifier of reordered list."
+                          },
+                          "intended-list-keys": {
+                            "type": "string",
+                            "description": ""
+                          },
+                          "actual-list-keys": {
+                            "type": "string",
+                            "description": ""
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Individual result of configuration comparison for given nodes."
+          },
+          "overall-status": {
+            "$ref": "#/components/schemas/frinx.types.OperationResultType"
+          }
+        },
+        "description": ""
+      },
       "uniconfig.manager.health.Output": {
+        "required": [],
         "properties": {
           "message": {
             "type": "string",
@@ -7992,9 +8914,11 @@
         "description": ""
       },
       "uniconfig.manager.isinsync.Input": {
+        "required": [],
         "properties": {
           "target-nodes": {
             "title": "uniconfig.manager.targetuniconfignodesfields.TargetNodes",
+            "required": [],
             "properties": {
               "node": {
                 "type": "array",
@@ -8010,6 +8934,7 @@
         "description": ""
       },
       "uniconfig.manager.isinsync.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -8017,12 +8942,14 @@
           },
           "node-results": {
             "title": "uniconfig.manager.isinsyncoutputfields.NodeResults",
+            "required": [],
             "properties": {
               "node-result": {
                 "type": "array",
                 "description": "Result of is-in-sync operation on the given node.",
                 "items": {
                   "title": "uniconfig.manager.nodeisinsyncresults.NodeResult",
+                  "required": [],
                   "properties": {
                     "node-id": {
                       "type": "string",
@@ -8055,9 +8982,11 @@
         "description": ""
       },
       "uniconfig.manager.replaceconfigwithoperational.Input": {
+        "required": [],
         "properties": {
           "target-nodes": {
             "title": "uniconfig.manager.targetuniconfigunistorenodesfields.TargetNodes",
+            "required": [],
             "properties": {
               "node": {
                 "type": "array",
@@ -8073,6 +9002,7 @@
         "description": ""
       },
       "uniconfig.manager.replaceconfigwithoperational.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -8080,12 +9010,14 @@
           },
           "node-results": {
             "title": "uniconfig.manager.replaceconfigwithoperationaloutputfields.NodeResults",
+            "required": [],
             "properties": {
               "node-result": {
                 "type": "array",
                 "description": "Result of replace-config-with-operational on actual uniconfig node.",
                 "items": {
                   "title": "uniconfig.manager.nodereplaceconfigwithoperationalresults.NodeResult",
+                  "required": [],
                   "properties": {
                     "node-id": {
                       "type": "string",
@@ -8114,6 +9046,7 @@
         "description": ""
       },
       "uniconfig.manager.syncfromnetwork.Input": {
+        "required": [],
         "properties": {
           "check-timestamp": {
             "type": "boolean",
@@ -8121,6 +9054,7 @@
           },
           "target-nodes": {
             "title": "uniconfig.manager.targetuniconfignodesfields.TargetNodes",
+            "required": [],
             "properties": {
               "node": {
                 "type": "array",
@@ -8131,15 +9065,12 @@
               }
             },
             "description": ""
-          },
-          "finish-install": {
-            "type": "boolean",
-            "description": "If this sync should mount devices and sync config for nodes that were installed without sync."
           }
         },
         "description": ""
       },
       "uniconfig.manager.syncfromnetwork.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -8147,12 +9078,14 @@
           },
           "node-results": {
             "title": "uniconfig.manager.syncfromnetworkoutputfields.NodeResults",
+            "required": [],
             "properties": {
               "node-result": {
                 "type": "array",
                 "description": "Result of synchronization of configuration from network element\nto actual uniconfig node.",
                 "items": {
                   "title": "uniconfig.manager.nodesyncresults.NodeResult",
+                  "required": [],
                   "properties": {
                     "node-id": {
                       "type": "string",
@@ -8181,10 +9114,15 @@
         "description": ""
       },
       "uniconfig.manager.synctonetwork.Input": {
+        "required": [],
         "properties": {
           "check-timestamp": {
             "type": "boolean",
             "description": "Perform timestamp comparison(last known to Uniconfig vs current timestamp on device)\nbefore loading all configuration from a device."
+          },
+          "skip-unreachable-nodes": {
+            "type": "boolean",
+            "description": "Option to skip nodes, that are unreachable at the time of commit. Other nodes will be commited"
           },
           "do-validate": {
             "type": "boolean",
@@ -8200,6 +9138,7 @@
           },
           "target-nodes": {
             "title": "uniconfig.manager.targetuniconfignodesfields.TargetNodes",
+            "required": [],
             "properties": {
               "node": {
                 "type": "array",
@@ -8210,15 +9149,12 @@
               }
             },
             "description": ""
-          },
-          "finish-install": {
-            "type": "boolean",
-            "description": "If this sync should mount devices and sync config for nodes that were installed without sync."
           }
         },
         "description": ""
       },
       "uniconfig.manager.synctonetwork.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -8226,12 +9162,14 @@
           },
           "node-results": {
             "title": "uniconfig.manager.synctonetworkoutputfields.NodeResults",
+            "required": [],
             "properties": {
               "node-result": {
                 "type": "array",
                 "description": "Result of synchronization of configuration to network element\nfrom actual uniconfig node.",
                 "items": {
                   "title": "uniconfig.manager.nodesynctonetworkresults.NodeResult",
+                  "required": [],
                   "properties": {
                     "node-id": {
                       "type": "string",
@@ -8260,9 +9198,11 @@
         "description": ""
       },
       "uniconfig.manager.validate.Input": {
+        "required": [],
         "properties": {
           "target-nodes": {
             "title": "uniconfig.manager.targetuniconfignodesfields.TargetNodes",
+            "required": [],
             "properties": {
               "node": {
                 "type": "array",
@@ -8278,6 +9218,7 @@
         "description": ""
       },
       "uniconfig.manager.validate.Output": {
+        "required": [],
         "properties": {
           "error-message": {
             "type": "string",
@@ -8285,12 +9226,14 @@
           },
           "node-results": {
             "title": "uniconfig.manager.validateoutputfields.NodeResults",
+            "required": [],
             "properties": {
               "node-result": {
                 "type": "array",
                 "description": "Result of configuration validation for actual uniconfig node.",
                 "items": {
                   "title": "uniconfig.manager.nodevalidateresults.NodeResult",
+                  "required": [],
                   "properties": {
                     "node-id": {
                       "type": "string",
@@ -8319,6 +9262,7 @@
         "description": ""
       },
       "uniconfig.query.queryconfig.Input": {
+        "required": [],
         "properties": {
           "jsonb-path-query": {
             "type": "string",
@@ -8336,6 +9280,7 @@
         "description": ""
       },
       "uniconfig.query.queryconfig.Output": {
+        "required": [],
         "properties": {
           "config": {
             "type": "array",
