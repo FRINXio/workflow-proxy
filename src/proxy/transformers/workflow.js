@@ -37,12 +37,7 @@ export const getRunningBefore: BeforeFun = (
   proxyCallback();
 };
 
-export const getPathBefore: BeforeFun = (
-  identity,
-  req,
-  res,
-  proxyCallback,
-) => {
+export const getPathBefore: BeforeFun = (identity, req, res, proxyCallback) => {
   // No RBAC required, this is just list of IDs, no need to filter them
   proxyCallback();
 };
