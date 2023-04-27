@@ -143,9 +143,8 @@ const NETWORK_ADMIN_GROUP = (process.env.ADMIN_ACCESS_ROLE || 'network-admin')
 const NETWORK_OWNER = OWNER_ROLE.concat(NETWORK_ADMIN_GROUP);
 
 export const adminAccess: AuthorizationCheck = (identity) => {
-  return (
-    identity.roles.filter((value) => NETWORK_OWNER.includes(value)).length >
-      0 ||
-    identity.groups.filter((value) => NETWORK_OWNER.includes(value)).length > 0
-  );
+  console.error(`SIMON DEBUG: identity.roles: ${identity.roles} identity.groups: ${identity.groups} network-owner: ${NETWORK_OWNER}`);
+  let caute = identity.roles.filter((value) => NETWORK_OWNER.includes(value.trim())).length > 0 || identity.groups.filter((value) => NETWORK_OWNER.includes(value.trim())).length > 0;
+  console.error(`SIMON DEBUG: caute: ${caute}`);
+  return caute;
 };
