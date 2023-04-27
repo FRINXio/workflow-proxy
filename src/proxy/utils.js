@@ -76,7 +76,7 @@ export function getUserRoles(req: ExpressRequest): Promise<string[]> {
   if (userRole == null) {
     return [];
   }
-  return userRole.split(',').map(element => {
+  return userRole.split(',').map((element) => {
     return element.trim();
   });
 }
@@ -87,7 +87,7 @@ export function getUserGroups(req: ExpressRequest): Promise<string[]> {
     return [];
   }
 
-  return userGroup.split(',').map(element => {
+  return userGroup.split(',').map((element) => {
     return element.trim();
   });
 }
