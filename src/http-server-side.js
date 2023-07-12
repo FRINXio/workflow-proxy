@@ -32,6 +32,7 @@ function makeOptions(
     // setting `json: true` would help by automatically converting, but it adds
     // `Accept: application/json` header that triggers conductor's bug #376,
     // see https://github.com/Netflix/conductor/issues/376
+    timeout: process.env.CLIENT_TIMEOUT ?? 15000,
   };
   // If body is empty object, convert it to null.
   // Otherwise the http library will send a request
