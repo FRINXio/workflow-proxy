@@ -70,6 +70,9 @@ const proxyTarget = process.env.PROXY_TARGET || 'http://conductor-server:8080';
 const schellarTarget = process.env.SCHELLAR_TARGET || 'http://schellar:3000';
 const tenantProxyUrl = 'http://localhost:8088/proxy/';
 
+const serverTimeout = process.env.SERVER_TIMEOUT ?? 20000;
+const serverKeepAliveTimeout = process.env.SERVER_KEEP_ALIVE_TIMEOUT ?? 20000;
+
 /*
 TODO: merge conductor proxy with tenant / rbac proxy
 TODO: do not make a real HTTP call between rbac_proxy and proxy (extract the functionality from express server if possible)
@@ -218,7 +221,10 @@ async function init() {
   app.get('/probe/readiness', (req, res) => {
     res.sendStatus(200);
   });
-  app.listen(userFacingPort);
+
+  const server = app.listen(userFacingPort);
+  server.timeout = serverTimeout;
+  server.keepAliveTimeout = serverKeepAliveTimeout;
 }
 
 init();
