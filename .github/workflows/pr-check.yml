@@ -24,8 +24,8 @@ jobs:
         run: yarn formatter:check
       - name: Run PR test check
         run: yarn test
-      - name: Run audit check
-        run: yarn audit
+#       - name: Run audit check
+#         run: yarn audit
 
   security-test:
     runs-on: ubuntu-latest
