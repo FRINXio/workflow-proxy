@@ -12,6 +12,8 @@ RUN yarn run transpile
 
 FROM node:19-alpine
 
+ARG git_commit=unspecified
+LABEL git_commit="${git_commit}"
 LABEL org.opencontainers.image.source="https://github.com/FRINXio/workflow-proxy"
 
 RUN apk update && apk upgrade && rm -rf /var/cache/apt/*
