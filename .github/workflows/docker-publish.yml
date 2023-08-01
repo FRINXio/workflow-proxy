@@ -28,7 +28,7 @@ jobs:
           fetch-depth: 0
 
       - name: Build image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+        run: docker build . --file Dockerfile --build-arg git_commit=$(git rev-parse HEAD) --tag $IMAGE_NAME
 
       # - uses: Azure/container-scan@v0
       #   with:
