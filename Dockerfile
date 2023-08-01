@@ -12,6 +12,8 @@ RUN yarn run transpile
 
 FROM node:19-alpine
 
+LABEL org.opencontainers.image.source="https://github.com/FRINXio/workflow-proxy"
+
 RUN apk update && apk upgrade && rm -rf /var/cache/apt/*
 WORKDIR /app/workflow-proxy
 
